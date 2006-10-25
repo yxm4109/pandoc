@@ -61,6 +61,12 @@ install: build
 
 	dh_haskell -a
 
+	# Hack!  Cabal builds executables while building libraries.  Move these
+	# files to top dir where the Makefile install target expects to find.
+	# See "BUGS" section at the following document:
+	# http://www.n-heptane.com/nhlab/repos/cabalDebianTemplate/INSTRUCTIONS.txt
+	find debian/libghc6-$(THIS)-dev -type d -name 'bin' -true | \
+		while read bin; do mv $$bin/* .; rm -rf $$bin; done
 	$(MAKE) install
 
 build-indep: build-indep-stamp

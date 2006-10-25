@@ -1,29 +1,30 @@
 # Makefile for Pandoc.
 
-CABAL       := Pandoc.cabal
+CABAL     := Pandoc.cabal
 
 #-------------------------------------------------------------------------------
 # Cabal constants
 #-------------------------------------------------------------------------------
-NAME        := $(shell sed -ne 's/^[Nn]ame:[[:space:]]*//p' $(CABAL).in)
-THIS        := $(shell echo $(NAME) | tr A-Z a-z)
-VERSION     := $(shell sed -ne 's/^[Vv]ersion:[[:space:]]*//p' $(CABAL).in)
+NAME      := $(shell sed -ne 's/^[Nn]ame:[[:space:]]*//p' $(CABAL).in)
+THIS      := $(shell echo $(NAME) | tr A-Z a-z)
+VERSION   := $(shell sed -ne 's/^[Vv]ersion:[[:space:]]*//p' $(CABAL).in)
+BINS      := $(shell sed -ne 's/^[Ee]xecutable:[[:space:]]*//p' $(CABAL).in)
 
 #-------------------------------------------------------------------------------
 # Variables to setup through environment
 #-------------------------------------------------------------------------------
-PREFIX      ?= /usr/local
-DESTDIR     ?=
+PREFIX    ?= /usr/local
+DESTDIR   ?=
 
 #-------------------------------------------------------------------------------
 # Constant names and commands in source tree
 #-------------------------------------------------------------------------------
-SRCDIR      := src
-MANDIR      := man
-BUILDDIR    := dist
-BUILDCONF   := .setup-config
-BUILDCMD    := runhaskell Setup.hs
-CONFIGURE   := configure
+SRCDIR    := src
+MANDIR    := man
+BUILDDIR  := dist
+BUILDCONF := .setup-config
+BUILDCMD  := runhaskell Setup.hs
+CONFIGURE := configure
 
 #-------------------------------------------------------------------------------
 # Installation paths
@@ -77,14 +78,11 @@ html/: configure
 	-rm -rf html
 	$(BUILDCMD) haddock && mv $(BUILDDIR)/doc/html .
 
-# All compiled files should be cleaned.
 cleanup_files+=$(BINS)
-
-BINS+=$(THIS)
-cleanup_files+=$(SRCDIR)/Main.o $(SRCDIR)/Main.h[io]
-$(THIS): build
-	$(GHC) $(HCFLAGS) --make -static -i$(SRCDIR) $(SRCDIR)/Main.hs -o $@
-# Other binary builds should follow here.
+$(BINS): build
+	# Ugly kludge to seperate program and library installations.
+	# Leave the library installation to Cabal ('install-lib' target).
+	find $(BUILDDIR) -type f -name "$(BINS)" -perm +a=x -exec mv {} . \;
 
 # XXX: Note that we don't handle PREFIX correctly at the install-* stages,
 # i.e. any PREFIX given at the configuration time is lost, unless it is
