@@ -1,0 +1,33 @@
+#!/bin/sh
+
+BASE_DEPENDS="base haskell98 parsec"
+
+GHC64_DEPENDS=${GHC64_DEPENDS}
+GHC66_DEPENDS=${GHC66_DEPENDS-"regex-compat html"}
+HCFLAGS=${HCFLAGS-"-O0"}
+EXECUTABLE=${EXECUTABLE-"pandoc"}
+
+set -- $(ghc --version)
+while [ -n "$1" ] && [ "$1" != 'version' ]; do
+	shift
+done
+shift
+ghc_version="$1"
+
+BUILD_DEPENDS="${BASE_DEPENDS}"
+case "$ghc_version" in
+6.4*)
+	BUILD_DEPENDS="${BUILD_DEPENDS} ${GHC64_DEPENDS}"
+	;;
+6.[56]*)
+	BUILD_DEPENDS="${BUILD_DEPENDS} ${GHC66_DEPENDS}"
+	;;
+*)
+	echo >&2 "$0: unsupported GHC version '$ghc_version'; aborting"
+	exit 1
+	;;
+esac
+BUILD_DEPENDS=$(echo "$BUILD_DEPENDS" | awk 'BEGIN { OFS=", " } { NF=NF; print }')
+
+sed -e "s#@HCFLAGS@#$HCFLAGS#g" \
+    -e "s#@BUILD_DEPENDS@#$BUILD_DEPENDS#g"
