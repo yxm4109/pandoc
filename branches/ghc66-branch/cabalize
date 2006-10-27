@@ -27,7 +27,7 @@ case "$ghc_version" in
 	exit 1
 	;;
 esac
-BUILD_DEPENDS=$(echo "$BUILD_DEPENDS" | awk 'BEGIN { OFS=", " } { NF=NF; print }')
+BUILD_DEPENDS=$(echo "$BUILD_DEPENDS" | sed -e 's# \+#, #g')
 
 sed -e "s#@HCFLAGS@#$HCFLAGS#g" \
     -e "s#@BUILD_DEPENDS@#$BUILD_DEPENDS#g"
