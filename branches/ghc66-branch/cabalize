@@ -28,7 +28,7 @@ case "$ghc_version" in
 esac
 BUILD_DEPENDS=$(echo "$BUILD_DEPENDS" | sed -e 's# \+#, #g')
 
-# Handle 'Hs-Source-Dir' which was deprecated in Cabal 1.1.4
+# Handle 'Hs-Source-Dir' option name which was deprecated in Cabal 1.1.4.
 HS_SOURCE_DIRS='Hs-Source-Dirs'
 if ghc-pkg -l | grep -q '\<[Cc]abal-[0-1]\.[0-1]\.[0-3][^,]*'; then
 	HS_SOURCE_DIRS='Hs-Source-Dir'
@@ -36,4 +36,4 @@ fi
 
 sed -e "s#@HCFLAGS@#$HCFLAGS#g" \
     -e "s#@BUILD_DEPENDS@#$BUILD_DEPENDS#g" \
-    -e "s#^[Hh]s-[Ss]ource-[Dd]ir[s]*#$HS_SOURCE_DIRS#g"
+    -e "s#@HS_SOURCE_DIRS@#$HS_SOURCE_DIRS#g"

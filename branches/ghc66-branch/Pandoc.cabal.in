@@ -9,7 +9,7 @@ Synopsis:        Utilities for translating between various markup formats
 Description:     Haskell utilities for translating between markdown, HTML,
                  reStructuredText, LaTeX, and RTF
 Build-Depends:	 @BUILD_DEPENDS@
-Hs-Source-Dirs:  src
+@HS_SOURCE_DIRS@: src
 Exposed-Modules: Text.ParserCombinators.Pandoc,
                  Text.Pandoc.ASCIIMathML,
 	         Text.Pandoc.Definition,
@@ -30,6 +30,6 @@ Exposed-Modules: Text.ParserCombinators.Pandoc,
 Ghc-Options:     @HCFLAGS@
 
 Executable:      pandoc
-Hs-Source-Dirs:  src
+@HS_SOURCE_DIRS@: src
 Main-Is:         Main.hs
 Ghc-Options:     @HCFLAGS@
