@@ -5,7 +5,6 @@ BASE_DEPENDS="base haskell98 parsec"
 GHC64_DEPENDS=${GHC64_DEPENDS}
 GHC66_DEPENDS=${GHC66_DEPENDS-"regex-compat html"}
 HCFLAGS=${HCFLAGS-"-O0"}
-EXECUTABLE=${EXECUTABLE-"pandoc"}
 
 set -- $(ghc --version)
 while [ -n "$1" ] && [ "$1" != 'version' ]; do
