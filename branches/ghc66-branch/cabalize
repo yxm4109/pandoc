@@ -22,11 +22,18 @@ case "$ghc_version" in
 	BUILD_DEPENDS="${BUILD_DEPENDS} ${GHC66_DEPENDS}"
 	;;
 *)
-	echo >&2 "$0: unsupported GHC version '$ghc_version'; aborting"
-	exit 1
+	echo >&2 "WARNING: Unsupported GHC version '$ghc_version'; proceeding anyway"
+	break
 	;;
 esac
 BUILD_DEPENDS=$(echo "$BUILD_DEPENDS" | sed -e 's# \+#, #g')
 
+# Handle 'Hs-Source-Dir' which was deprecated in Cabal 1.1.4
+HS_SOURCE_DIRS='Hs-Source-Dirs'
+if ghc-pkg -l | grep -q '\<[Cc]abal-[0-1]\.[0-1]\.[0-3][^,]*'; then
+	HS_SOURCE_DIRS='Hs-Source-Dir'
+fi
+
 sed -e "s#@HCFLAGS@#$HCFLAGS#g" \
-    -e "s#@BUILD_DEPENDS@#$BUILD_DEPENDS#g"
+    -e "s#@BUILD_DEPENDS@#$BUILD_DEPENDS#g" \
+    -e "s#^[Hh]s-[Ss]ource-[Dd]ir[s]*#$HS_SOURCE_DIRS#g"
