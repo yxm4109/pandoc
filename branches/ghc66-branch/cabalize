@@ -26,7 +26,7 @@ case "$ghc_version" in
 	break
 	;;
 esac
-BUILD_DEPENDS=$(echo "$BUILD_DEPENDS" | sed -e 's# \+#, #g')
+BUILD_DEPENDS=$(echo $BUILD_DEPENDS | sed -e 's# \+#, #g')
 
 # Handle 'Hs-Source-Dir' option name which was deprecated in Cabal 1.1.4.
 HS_SOURCE_DIRS='Hs-Source-Dirs'
