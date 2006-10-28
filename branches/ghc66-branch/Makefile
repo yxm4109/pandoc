@@ -101,8 +101,10 @@ man_all:=$(patsubst $(MANDIR)/%,%,$(wildcard $(MANDIR)/man?/*.1))
 cleanup_files+=README.html
 install-doc: $(doc_all)
 	$(INSTALL) -d $(DOCPATH) && $(INSTALL_DATA) $(doc_all) $(DOCPATH)/
-	$(INSTALL) -d $(MANPATH); \
-	for f in $(man_all); do $(INSTALL_DATA) -D $(MANDIR)/$$f $(MANPATH)/$$f; done
+	for f in $(man_all); do \
+		$(INSTALL) -d $(MANPATH)/$$(dirname $$f); \
+		$(INSTALL_DATA) $(MANDIR)/$$f $(MANPATH)/$$f; \
+	done
 uninstall-doc:
 	-for f in $(doc_all); do rm -f $(DOCPATH)/$$f; done
 	-for f in $(man_all); do rm -f $(MANPATH)/$$f; done
