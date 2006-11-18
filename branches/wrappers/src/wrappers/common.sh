@@ -31,7 +31,7 @@ _iconv () {
 }
 
 safein () {
-    _iconv "$1" -t utf-8
+    _iconv -t utf-8 "$1"
 }
 
 safeout () {
