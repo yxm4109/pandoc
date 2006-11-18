@@ -1,0 +1,33 @@
+.TH PANDOC 1 "November 1, 2006" Linux "User Manuals"
+.SH NAME
+markdown2html \- converts markdown-formatted text to HTML 
+.SH SYNOPSIS
+\fBmarkdown2html\fR [ \fIinput-files\fR ]
+.SH DESCRIPTION
+\fBmarkdown2html\fR converts \fIinput-files\fR 
+(or text from STDIN) from markdown-formatted plain text to HTML. 
+If multiple files are specified, they will be combined to make a single
+HTML document.
+.PP
+\fBmarkdown2html\fR is a wrapper for \fBpandoc\fR.
+.SH OPTIONS
+.TP
+.B \-\-
+Any options appearing after ` \-\- ' on the command line will be passed
+directly to \fBpandoc\fR.  See \fBpandoc\fR(1) for a list of options
+that may be used.  Options specified in this way will override
+PANDOC_OPTS (see below).  Example:
+.IP
+markdown2html input.txt -- --css=main.css -S
+.SH ENVIRONMENT
+Any command-line options contained in the PANDOC_OPTS environment variable
+will be passed directly to \fBpandoc\fR.  See \fBpandoc\fR(1)
+for a list of options that may be used.
+.SH "SEE ALSO"
+\fBpandoc\fR(1),
+\fBhtml2markdown\fR(1),
+\fBmarkdown2latex\fR(1),
+\fBlatex2markdown\fR(1),
+\fBmarkdown2pdf\fR(1)
+.SH AUTHOR
+John MacFarlane
