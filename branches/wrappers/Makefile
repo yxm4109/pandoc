@@ -24,7 +24,8 @@ MAIN      := $(firstword $(EXECS))
 #-------------------------------------------------------------------------------
 # Install targets
 #-------------------------------------------------------------------------------
-PROGS     := $(EXECS) html2markdown markdown2html latex2markdown markdown2latex markdown2pdf
+WRAPPERS  := $(notdir $(basename $(wildcard $(SRCDIR)/wrappers/*.in)))
+PROGS     := $(EXECS) $(WRAPPERS)
 DOCS      := README.html README BUGS TODO
 
 #-------------------------------------------------------------------------------
@@ -86,6 +87,22 @@ templates: $(SRCDIR)/templates
 $(SRCDIR)/templates:
 	$(MAKE) -C $(SRCDIR)/templates
 
+.PHONY: wrappers
+wrappers: $(WRAPPERS)
+wrapper_deps := $(wildcard $(SRCDIR)/wrappers/*.sh)
+cleanup_files+=$(WRAPPERS)
+%: $(SRCDIR)/wrappers/%.in $(wrapper_deps)
+	@echo "Updating $@...";                        \
+	awk '                                          \
+		/^### / {                              \
+			t = "$(SRCDIR)/wrappers/"$$2;  \
+			while (getline line < t > 0)   \
+				print line;            \
+			next;                          \
+		}                                      \
+		{ print }                              \
+	' <$< >$@
+
 cleanup_files+=$(CABAL)
 $(CABAL): cabalize $(CABAL).in
 	./cabalize <$(CABAL).in >$(CABAL)
@@ -104,7 +121,7 @@ build: templates configure
 	$(BUILDCMD) build
 
 .PHONY: build-exec
-build-exec: $(EXECS)
+build-exec: $(PROGS)
 cleanup_files+=$(EXECS)
 $(EXECS): build
 	for f in $@; do \

@@ -1,73 +1,119 @@
 #!/bin/sh
 # converts markdown to latex, then uses latex to make a PDF
 
-pathfind () { # portable which(1), code taken from Debian Developer's Reference
-    OLDIFS="$IFS"
+REQUIRED=pdflatex
+
+THIS=${0##*/}
+
+# Portable which(1).
+pathfind () {
+    ifs_save="$IFS"
     IFS=:
     for _p in $PATH; do
-        if [ -x "$_p/$*" ]; then
+        if [ -x "$_p/$*" ] && [ -f "$_p/$*" ]; then
             IFS="$OLDIFS"
             return 0
         fi
     done
-    IFS="$OLDIFS"
+    IFS="$ifs_save"
     return 1
 }
 
-for p in pandoc pdflatex; do
+_iconv () {
+    if [ -z "$ICONV_AVAIL" ] || pathfind iconv; then
+	ICONV_AVAIL=yes
+    fi
+
+    if [ -z "$1" ]; then
+	set --
+    fi
+
+    if [ "$ICONV_AVAIL" = "yes" ]; then
+	iconv "$@"
+    else
+	cat "$1"
+    fi
+}
+
+safein () {
+    _iconv "$1" -t utf-8
+}
+
+safeout () {
+    if [ -z "$1" ]; then
+	_iconv -f utf-8
+	return
+    fi
+
+    if [ -z "$2" ]; then
+	src=${TMPDIR-/tmp}/${THIS}.$$
+	dest="$1"
+	trap "status=$?; rm -rf $src; exit $status" EXIT INT TERM
+	_iconv -f utf-8 >$src
+    else
+	src="$1"
+	dest="$2"
+    fi
+
+    is_target_exists=
+    if [ -f "$dest" ]; then
+	is_target_exists=1
+	mv -f "$dest" "$dest~"
+    fi
+
+    mv -f "$src" "$dest"
+
+    printf "Created $dest" >&2
+    [ -z "$is_target_exists" ] || {
+	printf " (previous file has been backed up as '$dest~')" >&2
+    }
+    echo >&2 .
+}
+
+for p in pandoc $REQUIRED; do
     pathfind $p || {
         echo >&2 "You need '$p' to use this program!"
         exit 1
     }
 done
 
-ALL="$*"
-ARGS=${ALL%% -- *} # only the part before ' -- ' delimiters is relevant
-set -- $ARGS
-
-REST=${ALL#$ARGS}; REST=${REST# -- }
-PANDOC_OPTS=${REST:-$PANDOC_OPTS}
-
 outfile=
-for option; do
-    if [ -n "$prev" ]; then
-        eval "$prev=\$option"
-        prev=
-        shift
-        continue
-    fi
-    optarg=$(expr "x$option" : 'x[^=]*=\(.*\)')
-    case $option in
-    -h | --h | --help )
-        help=1
-        shift ;;
-    -o | --o | --output )
-        prev=outfile
-        shift ;;
-    -o=* | --o=* | --output=* )
-        outfile=$optarg
-        shift ;;
-    -* ) echo >&2 "$0: unknown option: $option; aborting"
-        exit 1 ;;
-    * ) break ;;
+while getopts o:h opt; do
+    case $opt in
+    o) outfile="$OPTARG" ;;
+    h) echo >&2 "Usage: $THIS [-o output_file] [-h] [input_file]"; exit 2 ;;
     esac
 done
 
-[ -z "$help" ] || {
-    echo >&2 "Usage: $0 [-o|--output output-file] [input-file]"
-    exit 0
-}
+shift $(($OPTIND - 1))
 
-infile=$1
+infile=
+ignored=
+while [ -n "$1" ]; do
+    case "$1" in
+    --)
+	shift
+	PANDOC_OPTS="$@"
+	break ;;
+    *)
+	if [ -z "$infile" ]; then
+	    infile="$1"
+	else
+	    ignored="$ignored$1"
+	fi ;;
+    esac
+    shift
+done
 
-if ! [ -r $infile ]; then
-    echo >&2 "'$infile' not found"
-    exit 1
+if [ -n "$ignored" ]; then
+    echo >&2 "Excessive arguments '$ignored' will be ignored!"
 fi
 
-if [ $# -gt 1 ]; then
-    shift
-    echo >&2 "Warning: extra arguments '$@' will be ignored!"
+PANDOC_OPTS=${PANDOC_OPTS:+$PANDOC_OPTS}
+
+if [ -n "$infile" ] && ! [ -f "$infile" ]; then
+    echo >&2 "'$infile' not found"
+    exit 1
 fi
 
 if [ -z "$outfile" ]; then
@@ -84,12 +130,12 @@ BASE=${BASE%.*}
 set -e
 
 TEMP=${TMPDIR-/tmp}/markdown2pdf.$$
-trap "status=$?; rm -rf $TEMP; exit $status" 0 INT
+trap "status=$?; rm -rf $TEMP; exit $status" EXIT INT TERM
 mkdir -p $TEMP
 
-iconv -t utf-8 $infile | \
+safein "$infile" | \
 pandoc $PANDOC_OPTS -w latex -s | \
-iconv -f utf-8 > $TEMP/$BASE.tex && (
+safeout >$TEMP/$BASE.tex && (
     cd $TEMP
     if ! pdflatex -interaction=batchmode $BASE.tex >/dev/null 2>&1; then
         echo >&2 "LaTeX errors:"
@@ -98,16 +144,4 @@ iconv -f utf-8 > $TEMP/$BASE.tex && (
     fi
 ) || exit $?
 
-is_target_exists=
-if [ -f $outfile ]; then
-    is_target_exists=1
-    mv -f $outfile $outfile~
-fi
-
-mv -f $TEMP/$BASE.pdf $outfile
-
-printf "Created $outfile" >&2
-[ -z "$is_target_exists" ] || {
-    printf " (previous file has been backed up as '$outfile~')" >&2
-}
-echo >&2 .
+safeout "$TEMP/$BASE.pdf" "$outfile"

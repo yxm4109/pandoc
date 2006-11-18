@@ -1,0 +1,10 @@
+#!/bin/sh -e
+# converts markdown to latex
+
+### common.sh
+
+### getopts.sh
+
+safein "$infile" | \
+pandoc $PANDOC_OPTS -r latex -s | \
+safeout "$outfile"
