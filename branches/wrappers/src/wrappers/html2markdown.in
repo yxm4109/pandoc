@@ -22,15 +22,15 @@ else
     done
     # Setup proper options.
     case "$DUMPER" in
-        wget)  OPT="-O-" ;;
-        lynx)  OPT="-source" ;;
-        w3m)   OPT="-dump_source" ;;
-        curl)  OPT="" ;;
-        links) OPT="-source" ;;
-        w3c)   OPT="-n -get" ;;
-        "")    printf "Needs a program to fetch the URL " >&2
-               printf "(e.g. wget, w3m, lynx, w3c, or curl)." >&2
-               exit 1 ;;
+    wget)  OPT="-O-" ;;
+    lynx)  OPT="-source" ;;
+    w3m)   OPT="-dump_source" ;;
+    curl)  OPT="" ;;
+    links) OPT="-source" ;;
+    w3c)   OPT="-n -get" ;;
+    "")    printf "Needs a program to fetch the URL " >&2
+           printf "(e.g. wget, w3m, lynx, w3c, or curl).\n" >&2
+	   exit 1 ;;
     esac
     # Fetch and feed to pandoc.
     $DUMPER $OPT "$infile" 2>/dev/null | \

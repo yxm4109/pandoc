@@ -43,7 +43,7 @@ safeout () {
     if [ -z "$2" ]; then
 	src=${TMPDIR-/tmp}/${THIS}.$$
 	dest="$1"
-	trap "status=$?; rm -rf $src; exit $status" EXIT INT TERM
+	trap "status=$?; rm -rf $src; exit $status" INT QUIT TERM EXIT
 	_iconv -f utf-8 >$src
     else
 	src="$1"

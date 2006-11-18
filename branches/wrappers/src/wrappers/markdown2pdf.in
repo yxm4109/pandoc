@@ -9,7 +9,7 @@ REQUIRED=pdflatex
 
 if [ -z "$outfile" ]; then
     if [ -n "$infile" ]; then
-        outfile=${infile%.*}.pdf
+        outfile="${infile%.*}.pdf"
     else
         outfile='stdin.pdf' # input is STDIN, since no argument given
     fi
@@ -21,7 +21,7 @@ BASE=${BASE%.*}
 set -e
 
 TEMP=${TMPDIR-/tmp}/markdown2pdf.$$
-trap "status=$?; rm -rf $TEMP; exit $status" EXIT INT TERM
+trap "status=$?; rm -rf $TEMP; exit $status" INT QUIT TERM EXIT
 mkdir -p $TEMP
 
 safein "$infile" | \
