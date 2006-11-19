@@ -14,29 +14,21 @@ pathfind () {
     return 1
 }
 
-_iconv () {
-    if [ -z "$ICONV_AVAIL" ] || pathfind iconv; then
-	ICONV_AVAIL=yes
-    fi
-
-    if [ -z "$1" ]; then
-	set --
-    fi
-
-    if [ "$ICONV_AVAIL" = "yes" ]; then
-	iconv "$@"
-    else
-	cat "$1"
-    fi
-}
+if pathfind iconv; then
+    alias _to_utf8='iconv -t utf-8'
+    alias _from_utf8='iconv -t utf-8'
+else
+    alias _to_utf8='cat'
+    alias _from_utf8='cat'
+fi
 
 safein () {
-    _iconv -t utf-8 "$1"
+    _to_utf8 "${1:--}" # safe-guarded against an "" argument
 }
 
 safeout () {
     if [ -z "$1" ]; then
-	_iconv -f utf-8
+	_from_utf8
 	return
     fi
 
@@ -44,7 +36,7 @@ safeout () {
 	src=${TMPDIR-/tmp}/${THIS}.$$
 	dest="$1"
 	trap "status=$?; rm -rf $src; exit $status" INT QUIT TERM EXIT
-	_iconv -f utf-8 >$src
+	_from_utf8 >$src
     else
 	src="$1"
 	dest="$2"
@@ -58,7 +50,7 @@ safeout () {
 
     mv -f "$src" "$dest"
 
-    printf "Created $dest" >&2
+    printf "Created '$dest'" >&2
     [ -z "$is_target_exists" ] || {
 	printf " (previous file has been backed up as '$dest~')" >&2
     }

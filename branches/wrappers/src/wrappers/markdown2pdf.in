@@ -7,6 +7,8 @@ REQUIRED=pdflatex
 
 ### getopts.sh
 
+### postopts.sh
+
 if [ -z "$outfile" ]; then
     if [ -n "$infile" ]; then
         outfile="${infile%.*}.pdf"
@@ -26,13 +28,13 @@ mkdir -p $TEMP
 
 safein "$infile" | \
 pandoc $PANDOC_OPTS -w latex -s | \
-safeout >$TEMP/$BASE.tex && (
+safeout >$TEMP/$BASE.tex && {
     cd $TEMP
     if ! pdflatex -interaction=batchmode $BASE.tex >/dev/null 2>&1; then
         echo >&2 "LaTeX errors:"
         sed -ne '/^!/,/^ *$/p' $BASE.log >&2
         exit 1
     fi
-) || exit $?
+}
 
 safeout "$TEMP/$BASE.pdf" "$outfile"

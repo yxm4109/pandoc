@@ -5,4 +5,6 @@
 
 ### getopts.sh
 
+### postopts.sh
+
 safein "$infile" | pandoc $PANDOC_OPTS | safeout "$outfile"

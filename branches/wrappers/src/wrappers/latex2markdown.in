@@ -5,6 +5,8 @@
 
 ### getopts.sh
 
+### postopts.sh
+
 safein "$infile" | \
 pandoc $PANDOC_OPTS -r latex -w markdown -s | \
 safeout "$outfile"
