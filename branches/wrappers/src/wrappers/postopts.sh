@@ -27,7 +27,7 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
 	echo >&2 "'$infile' not found"
 	exit 1
     else
-	inurl=$infile
+	inurl="$infile"
     fi
 else
     inurl=
