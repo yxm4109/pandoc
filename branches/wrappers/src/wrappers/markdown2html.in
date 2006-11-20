@@ -1,10 +1,12 @@
 #!/bin/sh -e
 # converts markdown to HTML
 
+EXTENSION=.html
+
 ### common.sh
 
 ### getopts.sh
 
 ### postopts.sh
 
-safein "$infile" | pandoc $PANDOC_OPTS | safeout "$outfile"
+safein "$@" | pandoc $PANDOC_OPTS | safeout "$outfile"

@@ -1,5 +1,11 @@
-infile=
-ignored=
+# As we may allow multiple filenames with white spaces we should
+# extract the PANDOC_OPTS part sensitively.
+NEWLINE='
+'
+OLDIFS="$IFS"
+IFS="$NEWLINE"
+
+infile_all=
 while [ -n "$1" ]; do
     case "$1" in
     --)
@@ -7,28 +13,41 @@ while [ -n "$1" ]; do
 	PANDOC_OPTS="$@"
 	break ;;
     *)
-	if [ -z "$infile" ]; then
-	    infile="$1"
-	else
-	    ignored="$ignored$1"
-	fi ;;
+	infile_all="${infile_all}${NEWLINE}${1}"
     esac
     shift
 done
 
-if [ -n "$ignored" ]; then
-    echo >&2 "Excessive arguments '$ignored' will be ignored!"
-fi
+set -- $infile_all
+IFS="$OLDIFS"
+# Now "$@" holds the filenames without '--' delimiter.
 
 PANDOC_OPTS=${PANDOC_OPTS:+$PANDOC_OPTS}
 
-if [ -n "$infile" ] && ! [ -f "$infile" ]; then
-    if [ -z "$inurl" ]; then
-	echo >&2 "'$infile' not found"
-	exit 1
-    else
-	inurl="$infile"
+infile="$1"
+if [ -n "$SINGLE_FILE_INPUT" ]; then
+    if [ -n "$2" ]; then
+	shift
+	echo >&2 "Warning:  excessive arguments '$@' will be ignored."
     fi
 else
-    inurl=
+    for f; do
+	if [ -n "$f" ] && ! [ -f "$f" ]; then
+	    echo >&2 "'$f' not found"
+	    exit 1
+	fi
+    done
+fi
+
+if [ -z "$outfile" ]; then
+    if [ -n "$1" ]; then
+        outfile="${1%.*}$EXTENSION"
+    else
+        outfile="stdin$EXTENSION" # input is STDIN, since no argument given
+    fi
+else
+    case "$outfile" in
+    *.*) ;;
+    *)   outfile="${outfile%.*}${EXTENSION}";;
+    esac
 fi

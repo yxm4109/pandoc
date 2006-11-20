@@ -2,6 +2,7 @@
 # converts markdown to latex, then uses latex to make a PDF
 
 REQUIRED=pdflatex
+EXTENSION=.pdf
 
 ### common.sh
 
@@ -9,32 +10,20 @@ REQUIRED=pdflatex
 
 ### postopts.sh
 
-if [ -z "$outfile" ]; then
-    if [ -n "$infile" ]; then
-        outfile="${infile%.*}.pdf"
-    else
-        outfile='stdin.pdf' # input is STDIN, since no argument given
-    fi
-fi
-
-BASE=${outfile##*/}
-BASE=${BASE%.*}
+# We should use a filename without white spaces for pdflatex.
+TEXNAME=$THIS
 
 set -e
 
 TEMP=${TMPDIR-/tmp}/markdown2pdf.$$
-trap "status=$?; rm -rf $TEMP; exit $status" INT QUIT TERM EXIT
+trap "exitcode=$?; rm -rf $TEMP; exit $exitcode" INT QUIT TERM EXIT
 mkdir -p $TEMP
 
-safein "$infile" | \
-pandoc $PANDOC_OPTS -w latex -s | \
-safeout >$TEMP/$BASE.tex && {
+safein "$@" | pandoc $PANDOC_OPTS -w latex -s | safeout >$TEMP/$TEXNAME.tex && (
     cd $TEMP
-    if ! pdflatex -interaction=batchmode $BASE.tex >/dev/null 2>&1; then
+    if ! pdflatex -interaction=batchmode $TEXNAME.tex >/dev/null 2>&1; then
         echo >&2 "LaTeX errors:"
-        sed -ne '/^!/,/^ *$/p' $BASE.log >&2
+        sed -ne '/^!/,/^ *$/p' $TEXNAME.log >&2
         exit 1
     fi
-}
-
-safeout "$TEMP/$BASE.pdf" "$outfile"
+) && safeout $TEMP/$TEXNAME.pdf "$outfile"

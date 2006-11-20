@@ -3,8 +3,8 @@
 # uses an available program to fetch URL and tidy to normalize it first
 
 REQUIRED=tidy
-
-inurl="unknown"
+SINGLE_FILE_INPUT=yes
+SYNOPSIS="$THIS [-o output_file] [-h] [input_file]"
 
 ### common.sh
 
@@ -12,7 +12,7 @@ inurl="unknown"
 
 ### postopts.sh
 
-if [ -n "$inurl" ]; then
+if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     # Treat given argument as an URL.
     echo >&2 "Attempting to fetch file from '$inurl'..."
     # Locate a sensible text based browser (note the order).
@@ -34,7 +34,7 @@ if [ -n "$inurl" ]; then
            printf "(e.g. wget, w3m, lynx, w3c, or curl).\n" >&2
 	   exit 1 ;;
     esac
-    $DUMPER $OPT "$inurl" 2>/dev/null | safein
+    $DUMPER $OPT "$infile" 2>/dev/null | safein
 else
     safein "$infile"
 fi | \

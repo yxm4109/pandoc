@@ -7,6 +7,6 @@
 
 ### postopts.sh
 
-safein "$infile" | \
+safein "$@" | \
 pandoc $PANDOC_OPTS -r latex -w markdown -s | \
 safeout "$outfile"

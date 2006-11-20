@@ -18,15 +18,19 @@ if pathfind iconv; then
     alias _to_utf8='iconv -t utf-8'
     alias _from_utf8='iconv -t utf-8'
 else
+    echo >&2 "Warning:  iconv not present.  Not converting to UTF-8."
     alias _to_utf8='cat'
     alias _from_utf8='cat'
 fi
 
 safein () {
-    _to_utf8 "${1:--}" # safe-guarded against an "" argument
+    _to_utf8 "${@:--}" # safe-guarded against an "" argument
 }
 
 safeout () {
+    # No argument: source is stdin, destination is stdout
+    # Single argument: source is stdin, destination is $1
+    # Two arguments: sourc is $1, destination is $2
     if [ -z "$1" ]; then
 	_from_utf8
 	return
@@ -35,7 +39,7 @@ safeout () {
     if [ -z "$2" ]; then
 	src=${TMPDIR-/tmp}/${THIS}.$$
 	dest="$1"
-	trap "status=$?; rm -rf $src; exit $status" INT QUIT TERM EXIT
+	trap "exitcode=$?; rm -rf $src; exit $exitcode" INT QUIT TERM EXIT
 	_from_utf8 >$src
     else
 	src="$1"
