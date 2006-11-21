@@ -10,7 +10,11 @@ while [ $# -gt 0 ]; do
     case "$1" in
     --)
 	shift
-	PANDOC_OPTS="$@"
+        # If reached here reset (overwrite) PANDOC_OPTS and collect options.
+        PANDOC_OPTS=
+        for opt; do
+	    PANDOC_OPTS="${PANDOC_OPTS}${OLDIFS}${opt}"
+        done
 	break ;;
     "")	;; # skip "" arguments
      *)	infile_all="${infile_all}${NEWLINE}${1}" ;;
@@ -21,8 +25,6 @@ done
 set -- $infile_all
 IFS="$OLDIFS"
 # Now "$@" holds the filenames without '--' delimiter.
-
-PANDOC_OPTS=${PANDOC_OPTS:+$PANDOC_OPTS}
 
 infile="$1"
 if [ -n "$SINGLE_FILE_INPUT" ]; then
@@ -45,4 +47,3 @@ if [ -n "$outfile" ]; then
     *)   outfile="${outfile%.*}${EXTENSION}";;
   esac
 fi
-
