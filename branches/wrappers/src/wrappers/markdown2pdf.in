@@ -10,6 +10,14 @@ EXTENSION=.pdf
 
 ### postopts.sh
 
+if [ -z "$outfile" ]; then
+    if [ -n "$1" ]; then
+        outfile="${1%.*}$EXTENSION"
+    else
+        outfile="stdin$EXTENSION" # input is STDIN, since no argument given
+    fi
+fi
+
 # We should use a filename without white spaces for pdflatex.
 TEXNAME=$THIS
 

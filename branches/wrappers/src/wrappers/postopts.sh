@@ -28,7 +28,7 @@ infile="$1"
 if [ -n "$SINGLE_FILE_INPUT" ]; then
     if [ -n "$2" ]; then
 	shift
-	echo >&2 "Warning:  excessive arguments '$@' will be ignored."
+	echo >&2 "Warning:  extra arguments '$@' will be ignored."
     fi
 else
     for f; do
@@ -39,15 +39,10 @@ else
     done
 fi
 
-if [ -z "$outfile" ]; then
-    if [ -n "$1" ]; then
-        outfile="${1%.*}$EXTENSION"
-    else
-        outfile="stdin$EXTENSION" # input is STDIN, since no argument given
-    fi
-else
-    case "$outfile" in
+if [ -n "$outfile" ]; then
+  case "$outfile" in
     *.*) ;; # skip appending extension if one is already present
     *)   outfile="${outfile%.*}${EXTENSION}";;
-    esac
+  esac
 fi
+

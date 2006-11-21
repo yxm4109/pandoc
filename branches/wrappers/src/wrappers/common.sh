@@ -18,7 +18,7 @@ if pathfind iconv; then
     alias _to_utf8='iconv -t utf-8'
     alias _from_utf8='iconv -t utf-8'
 else
-    echo >&2 "Warning:  iconv not present.  Not converting to UTF-8."
+    echo >&2 "Warning:  iconv not present.  Assuming UTF-8 character encoding."
     alias _to_utf8='cat'
     alias _from_utf8='cat'
 fi
