@@ -4,7 +4,7 @@
 
 REQUIRED=tidy
 SINGLE_FILE_INPUT=yes
-SYNOPSIS="$THIS [-o output_file] [-h] [input_file]"
+SYNOPSIS="[-o output_file] [-h] [input_file]"
 
 ### common.sh
 
