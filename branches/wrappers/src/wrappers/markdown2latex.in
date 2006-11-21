@@ -9,6 +9,4 @@ EXTENSION=.tex
 
 ### postopts.sh
 
-safein "$@" | \
-pandoc $PANDOC_OPTS -w latex -s | \
-safeout "$outfile"
+safein "$@" | pandoc $PANDOC_OPTS -w latex -s | safeout "$outfile"

@@ -37,6 +37,6 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     $DUMPER $OPT "$infile" | safein
 else
     safein "$infile"
-fi | \
-tidy -utf8 2>/dev/null | \
+fi |
+tidy -utf8 2>/dev/null |
 pandoc $PANDOC_OPTS -r html -w markdown -s | safeout "$outfile"
