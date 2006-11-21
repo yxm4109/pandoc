@@ -6,14 +6,14 @@ OLDIFS="$IFS"
 IFS="$NEWLINE"
 
 infile_all=
-while [ -n "$1" ]; do
+while [ $# -gt 0 ]; do
     case "$1" in
     --)
 	shift
 	PANDOC_OPTS="$@"
 	break ;;
-    *)
-	infile_all="${infile_all}${NEWLINE}${1}"
+    "")	;; # skip "" arguments
+     *)	infile_all="${infile_all}${NEWLINE}${1}" ;;
     esac
     shift
 done
@@ -47,7 +47,7 @@ if [ -z "$outfile" ]; then
     fi
 else
     case "$outfile" in
-    *.*) ;;
+    *.*) ;; # skip appending extension if one is already present
     *)   outfile="${outfile%.*}${EXTENSION}";;
     esac
 fi
