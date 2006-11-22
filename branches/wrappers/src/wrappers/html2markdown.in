@@ -63,7 +63,7 @@ grab_url_with () {
     return $exitcode
 }
 
-SYNOPSIS="[-o output_file] [-g grabber_command] [-h] [-n] [input_file]..."
+SYNOPSIS="[-o output_file] [-g grabber_command] [-n] [-h|?] [input_file|url]"
 
 grabber=
 outfile=
@@ -83,7 +83,7 @@ shift $(($OPTIND - 1))
 
 if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     if [ -n "$nograb" ]; then
-	err "'$infile' not found; refusing to treat as URL."
+	err "'$infile' not found; refusing to treat input as URL."
         exit 1
     fi
 

@@ -1,4 +1,4 @@
-SYNOPSIS=${SYNOPSIS:-"[-o output_file] [-h] [input_file]..."}
+SYNOPSIS=${SYNOPSIS:-"[-o output_file] [-h|?] [input_file]..."}
 
 outfile=
 while getopts o:h opt; do
