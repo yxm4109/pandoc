@@ -18,20 +18,19 @@ if [ -z "$outfile" ]; then
     fi
 fi
 
+set -e
+
 # We should use a filename without white spaces for pdflatex.
 TEXNAME=$THIS
 
-set -e
+ensure_tempdir
 
-TEMP=${TMPDIR-/tmp}/markdown2pdf.$$
-trap "exitcode=$?; rm -rf $TEMP; exit $exitcode" INT QUIT TERM EXIT
-mkdir -p $TEMP
-
-safein "$@" | pandoc $PANDOC_OPTS -w latex -s | safeout >$TEMP/$TEXNAME.tex && (
-    cd $TEMP
+safein "$@" |
+pandoc $PANDOC_OPTS -w latex -s | safeout >$THIS_TEMPDIR/$TEXNAME.tex && (
+    cd $THIS_TEMPDIR
     if ! pdflatex -interaction=batchmode $TEXNAME.tex >/dev/null 2>&1; then
-        echo >&2 "LaTeX errors:"
+        err "LaTeX errors:"
         sed -ne '/^!/,/^ *$/p' $TEXNAME.log >&2
         exit 1
     fi
-) && safeout $TEMP/$TEXNAME.pdf "$outfile"
+) && safeout $THIS_TEMPDIR/$TEXNAME.pdf "$outfile"

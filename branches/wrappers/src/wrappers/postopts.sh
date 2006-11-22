@@ -30,12 +30,12 @@ infile="$1"
 if [ -n "$SINGLE_FILE_INPUT" ]; then
     if [ -n "$2" ]; then
 	shift
-	echo >&2 "Warning:  extra arguments '$@' will be ignored."
+	err "Warning:  extra arguments '$@' will be ignored."
     fi
 else
     for f; do
 	if [ -n "$f" ] && ! [ -f "$f" ]; then
-	    echo >&2 "'$f' not found"
+	    err "'$f' not found"
 	    exit 1
 	fi
     done

@@ -1,5 +1,14 @@
 THIS=${0##*/}
 
+err ()  { echo "$*"   | fold -s -w ${COLUMNS:-80} >&2; }
+errn () { printf "$*" | fold -s -w ${COLUMNS:-80} >&2; }
+
+usage () {
+    synopsis="$@"
+    err "Usage:  $THIS $synopsis"
+    err "See $THIS(1) man file for details."
+}
+
 # Portable which(1).
 pathfind () {
     ifs_save="$IFS"
@@ -18,13 +27,38 @@ if pathfind iconv; then
     alias _to_utf8='iconv -t utf-8'
     alias _from_utf8='iconv -t utf-8'
 else
-    echo >&2 "Warning:  iconv not present.  Assuming UTF-8 character encoding."
+    err "Warning:  iconv not present.  Assuming UTF-8 character encoding."
     alias _to_utf8='cat'
     alias _from_utf8='cat'
 fi
 
+THIS_TEMPDIR=
+trap '
+    exitcode=$?
+    [ -z $THIS_TEMPDIR ] || rm -rf $THIS_TEMPDIR ||:
+    exit $exitcode
+' INT QUIT TERM EXIT
+
+ensure_tempdir () {
+    while [ -z "$THIS_TEMPDIR" ]; do
+        set -- $1
+        t=${1:-$THIS.$$}
+        if ! [ -d ${TMPDIR-/tmp}/$t ]; then
+            THIS_TEMPDIR=${TMPDIR-/tmp}/$t
+	    mkdir $THIS_TEMPDIR || THIS_TEMPDIR=
+        fi
+        break
+    done
+
+    if [ -z "$THIS_TEMPDIR" ]; then
+        err "Couldn't create a temporary directory; aborting"
+        exit 1
+    fi
+}
+
 safein () {
-    _to_utf8 "${@:--}" # safe-guarded against an "" argument
+    [ -n "$1" ] || set --  # safe-guarded against an "" argument
+    _to_utf8 "$@"
 }
 
 safeout () {
@@ -37,9 +71,9 @@ safeout () {
     fi
 
     if [ -z "$2" ]; then
-	src=${TMPDIR-/tmp}/${THIS}.$$
+        ensure_tempdir
+	src=$THIS_TEMPDIR/STDIN.$$
 	dest="$1"
-	trap "exitcode=$?; rm -rf $src; exit $exitcode" INT QUIT TERM EXIT
 	_from_utf8 >$src
     else
 	src="$1"
@@ -54,16 +88,16 @@ safeout () {
 
     mv -f "$src" "$dest"
 
-    printf "Created '$dest'" >&2
+    errn "Created '$dest'"
     [ -z "$is_target_exists" ] || {
-	printf " (previous file has been backed up as '$dest~')" >&2
+	errn " (previous file has been backed up as '$dest~')"
     }
-    echo >&2 .
+    err .
 }
 
 for p in pandoc $REQUIRED; do
     pathfind $p || {
-        echo >&2 "You need '$p' to use this program!"
+        err "You need '$p' to use this program!"
         exit 1
     }
 done

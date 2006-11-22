@@ -4,7 +4,7 @@ outfile=
 while getopts o:h opt; do
     case $opt in
     o) outfile="$OPTARG" ;;
-    h) echo >&2 "Usage:  $THIS $SYNOPSIS"; exit 2 ;;
+    ?|h) usage "$SYNOPSIS"; exit 2 ;;
     esac
 done
 
