@@ -31,6 +31,10 @@ pandoc $PANDOC_OPTS -w latex -s | safeout >$THIS_TEMPDIR/$TEXNAME.tex && (
     if ! pdflatex -interaction=batchmode $TEXNAME.tex >/dev/null 2>&1; then
         err "LaTeX errors:"
         sed -ne '/^!/,/^ *$/p' $TEXNAME.log >&2
+        ucs_errors=$(grep "File \`ucs.sty' not found" $TEXNAME.log)
+        if [ -n $ucs_errors ]; then
+            err "Please install the 'unicode' package from ctan.org."
+        fi
         exit 1
     fi
 ) && safeout $THIS_TEMPDIR/$TEXNAME.pdf "$outfile"
