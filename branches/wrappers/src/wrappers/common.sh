@@ -32,28 +32,13 @@ else
     alias _from_utf8='cat'
 fi
 
-THIS_TEMPDIR=
-trap '
-    exitcode=$?
-    [ -z $THIS_TEMPDIR ] || rm -rf $THIS_TEMPDIR ||:
-    exit $exitcode
-' INT QUIT TERM EXIT
-
+readonly THIS_TEMPDIR=${TMPDIR-/tmp}/$THIS.$$
+trap 'exitcode=$?; rm -rf $THIS_TEMPDIR ||:; exit $exitcode' INT QUIT TERM EXIT
 ensure_tempdir () {
-    while [ -z "$THIS_TEMPDIR" ]; do
-        set -- $1
-        t=${1:-$THIS.$$}
-        if ! [ -d ${TMPDIR-/tmp}/$t ]; then
-            THIS_TEMPDIR=${TMPDIR-/tmp}/$t
-	    mkdir $THIS_TEMPDIR || THIS_TEMPDIR=
-        fi
-        break
-    done
-
-    if [ -z "$THIS_TEMPDIR" ]; then
-        err "Couldn't create a temporary directory; aborting"
+    mkdir -p "$THIS_TEMPDIR" || {
+        err "$THIS:  Couldn't create a temporary directory; aborting."
         exit 1
-    fi
+    }
 }
 
 safein () {
