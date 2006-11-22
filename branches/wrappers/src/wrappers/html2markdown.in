@@ -32,13 +32,13 @@ grab_url_with () {
 	done
 
 	[ -n "$prog" ] || {
-            errn "$THIS: Couldn't find a program to fetch the URL "
+            errn "$THIS:  Couldn't find a program to fetch the file from URL "
 	    err "(e.g. wget, w3m, lynx, w3c, or curl)."
 	    return 1
 	}
     else
 	pathfind "$prog" || {
-	    err "$THIS: No such web grabber '$prog' found; aborting."
+	    err "$THIS:  No such web grabber '$prog' found; aborting."
 	    return 1
 	}
     fi
@@ -52,14 +52,14 @@ grab_url_with () {
     curl)  base_opts="" ;;
     links) base_opts="-source" ;;
     w3c)   base_opts="-n -get" ;;
-    *)     err "$THIS: unhandled web grabber '$prog'.  Hope it succeeds."
+    *)     err "$THIS:  unhandled web grabber '$prog'; hope it succeeds."
     esac
 
     set -- $base_opts $prog_opts
 
     $prog "$@" "$url"; exitcode=$?
 
-    err "$THIS: '$prog $@ $url' invoked."
+    err "$THIS:  '$prog $@ $url' invoked."
     return $exitcode
 }
 

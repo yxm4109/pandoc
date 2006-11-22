@@ -49,7 +49,7 @@ safein () {
 safeout () {
     # No argument: source is stdin, destination is stdout
     # Single argument: source is stdin, destination is $1
-    # Two arguments: sourc is $1, destination is $2
+    # Two arguments: source is $1, destination is $2
     if [ -z "$1" ]; then
 	_from_utf8
 	return
