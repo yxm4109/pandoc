@@ -108,12 +108,7 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
         exit 1
     fi
 
-    # To be on the safe side detect bogus output.
     infile=$grabber_out
-    if ! [ -f $infile ] || [ -z "$(tr -d [:space:] <$infile)" ]; then
-        err "Empty content returned from grabber."
-        exit 0
-    fi
 fi
 
 safein "$infile" | tidy -utf8 2>/dev/null |
