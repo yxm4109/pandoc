@@ -3,7 +3,6 @@
 # uses an available program to fetch URL and tidy to normalize it first
 
 REQUIRED=tidy
-SINGLE_FILE_INPUT=yes
 
 ### common.sh
 
@@ -57,29 +56,29 @@ grab_url_with () {
 
     set -- $base_opts $prog_opts
 
-    $prog "$@" "$url"; exitcode=$?
-
-    err "$THIS:  '$prog $@ $url' invoked."
-    return $exitcode
+    err "$THIS: invoking '$prog $@ $url'..."
+    $prog "$@" "$url"
 }
 
-SYNOPSIS="[-o output_file] [-g grabber_command] [-n] [-h|?] [input_file|url]"
-
 grabber=
-outfile=
 nograb=
-while getopts g:o:nh opt; do
+while getopts g:nh opt; do
     case $opt in
     g) grabber="$OPTARG" ;;
-    o) outfile="$OPTARG" ;;
     n) nograb=1 ;;
-    ?|h) usage "$SYNOPSIS"; exit 2 ;;
+    ?|h) usage "[-g grabber_command] [-n] [-h|?] [input_file|url]"; exit 2 ;;
     esac
 done
 
 shift $(($OPTIND - 1))
 
 ### postopts.sh
+
+infile="$1"
+if [ -n "$2" ]; then
+    shift
+    err "Warning:  extra arguments '$@' will be ignored."
+fi
 
 if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     if [ -n "$nograb" ]; then
@@ -90,8 +89,7 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     # Treat given argument as an URL.
     err "Attempting to fetch file from '$infile'..."
 
-    # We need a temporary directory.
-    ensure_tempdir
+    ### tempdir.sh
 
     grabber_out=$THIS_TEMPDIR/grabber.out
     grabber_log=$THIS_TEMPDIR/grabber.log
@@ -108,8 +106,8 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
         exit 1
     fi
 
-    infile=$grabber_out
+    set -- $grabber_out
 fi
 
-safein "$infile" | tidy -utf8 2>/dev/null |
-pandoc $PANDOC_OPTS -r html -w markdown -s | safeout "$outfile"
+from_utf8 "$@" | tidy -utf8 2>/dev/null |
+pandoc $PANDOC_OPTS -r html -w markdown -s | to_utf8

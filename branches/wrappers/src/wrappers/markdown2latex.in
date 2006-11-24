@@ -1,12 +1,12 @@
 #!/bin/sh -e
 # converts markdown to latex
 
-EXTENSION=.tex
-
 ### common.sh
 
 ### getopts.sh
 
 ### postopts.sh
 
-safein "$@" | pandoc $PANDOC_OPTS -w latex -s | safeout "$outfile"
+### checkin.sh
+
+from_utf8 "$@" | pandoc $PANDOC_OPTS -w latex -s | to_utf8

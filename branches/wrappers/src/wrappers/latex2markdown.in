@@ -7,4 +7,6 @@
 
 ### postopts.sh
 
-safein "$@" | pandoc $PANDOC_OPTS -r latex -w markdown -s | safeout "$outfile"
+### checkin.sh
+
+from_utf8 "$@" | pandoc $PANDOC_OPTS -r latex -w markdown -s | to_utf8

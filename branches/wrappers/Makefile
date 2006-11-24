@@ -92,15 +92,16 @@ wrappers: $(WRAPPERS)
 wrapper_deps := $(wildcard $(SRCDIR)/wrappers/*.sh)
 cleanup_files+=$(WRAPPERS)
 %: $(SRCDIR)/wrappers/%.in $(wrapper_deps)
-	@echo "Updating $@...";                        \
-	awk '                                          \
-		/^### / {                              \
-			t = "$(SRCDIR)/wrappers/"$$2;  \
-			while (getline line < t > 0)   \
-				print line;            \
-			next;                          \
-		}                                      \
-		{ print }                              \
+	@echo "Updating $@...";                                 \
+	awk '                                                   \
+		/^[ \t]*###+ / {                                \
+                        lead = substr($$0, 0, index($$0, $$1)); \
+			t = "$(SRCDIR)/wrappers/"$$2;           \
+			while (getline line < t > 0)            \
+				print lead line;                \
+			next;                                   \
+		}                                               \
+		{ print }                                       \
 	' <$< >$@
 
 cleanup_files+=$(CABAL)
