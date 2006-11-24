@@ -1,6 +1,6 @@
 # As a security measure refuse to proceed if mktemp is not available.
 pathfind mktemp || {
-    err "You need '$mktemp' to use this program!"
+    err "You need 'mktemp' to use this program!"
     exit 1
 }
 
