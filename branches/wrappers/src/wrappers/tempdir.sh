@@ -1,8 +1,5 @@
 # As a security measure refuse to proceed if mktemp is not available.
-pathfind mktemp || {
-    err "You need 'mktemp' to use this program!"
-    exit 1
-}
+pathfind mktemp || { err "Couldn't find 'mktemp'; aborting."; exit 1;  }
 
 readonly THIS_TEMPDIR="$(mktemp -d -t $THIS.XXXXXXXX)" || {
     err "$THIS:  Couldn't create a temporary directory; aborting."
