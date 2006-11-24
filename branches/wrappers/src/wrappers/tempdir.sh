@@ -1,7 +1,8 @@
 # As a security measure refuse to proceed if mktemp is not available.
 pathfind mktemp || { err "Couldn't find 'mktemp'; aborting."; exit 1;  }
 
-readonly THIS_TEMPDIR="$(mktemp -d -t $THIS.XXXXXXXX)" || {
+THIS_TEMPDIR=
+readonly THIS_TEMPDIR="$(mktemp -d $THIS.XXXXXXXX)" || {
     err "$THIS:  Couldn't create a temporary directory; aborting."
     exit 1
 }
