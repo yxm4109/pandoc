@@ -25,7 +25,7 @@ pathfind () {
 
 if pathfind iconv; then
     alias to_utf8='iconv -t utf-8'
-    alias from_utf8='iconv -t utf-8'
+    alias from_utf8='iconv -f utf-8'
 else
     err "Warning:  iconv not present.  Assuming UTF-8 character encoding."
     alias to_utf8='cat'
