@@ -2,15 +2,22 @@
 .SH NAME
 markdown2html \- converts markdown-formatted text to HTML 
 .SH SYNOPSIS
-\fBmarkdown2html\fR [ \fIinput-files\fR ]
+\fBmarkdown2html\fR [\fIoptions\fR] [\fB\-o\fR \fIoutput-file\fR]
+[\fIinput-file\fR]... [\fB\-\-\fR \fIpandoc\-opts\fR]
 .SH DESCRIPTION
-\fBmarkdown2html\fR converts \fIinput-files\fR 
+\fBmarkdown2html\fR converts \fIinput-file\fR 
 (or text from STDIN) from markdown-formatted plain text to HTML. 
 If multiple files are specified, they will be combined to make a single
 HTML document.
 .PP
 \fBmarkdown2html\fR is a wrapper for \fBpandoc\fR.
 .SH OPTIONS
+.TP
+.B \-h
+Show usage message.
+.TP
+.B \-o \fIoutput-file\fR
+Send output to \fIoutput-file\fR instead of STDOUT.
 .TP
 .B \-\-
 Any options appearing after ` \-\- ' on the command line will be passed
@@ -30,4 +37,4 @@ for a list of options that may be used.
 \fBlatex2markdown\fR(1),
 \fBmarkdown2pdf\fR(1)
 .SH AUTHOR
-John MacFarlane
+John MacFarlane and Recai Oktas

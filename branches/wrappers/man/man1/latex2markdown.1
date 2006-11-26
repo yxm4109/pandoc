@@ -2,13 +2,21 @@
 .SH NAME
 latex2markdown \- converts LaTeX to markdown-formatted text
 .SH SYNOPSIS
-\fBlatex2markdown\fR [ \fIinput-file\fR ]
+\fBlatex2markdown\fR [\fIoptions\fR] [\fB\-o\fR \fIoutput-file\fR] 
+[\fIinput-file\fR] [\fB\-\-\fR \fIpandoc\-opts\fR]
 .SH DESCRIPTION
 \fBlatex2markdown\fR converts \fIinput-file\fR
 (or text from STDIN) from LaTeX to markdown-formatted plain text.
+By default, output is sent to STDOUT.
 .PP
 \fBlatex2markdown\fR is a wrapper for \fBpandoc\fR.
 .SH OPTIONS
+.TP
+.B \-h
+Show usage message.
+.TP
+.B \-o \fIoutput-file\fR
+Send output to \fIoutput-file\fR instead of STDOUT.
 .TP
 .B \-\-
 Any options appearing after ` \-\- ' on the command line will be passed
@@ -28,4 +36,4 @@ for a list of options that may be used.
 \fBmarkdown2latex\fR(1),
 \fBmarkdown2pdf\fR(1)
 .SH AUTHOR
-John MacFarlane
+John MacFarlane and Recai Oktas

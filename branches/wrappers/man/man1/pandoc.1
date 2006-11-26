@@ -2,7 +2,7 @@
 .SH NAME
 pandoc \- general markup converter
 .SH SYNOPSIS
-\fBpandoc\fR [ \fIoptions\fR ] [ \fIinput-files\fR ]
+\fBpandoc\fR [\fIoptions\fR] [\fIinput-file\fR]...
 
 .SH DESCRIPTION
 \fIPandoc\fR converts files from one markup format to another. It can
@@ -10,7 +10,7 @@ read markdown and (subsets of) reStructuredText, HTML, and LaTeX, and
 it can write markdown, reStructuredText, HTML, LaTeX, RTF, and S5 HTML
 slide shows.
 .PP
-If no \fIinput-files\fR are specified, input is read from STDIN.  Otherwise,
+If no \fIinput-file\fR is specified, input is read from STDIN.  Otherwise,
 the \fIinput-files\fR are concatenated (with a blank line between each)
 and used as input.  Output goes to STDOUT.  If you want output to a file,
 use shell redirection:
@@ -145,4 +145,4 @@ file distributed with Pandoc contains full documentation.
 The Pandoc source code and all documentation may be downloaded from
 <http://sophos.berkeley.edu/macfarlane/pandoc/>.
 .SH AUTHOR
-John MacFarlane
+John MacFarlane and Recai Oktas
