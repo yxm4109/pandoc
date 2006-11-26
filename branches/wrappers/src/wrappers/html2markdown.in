@@ -109,5 +109,5 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     set -- $grabber_out
 fi
 
-from_utf8 "$@" | tidy -utf8 2>/dev/null |
-pandoc $PANDOC_OPTS -r html -w markdown -s | to_utf8
+tidy -utf8 "$@" 2>/dev/null |
+pandoc $PANDOC_OPTS -r html -w markdown -s | from_utf8

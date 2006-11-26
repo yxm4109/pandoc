@@ -9,4 +9,4 @@
 
 ### checkin.sh
 
-from_utf8 "$@" | pandoc $PANDOC_OPTS -r latex -w markdown -s | to_utf8
+to_utf8 "$@" | pandoc $PANDOC_OPTS -r latex -w markdown -s | from_utf8

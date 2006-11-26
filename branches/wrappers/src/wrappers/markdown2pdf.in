@@ -36,12 +36,12 @@ esac
 # We should use a filename without white spaces for pdflatex.
 TEXNAME=$THIS
 
-from_utf8 "$@" |
-pandoc $PANDOC_OPTS -w latex -s | to_utf8 >$THIS_TEMPDIR/$TEXNAME.tex && (
+to_utf8 "$@" |
+pandoc $PANDOC_OPTS -w latex -s >$THIS_TEMPDIR/$TEXNAME.tex && (
     cd $THIS_TEMPDIR
     if ! pdflatex -interaction=batchmode $TEXNAME.tex >/dev/null 2>&1; then
         err "LaTeX errors:"
-        sed -ne '/^!/,/^ *$/p' $TEXNAME.log >&2
+        from_utf8 $TEXNAME.log | sed -ne '/^!/,/^ *$/p' >&2
         if grep -q "File \`ucs.sty' not found" $TEXNAME.log; then
             err "Please install the 'unicode' package from ctan.org."
         fi
