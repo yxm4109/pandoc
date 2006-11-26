@@ -15,7 +15,7 @@ grab_url_with () {
     prog=
     prog_opts=
     if [ -n "$cmdline" ]; then
-	set -- $cmdline
+	eval "set -- $cmdline"
 	prog=$1
 	shift
 	prog_opts="$@"
@@ -54,7 +54,7 @@ grab_url_with () {
     *)     err "$THIS:  unhandled web grabber '$prog'; hope it succeeds."
     esac
 
-    set -- $base_opts $prog_opts
+    eval "set -- $base_opts $prog_opts"
 
     err "$THIS: invoking '$prog $@ $url'..."
     $prog "$@" "$url"
