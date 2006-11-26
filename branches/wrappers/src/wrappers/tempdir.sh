@@ -2,7 +2,7 @@
 pathfind mktemp || { err "Couldn't find 'mktemp'; aborting."; exit 1;  }
 
 THIS_TEMPDIR=
-THIS_TEMPDIR="$(mktemp -d $THIS.XXXXXXXX)" || exit 1
+THIS_TEMPDIR="$(mktemp -d -t $THIS.XXXXXXXX)" || exit 1
 readonly THIS_TEMPDIR
 
 trap 'exitcode=$?
