@@ -146,12 +146,10 @@ browser will be used to fetch the contents of the URL.  (The `-n` option
 inhibits this behavior; the `-g` option allows the user to specify a
 custom command that will be used to fetch from a URL.)
 
-With the exception of `markdown2pdf`, the scripts write to standard output
-by default.  Output can be sent to a file using shell output redirection
-or the `-o` option:
+With the exception of `markdown2pdf`, the scripts write to standard output.
+Output can be sent to a file using shell output redirection:
 
 	latex2markdown sample.tex > sample.txt
-	latex2markdown -o sample.txt sample.tex
 
 The default behavior of `markdown2pdf` is to create a file with the same
 base name as the first argument and the extension `pdf`; thus, for example,
