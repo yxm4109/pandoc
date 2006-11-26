@@ -2,14 +2,14 @@
 .SH NAME
 html2markdown \- converts HTML to markdown-formatted text
 .SH SYNOPSIS
-\fBhtml2markdown\fR [\fIoptions\fR] [\fB\-o\fR \fIoutput-file\fR] 
-[\fIinput-file\fR or \fIURL\fR] [\fB\-\-\fR \fIpandoc\-opts\fR]
+\fBhtml2markdown\fR [\fIoptions\fR] [\fIinput-file\fR or \fIURL\fR]
+[\fB\-\-\fR \fIpandoc\-opts\fR]
 .SH DESCRIPTION
 \fBhtml2markdown\fR converts \fIinput-file\fR or \fIURL\fR (or text
-from STDIN) from HTML to markdown-formatted plain text.  Output is
-sent to STDOUT unless another destination is specified using the
-\fB\-o\fR option. \fBhtml2markdown\fR uses an available program
-(e.g. wget, w3m, lynx or curl) to fetch the contents of the URL.
+from STDIN) from HTML to markdown-formatted plain text. 
+If a URL is specified, \fBhtml2markdown\fR uses an available program
+(e.g. wget, w3m, lynx or curl) to fetch its contents.  Output is sent
+to STDOUT.
 .PP
 \fBhtml2markdown\fR is a wrapper for \fBpandoc\fR.
 .SH OPTIONS
@@ -27,9 +27,6 @@ html2markdown -g 'wget --user=foo --password=bar' mysite.com
 .B \-n
 Disable automatic fetching of contents when URLs are specified as
 arguments.
-.TP
-.B \-o \fIoutput-file\fR
-Send output to \fIoutput-file\fR instead of STDOUT.
 .TP
 .B \-\-
 Any options appearing after ` \-\- ' on the command line will be passed

@@ -2,21 +2,19 @@
 .SH NAME
 markdown2latex \- converts markdown-formatted text to LaTeX 
 .SH SYNOPSIS
-\fBmarkdown2latex\fR [\fIoptions\fR] [\fB\-o\fR \fIoutput-file\fR]
-[\fIinput-file\fR]... [\fB\-\-\fR \fIpandoc\-opts\fR]
+\fBmarkdown2latex\fR [\fIoptions\fR] [\fIinput-file\fR]...
+[\fB\-\-\fR \fIpandoc\-opts\fR]
 .SH DESCRIPTION
 \fBmarkdown2latex\fR converts \fIinput-file\fR (or text from STDIN)
 from markdown-formatted plain text to LaTeX.  If multiple files are
 specified, they will be combined to make a single LaTeX document.
+Output is sent to STDOUT.
 .PP
 \fBmarkdown2latex\fR is a wrapper for \fBpandoc\fR.
 .SH OPTIONS
 .TP
 .B \-h
 Show usage message.
-.TP
-.B \-o \fIoutput-file\fR
-Send output to \fIoutput-file\fR instead of STDOUT.
 .TP
 .B \-\-
 Any options appearing after ` \-\- ' on the command line will be passed
