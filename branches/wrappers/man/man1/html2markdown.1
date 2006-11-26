@@ -20,7 +20,9 @@ Show usage message.
 .B \-g \fIcommand\fR
 Use \fIcommand\fR to fetch the contents of a URL.  (By default,
 \fBhtml2markdown\fR searches for an available program or text-based
-browser to fetch the contents of a URL.)
+browser to fetch the contents of a URL.)  For example:
+.IP
+html2markdown -g 'wget --user=foo --password=bar' mysite.com
 .TP
 .B \-n
 Disable automatic fetching of contents when URLs are specified as
