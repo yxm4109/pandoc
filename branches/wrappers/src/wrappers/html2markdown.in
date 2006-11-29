@@ -88,6 +88,7 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
 
     # Treat given argument as an URL.
     err "Attempting to fetch file from '$infile'..."
+    is_url=yes
 
     ### tempdir.sh
 
@@ -109,5 +110,18 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     set -- $grabber_out
 fi
 
-tidy -utf8 "$@" 2>/dev/null |
+if pathfind iconv; then
+    # Try to determine character encoding
+    encoding=$(LC_ALL=C head "$@" | tr 'A-Z' 'a-z' | sed -ne '/<meta .*content-type.*charset=/ s/.*charset=["'\'']*\([-a-zA-Z0-9]*\).*["'\'']*/\1/p')
+    if [ -n "$encoding" ]; then
+        alias to_utf8='iconv -f "$encoding" -t utf-8'
+    else
+        if [ -n $is_url ]; then
+            alias to_utf8='cat' # assume web pages are UTF-8 if not specified
+        # otherwise just use local encoding
+        fi 
+    fi
+fi
+
+to_utf8 "$@" | tidy -utf8 2>/dev/null |
 pandoc $PANDOC_OPTS -r html -w markdown -s | from_utf8
