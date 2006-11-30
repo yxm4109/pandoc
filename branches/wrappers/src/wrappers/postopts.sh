@@ -31,5 +31,3 @@ done
 set -- $infile_all
 IFS="$OLDIFS"
 # Now "$@" holds the filenames without '--' delimiter.
-
-[ -z "$ignored" ] || err "Warning:  extra arguments '$ignored' will be ignored."
