@@ -1,4 +1,7 @@
-SYNOPSIS=${SYNOPSIS:-"[-h|?] [input_file]..."}
+if [ -z "$SYNOPSIS" ]; then
+    SYNOPSIS="[-h|?] [input_file]"
+    [ -n "$THIS_NARG" ] || SYNOPSIS="${SYNOPSIS}..."
+fi
 
 while getopts o:h opt; do
     case $opt in
