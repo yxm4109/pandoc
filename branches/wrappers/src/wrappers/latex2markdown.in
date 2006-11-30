@@ -1,6 +1,8 @@
 #!/bin/sh -e
 # runs pandoc to convert latex to markdown
 
+THIS_NARG=1
+
 ### common.sh
 
 ### getopts.sh

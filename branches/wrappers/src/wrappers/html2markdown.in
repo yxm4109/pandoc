@@ -3,6 +3,7 @@
 # uses an available program to fetch URL and tidy to normalize it first
 
 REQUIRED=tidy
+THIS_NARG=1
 
 ### common.sh
 
@@ -86,11 +87,6 @@ if [ -n "$1" ] && ! [ -f "$1" ]; then
     fi
     # Treat given argument as an URL.
     inurl="$1"
-fi
-
-if [ -n "$2" ]; then
-    shift
-    err "Warning:  extra arguments '$@' will be ignored."
 fi
 
 if [ -n "$inurl" ]; then
