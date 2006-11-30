@@ -19,6 +19,8 @@ Show usage message.
 .TP
 .B \-e \fIencoding\fR
 Assume the character encoding \fIencoding\fR in reading the HTML.
+(Note: \fIencoding\fR will be passed to \fBiconv\fR; a list of
+available encodings may be obtained using `\fBiconv \-l\fR'.)
 If the \fB\-e\fR option is not specified, the encoding will be
 determined as follows:  If input is from STDIN, the local encoding 
 will be assumed.  Otherwise, \fBhtml2markdown\fR will try to
@@ -54,6 +56,7 @@ for a list of options that may be used.
 \fBmarkdown2html\fR(1),
 \fBmarkdown2latex\fR(1),
 \fBlatex2markdown\fR(1),
-\fBmarkdown2pdf\fR(1)
+\fBmarkdown2pdf\fR(1),
+\fBiconv\fR(1)
 .SH AUTHOR
 John MacFarlane and Recai Oktas
