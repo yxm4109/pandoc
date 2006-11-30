@@ -17,6 +17,16 @@ to STDOUT.
 .B \-h
 Show usage message.
 .TP
+.B \-e \fIencoding\fR
+Assume the character encoding \fIencoding\fR in reading the HTML.
+If the \fB\-e\fR option is not specified, the encoding will be
+determined as follows:  If input is from STDIN, the local encoding 
+will be assumed.  Otherwise, \fBhtml2markdown\fR will try to
+extract the character encoding from the "Content-type" meta tag.
+If no character encoding is specified in this way, UTF-8 will be
+assumed for a URL argument, and the local encoding will be assumed
+for a file argument.
+.TP
 .B \-g \fIcommand\fR
 Use \fIcommand\fR to fetch the contents of a URL.  (By default,
 \fBhtml2markdown\fR searches for an available program or text-based
