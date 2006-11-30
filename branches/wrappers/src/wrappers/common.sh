@@ -23,7 +23,9 @@ pathfind () {
     return 1
 }
 
+HAVE_ICONV=
 if pathfind iconv; then
+    HAVE_ICONV=1
     alias to_utf8='iconv -t utf-8'
     alias from_utf8='iconv -f utf-8'
 else

@@ -60,13 +60,17 @@ grab_url_with () {
     $prog "$@" "$url"
 }
 
+encoding=
 grabber=
 nograb=
-while getopts g:nh opt; do
+while getopts e:g:nh opt; do
     case $opt in
+    e) encoding="$OPTARG" ;;
     g) grabber="$OPTARG" ;;
     n) nograb=1 ;;
-    ?|h) usage "[-g grabber_command] [-n] [-h|?] [input_file|url]"; exit 2 ;;
+    ?|h)
+        usage "[-e encoding] [-g grabber_command] [-n] [-h|?] [input_file|url]"
+        exit 2 ;;
     esac
 done
 
@@ -74,28 +78,30 @@ shift $(($OPTIND - 1))
 
 ### postopts.sh
 
-infile="$1"
+inurl=
+if [ -n "$1" ] && ! [ -f "$1" ]; then
+    if [ -n "$nograb" ]; then
+        err "'$1' not found; refusing to treat input as URL."
+        exit 1
+    fi
+    # Treat given argument as an URL.
+    inurl="$1"
+fi
+
 if [ -n "$2" ]; then
     shift
     err "Warning:  extra arguments '$@' will be ignored."
 fi
 
-if [ -n "$infile" ] && ! [ -f "$infile" ]; then
-    if [ -n "$nograb" ]; then
-	err "'$infile' not found; refusing to treat input as URL."
-        exit 1
-    fi
-
-    # Treat given argument as an URL.
-    err "Attempting to fetch file from '$infile'..."
-    is_url=yes
+if [ -n "$inurl" ]; then
+    err "Attempting to fetch file from '$inurl'..."
 
     ### tempdir.sh
 
     grabber_out=$THIS_TEMPDIR/grabber.out
     grabber_log=$THIS_TEMPDIR/grabber.log
-    if ! grab_url_with "$infile" "$grabber" 1>$grabber_out \
-                                            2>$grabber_log; then
+    if ! grab_url_with "$inurl" "$grabber" 1>$grabber_out \
+                                           2>$grabber_log; then
         errn "grab_url_with failed"
         if [ -f $grabber_log ]; then
             err " with the following error log."
@@ -110,19 +116,23 @@ if [ -n "$infile" ] && ! [ -f "$infile" ]; then
     set -- $grabber_out
 fi
 
-# unless input is from stdin, attempt to determine character encoding
-if [ -n "$infile" ] && pathfind iconv; then
-    # Try to determine character encoding
-    encoding=$(LC_ALL=C head "$@" | tr 'A-Z' 'a-z' | sed -ne '/<meta .*content-type.*charset=/ s/.*charset=["'\'']*\([-a-zA-Z0-9]*\).*["'\'']*/\1/p')
-    if [ -n "$encoding" ]; then
-        alias to_utf8='iconv -f "$encoding" -t utf-8'
-    else
-        if [ -n $is_url ]; then
-            alias to_utf8='cat' # assume web pages are UTF-8 if not specified
-        # otherwise just use local encoding
-        fi
-    fi 
+if [ -z "$encoding" ] && [ "x$@" != "x" ]; then
+    # Try to determine character encoding unless not specified
+    # and input is STDIN.
+    encoding=$(
+        head "$@" |
+        LC_ALL=C tr 'A-Z' 'a-z' |
+        sed -ne '/<meta .*content-type.*charset=/ {
+            s/.*charset=["'\'']*\([-a-zA-Z0-9]*\).*["'\'']*/\1/p
+        }'
+    )
 fi
+
+if [ -n "$encoding" ] && [ -n "$HAVE_ICONV" ]; then
+    alias to_utf8='iconv -f "$encoding" -t utf-8'
+elif [ -n "$inurl" ]; then # assume web pages are UTF-8
+    alias to_utf8='cat'
+fi # else just use local encoding
 
 to_utf8 "$@" | tidy -utf8 2>/dev/null |
 pandoc $PANDOC_OPTS -r html -w markdown -s | from_utf8
