@@ -21,7 +21,7 @@ pathfind () {
     IFS=:
     for _p in $PATH; do
         if [ -x "$_p/$*" ] && [ -f "$_p/$*" ]; then
-            IFS="$OLDIFS"
+            IFS="$ifs_save"
             return 0
         fi
     done
