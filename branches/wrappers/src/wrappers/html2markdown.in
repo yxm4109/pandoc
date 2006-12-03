@@ -55,10 +55,8 @@ grab_url_with () {
     *)     err "$THIS:  unhandled web grabber '$prog'; hope it succeeds."
     esac
 
-    eval "set -- $base_opts $prog_opts"
-
-    err "$THIS: invoking '$prog $@ $url'..."
-    $prog "$@" "$url"
+    err "$THIS: invoking '$prog $base_opts $prog_opts $url'..."
+    run $prog $base_opts $prog_opts "$url"
 }
 
 encoding=
