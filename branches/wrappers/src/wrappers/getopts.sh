@@ -5,7 +5,7 @@ fi
 
 while getopts h opt; do
     case $opt in
-    h) usage "$SYNOPSIS"; exit 2 ;;
+    h|?) usage "$SYNOPSIS"; exit 2 ;;
     esac
 done
 

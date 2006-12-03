@@ -67,7 +67,7 @@ while getopts e:g:nh opt; do
     e) encoding="$OPTARG" ;;
     g) grabber="$OPTARG" ;;
     n) nograb=1 ;;
-    h)
+    h|?)
         usage "[-e encoding] [-g grabber_command] [-n] [-h] [input_file|url]"
         exit 2 ;;
     esac
