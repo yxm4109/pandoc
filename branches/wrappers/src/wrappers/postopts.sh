@@ -23,4 +23,4 @@ while [ $# -gt 0 ]; do
 done
 
 IFS="$NEWLINE"; set -- $infile_all; IFS="$OLDIFS"
-# Now "$@" holds the filenames without '--' delimiter.
+# Now "$@" holds the filenames.

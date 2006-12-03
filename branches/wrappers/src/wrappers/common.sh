@@ -2,12 +2,17 @@ THIS=${0##*/}
 
 err ()  { echo "$*"   | fold -s -w ${COLUMNS:-110} >&2; }
 errn () { printf "$*" | fold -s -w ${COLUMNS:-110} >&2; }
-run ()  { eval "set -- $@"; "$@"; }
 
 usage () {
     synopsis="$@"
     err "Usage:  $THIS $synopsis"
     err "See $THIS(1) man file for details."
+}
+
+# Evaluate and run the given command line.
+run () {
+    eval "set -- $@"
+    "$@"
 }
 
 # Portable which(1).
