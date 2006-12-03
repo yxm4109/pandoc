@@ -2,6 +2,7 @@ THIS=${0##*/}
 
 err ()  { echo "$*"   | fold -s -w ${COLUMNS:-110} >&2; }
 errn () { printf "$*" | fold -s -w ${COLUMNS:-110} >&2; }
+run ()  { eval "set -- $@"; "$@"; }
 
 usage () {
     synopsis="$@"

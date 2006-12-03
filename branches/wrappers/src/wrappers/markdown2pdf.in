@@ -9,7 +9,7 @@ outfile=
 while getopts o:h opt; do
     case $opt in
     o) outfile="$OPTARG" ;;
-    ?|h) usage "[-o output_file] [-h|?] [input_file]..."; exit 2 ;;
+    h) usage "[-o output_file] [-h] [input_file]..."; exit 2 ;;
     esac
 done
 
@@ -37,7 +37,7 @@ esac
 TEXNAME=$THIS
 
 to_utf8 "$@" |
-pandoc $PANDOC_OPTS -w latex -s >$THIS_TEMPDIR/$TEXNAME.tex && (
+run pandoc $PANDOC_OPTS -w latex -s >$THIS_TEMPDIR/$TEXNAME.tex && (
     cd $THIS_TEMPDIR
     if ! pdflatex -interaction=batchmode $TEXNAME.tex >/dev/null 2>&1; then
         err "LaTeX errors:"

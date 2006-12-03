@@ -3,20 +3,14 @@
 NEWLINE='
 '
 OLDIFS="$IFS"
-IFS="$NEWLINE"
 
 infile_all=
 ncur=$#
 while [ $# -gt 0 ]; do
     case "$1" in
-    --)
-	shift
-        # If reached here reset (overwrite) PANDOC_OPTS and collect options.
-        PANDOC_OPTS=
-        for opt; do
-	    PANDOC_OPTS="${PANDOC_OPTS}${OLDIFS}${opt}"
-        done
-	break ;;
+    -*)
+        PANDOC_OPTS="$@"
+        break ;;
      *)
         if [ -z "$THIS_NARG" ] || [ $(($ncur - $#)) -lt $THIS_NARG ]; then
             [ -n "$1" ] || continue # skip empty arguments
@@ -28,6 +22,5 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-set -- $infile_all
-IFS="$OLDIFS"
+IFS="$NEWLINE"; set -- $infile_all; IFS="$OLDIFS"
 # Now "$@" holds the filenames without '--' delimiter.

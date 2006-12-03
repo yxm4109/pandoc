@@ -1,11 +1,11 @@
 if [ -z "$SYNOPSIS" ]; then
-    SYNOPSIS="[-h|?] [input_file]"
+    SYNOPSIS="[-h] [input_file]"
     [ -n "$THIS_NARG" ] || SYNOPSIS="${SYNOPSIS}..."
 fi
 
-while getopts o:h opt; do
+while getopts h opt; do
     case $opt in
-    ?|h) usage "$SYNOPSIS"; exit 2 ;;
+    h) usage "$SYNOPSIS"; exit 2 ;;
     esac
 done
 
