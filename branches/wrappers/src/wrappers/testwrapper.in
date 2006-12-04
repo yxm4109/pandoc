@@ -86,7 +86,8 @@ Arguments passed to wrappee:
 |-A|
 |quux baz|
 |-B|
-EOF)
+EOF
+)
         check_results "$actual" "$expected" \
             'wrapper -o "output file" "foo bar" -A "quux baz" -B'
 
@@ -99,7 +100,8 @@ Arguments passed to wrapper:
 Arguments passed to wrappee:
 |-A|
 |foo bar|
-EOF)
+EOF
+)
         check_results "$actual" "$expected" 'wrapper -- -A "foo bar"'
 
         # Test 3
@@ -112,7 +114,8 @@ Arguments passed to wrapper:
 Arguments passed to wrappee:
 |-Z|
 |baz|
-EOF)
+EOF
+)
         check_results "$actual" "$expected" \
             'PANDOC_OPTS="-Z baz" wrapper "foo bar"'
     else
