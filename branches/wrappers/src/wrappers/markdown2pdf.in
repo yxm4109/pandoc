@@ -36,7 +36,8 @@ esac
 # We should use a filename without white spaces for pdflatex.
 TEXNAME=$THIS
 
-to_utf8 "$@" | runpandoc -w latex -s >$THIS_TEMPDIR/$TEXNAME.tex && (
+to_utf8 "$@" | runpandoc -w latex -s >$THIS_TEMPDIR/$TEXNAME.tex
+(
     cd $THIS_TEMPDIR
     if ! pdflatex -interaction=batchmode $TEXNAME.tex >/dev/null 2>&1; then
         err "LaTeX errors:"
