@@ -16,7 +16,9 @@ usage () {
 
 runpandoc () {
     if [ -n "$WRAPPEE_ARGS" ]; then
+        # Unpack arguments that will be passed to pandoc.
         oldifs="$IFS"; IFS="$NEWLINE"; set -- $WRAPPEE_ARGS "$@"; IFS="$oldifs"
+        case "$1" in --) shift;; esac # tolerate the existence of a leading '--'
     fi
 
     pandoc "$@"
