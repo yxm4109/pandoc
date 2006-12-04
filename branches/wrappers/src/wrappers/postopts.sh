@@ -1,5 +1,5 @@
 # Parse wrapper and wrappee (pandoc) arguments by taking
-# into account that they may have white spaces.
+# into account that they may have space or tab characters.
 pick="WRAPPER_ARGS"
 while [ $# -gt 0 ]; do
     if [ "$pick" = "WRAPPER_ARGS" ]; then
