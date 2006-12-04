@@ -9,4 +9,4 @@
 
 ### checkin.sh
 
-to_utf8 "$@" | run pandoc $PANDOC_OPTS | from_utf8
+to_utf8 "$@" | runpandoc | from_utf8

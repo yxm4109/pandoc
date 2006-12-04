@@ -1,5 +1,10 @@
 THIS=${0##*/}
 
+NEWLINE='
+'
+WRAPPER_ARGS=
+WRAPPEE_ARGS=
+
 err ()  { echo "$*"   | fold -s -w ${COLUMNS:-110} >&2; }
 errn () { printf "$*" | fold -s -w ${COLUMNS:-110} >&2; }
 
@@ -9,23 +14,24 @@ usage () {
     err "See $THIS(1) man file for details."
 }
 
-# Evaluate and run the given command line.
-run () {
-    eval "set -- $@"
-    "$@"
+runpandoc () {
+    if [ -n "$WRAPPEE_ARGS" ]; then
+        oldifs="$IFS"; IFS="$NEWLINE"; set -- $WRAPPEE_ARGS "$@"; IFS="$oldifs"
+    fi
+
+    pandoc "$@"
 }
 
 # Portable which(1).
 pathfind () {
-    ifs_save="$IFS"
-    IFS=:
+    oldifs="$IFS"; IFS=':'
     for _p in $PATH; do
         if [ -x "$_p/$*" ] && [ -f "$_p/$*" ]; then
-            IFS="$ifs_save"
+            IFS="$oldifs"
             return 0
         fi
     done
-    IFS="$ifs_save"
+    IFS="$oldifs"
     return 1
 }
 
