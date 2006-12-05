@@ -131,6 +131,23 @@ EOF
 )
         check_results "$actual" "$expected" \
             'PANDOC_OPTS="-Z baz" wrapper "foo bar"'
+
+        # Test 4 (Test 1 with a redundant '--')
+        printf >&2 "    test case 4... "
+        actual=$(wrapper -o "output file" "foo bar" -- -A "quux baz" -B)
+        expected=$(cat <<'EOF'
+Options passed to wrapper:
+|output file|
+Arguments passed to wrapper:
+|foo bar|
+Arguments passed to wrappee:
+|-A|
+|quux baz|
+|-B|
+EOF
+)
+        check_results "$actual" "$expected" \
+            'wrapper -o "output file" "foo bar" -- -A "quux baz" -B'
     else
         echo >&2 "Warning: cannot verify correctness with $CMD; shell not available"
     fi
