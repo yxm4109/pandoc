@@ -44,6 +44,19 @@ runpandoc
 EOF
 }
 
+# Portable which(1).
+pathfind () {
+    oldifs="$IFS"; IFS=':'
+    for _p in $PATH; do
+        if [ -x "$_p/$*" ] && [ -f "$_p/$*" ]; then
+            IFS="$oldifs"
+            return 0
+        fi
+    done
+    IFS="$oldifs"
+    return 1
+}
+
 check_results () {
         if [ "$1" = "$2" ]; then
             echo >&2 ok
@@ -64,7 +77,7 @@ EOF
 for SH in "$BASH" "$DASH" "$KSH" "$ZSH"; do
     CMD=${SH%% *}
     echo >&2 "  Testing with $CMD..."
-    if which "$CMD" >/dev/null 2>&1; then
+    if pathfind "$CMD"; then
         if [ "$CMD" = "zsh" ]; then
             # Zsh needs to be called as 'sh' to enable POSIX mode.
             ln -s $(which zsh) ./sh
@@ -106,7 +119,7 @@ EOF
 
         # Test 3
         printf >&2 "    test case 3... "
-        actual=$(PANDOC_OPTS="-Z baz" wrapper "foo bar")
+        actual=$(PANDOC_OPTS="-Z baz"; export PANDOC_OPTS; wrapper "foo bar")
         expected=$(cat <<'EOF'
 Options passed to wrapper:
 Arguments passed to wrapper:
@@ -119,7 +132,7 @@ EOF
         check_results "$actual" "$expected" \
             'PANDOC_OPTS="-Z baz" wrapper "foo bar"'
     else
-        warn "cannot verify correctness with $CMD; shell not available"
+        echo >&2 "Warning: cannot verify correctness with $CMD; shell not available"
     fi
 done
 
