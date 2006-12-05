@@ -3,10 +3,10 @@
 markdown2pdf \- converts markdown-formatted text to PDF, using pdflatex 
 .SH SYNOPSIS
 \fBmarkdown2pdf\fR [\fIoptions\fR] [\fB\-o\fR \fIoutput-file\fR]
-[\fIinput-file\fR]... [\fB\-\-\fR \fIpandoc\-opts\fR]
+[\fIinput-file\fR]... [\fB\-\-\fR] [\fIpandoc\-opts\fR]
 .SH DESCRIPTION
-\fBmarkdown2pdf\fR converts \fIinput-file\fR (or text from STDIN) from
-markdown-formatted plain text to PDF, using \fBpdflatex\fR.  If no output
+\fBmarkdown2pdf\fR converts \fIinput\-file\fR (or text from STDIN) from
+markdown\-formatted plain text to PDF, using \fBpdflatex\fR.  If no output
 filename is specified, the name of the output file is derived from the
 input file; thus, for example, if the input file is \fIhello.txt\fR,
 the output file will be \fIhello.pdf\fR.  If the input is read from STDIN
@@ -24,15 +24,17 @@ Show usage message.
 .B \-o \fIoutput-file\fR
 Specify name of output (PDF) file.
 .TP
-.B \-\-
-Any options appearing after ` \-\- ' on the command line will be passed
-directly to \fBpandoc\fR.  See \fBpandoc\fR(1) for a list of options
-that may be used.  Options specified in this way will override
-PANDOC_OPTS (see below).  Example:
+.I pandoc\-opts
+Any options appearing after \fIinput\-file\fR... on the command line
+will be passed directly to \fBpandoc\fR.  If no \fIinput-file\fR
+is specified, these options must be preceded by ` \fB\-\-\fR '.
+(In other cases, ` \fB\-\-\fR ' is optional.)  See \fBpandoc\fR(1)
+for a list of options that may be used.  Options specified in 
+this way will override PANDOC_OPTS (see below).  Example:
 .IP
-markdown2pdf input.txt -- --custom-header=letterhead.tex
+markdown2pdf input.txt \-\- \-\-custom\-header=letterhead.tex
 .SH ENVIRONMENT
-Any command-line options contained in the PANDOC_OPTS environment variable
+Any command\-line options contained in the PANDOC_OPTS environment variable
 will be passed directly to \fBpandoc\fR.  See \fBpandoc\fR(1)
 for a list of options that may be used.
 .SH "SEE ALSO"

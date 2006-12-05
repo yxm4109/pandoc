@@ -162,15 +162,28 @@ explicitly using the `-o` option:
 
 	markdown2pdf -o "My Book.pdf" chap1.txt chap2.txt chap3.txt  
 
-If you want to use `pandoc`'s command-line options in these scripts,
-you may specify them on the command line, separating them from other
-arguments and shell script options with '` -- `'.  For example,
+Options specific to the scripts, like `-o`, `-g`, and `-n`, must
+be specified *before* any command-line arguments (file names or URLs).
+Any options specified *after* the command-line arguments will be
+passed directly to `pandoc`. For example,
 
-	markdown2html tusks.txt -- -S -T Elephants
+	markdown2html tusks.txt -S -T Elephants
 
 will convert `tusks.txt` to `tusks.html` using smart quotes, ellipses,
-and dashes, with "Elephants" as the page title prefix.  Alternatively,
-the options may be put into the environment variable `PANDOC_OPTS`:
+and dashes, with "Elephants" as the page title prefix.  (For a
+complete list of `pandoc` options, see below.)  When there are no
+command-line arguments (because input is from STDIN), `pandoc`
+options must be preceded by ` -- `:
+
+	cat tusks.txt | markdown2html -- -S -T Elephants
+
+The ` -- ` separator may optionally be used when there are command-line
+arguments:
+
+	markdown2html -- tusks.txt -S -T Elephants
+
+Alternatively, the options may be put into the environment variable
+`PANDOC_OPTS`:
 
 	PANDOC_OPTS="-S -T Elephants" markdown2html tusks.txt > tusks.html
 
@@ -180,8 +193,8 @@ To make these options persistent, use `export`:
 	markdown2html tusks.txt > tusks.html 
 	markdown2html trunk.txt > trunk.html
 
-Note that options specified on the command line after '` -- `' will override
-any options set in `PANDOC_OPTS`.
+If `pandoc` options are specified on the command line, `PANDOC_OPTS`
+will be ignored.
 
 Note:  `markdown2html` is designed to be used as a drop-in replacement
 for John Gruber's `Markdown.pl`, so by default it produces an HTML fragment,

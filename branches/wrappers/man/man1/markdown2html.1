@@ -1,12 +1,12 @@
 .TH MARKDOWN2HTML 1 "November 21, 2006" Pandoc "User Manuals"
 .SH NAME
-markdown2html \- converts markdown-formatted text to HTML 
+markdown2html \- converts markdown\-formatted text to HTML 
 .SH SYNOPSIS
-\fBmarkdown2html\fR [\fIoptions\fR] [\fIinput-file\fR]...
-[\fB\-\-\fR \fIpandoc\-opts\fR]
+\fBmarkdown2html\fR [\fIoptions\fR] [\fIinput\-file\fR]...
+[\fB\-\-\fR] [\fIpandoc\-opts\fR]
 .SH DESCRIPTION
-\fBmarkdown2html\fR converts \fIinput-file\fR 
-(or text from STDIN) from markdown-formatted plain text to HTML. 
+\fBmarkdown2html\fR converts \fIinput\-file\fR 
+(or text from STDIN) from markdown\-formatted plain text to HTML. 
 If multiple files are specified, they will be combined to make a single
 HTML document.  Output is sent to STDOUT.
 .PP
@@ -16,15 +16,17 @@ HTML document.  Output is sent to STDOUT.
 .B \-h
 Show usage message.
 .TP
-.B \-\-
-Any options appearing after ` \-\- ' on the command line will be passed
-directly to \fBpandoc\fR.  See \fBpandoc\fR(1) for a list of options
-that may be used.  Options specified in this way will override
-PANDOC_OPTS (see below).  Example:
+.I pandoc\-opts
+Any options appearing after \fIinput\-file\fR... on the command line
+will be passed directly to \fBpandoc\fR.  If no \fIinput-file\fR
+is specified, these options must be preceded by ` \fB\-\-\fR '.
+(In other cases, ` \fB\-\-\fR ' is optional.)  See \fBpandoc\fR(1)
+for a list of options that may be used.  Options specified in 
+this way will override PANDOC_OPTS (see below).  Example:
 .IP
-markdown2html input.txt -- --css=main.css -S
+markdown2html input.txt \-\- \-\-css=main.css \-S
 .SH ENVIRONMENT
-Any command-line options contained in the PANDOC_OPTS environment variable
+Any command\-line options contained in the PANDOC_OPTS environment variable
 will be passed directly to \fBpandoc\fR.  See \fBpandoc\fR(1)
 for a list of options that may be used.
 .SH "SEE ALSO"

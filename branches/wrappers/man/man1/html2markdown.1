@@ -2,11 +2,11 @@
 .SH NAME
 html2markdown \- converts HTML to markdown-formatted text
 .SH SYNOPSIS
-\fBhtml2markdown\fR [\fIoptions\fR] [\fIinput-file\fR or \fIURL\fR]
-[\fB\-\-\fR \fIpandoc\-opts\fR]
+\fBhtml2markdown\fR [\fIoptions\fR] [\fIinput\-file\fR or \fIURL\fR]
+[\fB\-\-\fR] [\fIpandoc\-opts\fR]
 .SH DESCRIPTION
-\fBhtml2markdown\fR converts \fIinput-file\fR or \fIURL\fR (or text
-from STDIN) from HTML to markdown-formatted plain text. 
+\fBhtml2markdown\fR converts \fIinput\-file\fR or \fIURL\fR (or text
+from STDIN) from HTML to markdown\-formatted plain text. 
 If a URL is specified, \fBhtml2markdown\fR uses an available program
 (e.g. wget, w3m, lynx or curl) to fetch its contents.  Output is sent
 to STDOUT.
@@ -34,21 +34,24 @@ Use \fIcommand\fR to fetch the contents of a URL.  (By default,
 \fBhtml2markdown\fR searches for an available program or text-based
 browser to fetch the contents of a URL.)  For example:
 .IP
-html2markdown -g 'wget --user=foo --password=bar' mysite.com
+html2markdown \-g 'wget \-\-user=foo \-\-password=bar' mysite.com
 .TP
 .B \-n
 Disable automatic fetching of contents when URLs are specified as
 arguments.
 .TP
-.B \-\-
-Any options appearing after ` \-\- ' on the command line will be passed
-directly to \fBpandoc\fR.  See \fBpandoc\fR(1) for a list of options
-that may be used.  Options specified in this way will override
-PANDOC_OPTS (see below).  Example:
+.I pandoc\-opts
+Any options appearing after \fIinput\-file\fR or \fIURL\fR on the
+command line will be passed directly to \fBpandoc\fR.  If no
+\fIinput-file\fR or \fIURL\fR is specified, these options must
+be preceded by ` \fB\-\-\fR '.  (In other cases, ` \fB\-\-\fR ' is
+optional.)  See \fBpandoc\fR(1) for a list of options that may be used.
+Options specified in this way will override PANDOC_OPTS (see below).
+Example:
 .IP
-html2markdown input.txt -- -R
+html2markdown input.txt \-\- \-R
 .SH ENVIRONMENT
-Any command-line options contained in the PANDOC_OPTS environment variable
+Any command\-line options contained in the PANDOC_OPTS environment variable
 will be passed directly to \fBpandoc\fR.  See \fBpandoc\fR(1)
 for a list of options that may be used.
 .SH "SEE ALSO"
