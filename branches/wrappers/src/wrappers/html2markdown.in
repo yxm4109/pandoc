@@ -3,7 +3,6 @@
 # uses an available program to fetch URL and tidy to normalize it first
 
 REQUIRED=tidy
-THIS_NARG=1
 
 ### common.sh
 
@@ -77,6 +76,8 @@ done
 shift $(($OPTIND - 1))
 
 ### postopts.sh
+
+### singlearg.sh
 
 inurl=
 if [ -n "$1" ] && ! [ -f "$1" ]; then

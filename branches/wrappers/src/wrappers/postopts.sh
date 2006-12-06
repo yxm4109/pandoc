@@ -5,12 +5,6 @@ while [ $# -gt 0 ]; do
     if [ "$pick" = "WRAPPER_ARGS" ]; then
         case "$1" in
         -*) pick="WRAPPEE_ARGS" ;;
-        *)  cur=$(($cur + 1))
-            if [ -n "$THIS_NARG" ] && [ $cur -gt $THIS_NARG ]; then
-                err "Warning:  extra argument '$1' will be ignored."
-                shift
-                continue
-            fi ;;
         esac
     fi
     # Pack args with NEWLINE to preserve spaces,
