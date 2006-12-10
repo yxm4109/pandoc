@@ -332,7 +332,7 @@ $(windows_src_dir): templates $(CABAL)
 		mkdir $(windows_src_dir)/$$d; \
 		cp $$d/*.hs $(windows_src_dir)/$$d/; \
 	done; \
-	for f in README $(CABAL) Setup.hs; do \
+	for f in README LICENSE $(CABAL) Setup.hs; do \
 		cp $$f $(windows_src_dir)/$$f; \
 	done  
 	
