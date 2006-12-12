@@ -20,7 +20,7 @@ import Text.Regex ( mkRegex, splitRegex )
 import System ( exitWith, getArgs, getProgName )
 import System.Exit
 import System.Console.GetOpt
-import IO ( stdout, stderr, hPutStrLn )
+import System.IO
 import Data.Maybe ( fromMaybe )
 import Data.List ( isPrefixOf )
 import Char ( toLower )
@@ -72,6 +72,7 @@ data Opt = Opt
     , optCustomHeader       :: String           -- ^ Custom header to use, or "DEFAULT"
     , optDefaultHeader      :: String           -- ^ Default header
     , optTitlePrefix        :: String           -- ^ Optional prefix for HTML title
+    , optOutputHandle       :: Handle           -- ^ Handle for output
     , optNumberSections     :: Bool             -- ^ If @True@, number sections in LaTeX
     , optIncremental        :: Bool             -- ^ If @True@, show lists incrementally in S5
     , optSmartypants        :: Bool             -- ^ If @True@, use smart quotes, dashes, ...
@@ -94,6 +95,7 @@ startOpt = Opt
     , optCustomHeader      = "DEFAULT"
     , optDefaultHeader     = defaultHtmlHeader
     , optTitlePrefix       = ""
+    , optOutputHandle      = stdout
     , optNumberSections    = False
     , optIncremental       = False
     , optSmartypants       = False
@@ -141,6 +143,14 @@ options =
                  (NoArg
                   (\opt -> return opt { optStandalone = True }))
                  "Include needed header and footer on output"
+
+    , Option "o" ["output"]
+                 (ReqArg
+                  (\arg opt -> do
+                     handle <- openFile arg WriteMode
+                     return opt { optOutputHandle = handle })
+                  "FILENAME")
+                 "Name of output file"
 
     , Option "p" ["preserve-tabs"]
                  (NoArg
@@ -208,7 +218,7 @@ options =
                   "FILENAME")
                  "File to include after document body"
 
-    , Option "" ["custom-header"]
+    , Option "C" ["custom-header"]
                  (ReqArg
                   (\arg opt -> do
                      text <- readFile arg
@@ -266,6 +276,7 @@ main = do
               , optCustomHeader      = customHeader
               , optDefaultHeader     = defaultHeader 
               , optTitlePrefix       = titlePrefix
+              , optOutputHandle      = output
               , optNumberSections    = numberSections
               , optIncremental       = incremental
               , optSmartypants       = smartypants
@@ -299,7 +310,7 @@ main = do
                                       writerIncludeBefore  = includeBefore, 
                                       writerIncludeAfter   = includeAfter }
 
-  (readSources sources) >>= (putStrLn . encodeUTF8 . (writer writerOptions) . 
+  (readSources sources) >>= (hPutStrLn output . encodeUTF8 . (writer writerOptions) . 
                              (reader startParserState) .  filter .
                              decodeUTF8 . (joinWithSep "\n"))
 
