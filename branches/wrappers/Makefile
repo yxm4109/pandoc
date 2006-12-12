@@ -322,26 +322,6 @@ deb: debian
 		dpkg-buildpackage -rfakeroot -uc -us -i.svn -I.svn -i_darcs -I_darcs; \
 	fi
 
-windows_src_dir:=$(THIS)-$(VERSION)-windows-source
-cleanup_files+=$(windows_src_dir)
-$(windows_src_dir): templates $(CABAL)
-	mkdir $(windows_src_dir); \
-	mkdir $(windows_src_dir)/src; \
-	cp $(SRCDIR)/Main.hs $(windows_src_dir)/src/; \
-	for d in $(shell find $(SRCDIR) -type d -name "[A-Z]*"); do \
-		mkdir $(windows_src_dir)/$$d; \
-		cp $$d/*.hs $(windows_src_dir)/$$d/; \
-	done; \
-	for f in README LICENSE $(CABAL) Setup.hs; do \
-		cp $$f $(windows_src_dir)/$$f; \
-	done  
-	
-.PHONY: windows-source
-windows_src_name:=$(windows_src_dir).zip
-cleanup_files+=$(windows_src_name)
-windows-source: $(windows_src_dir)
-	zip -l -r $(windows_src_name) $(windows_src_dir)
-
 .PHONY: website
 web_src:=web
 web_dest:=web/pandoc
