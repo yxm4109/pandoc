@@ -109,7 +109,7 @@ options =
     [ Option "v" ["version"]
                  (NoArg
                   (\_ -> do
-                     hPutStrLn stderr ("Version " ++ version)
+                     hPutStrLn stdout ("Version " ++ version)
                      exitWith ExitSuccess))
                  "Print version"
 
@@ -117,7 +117,7 @@ options =
                  (NoArg
                   (\_ -> do
                      prg <- getProgName
-                     hPutStrLn stderr (usageInfo (prg ++ " [OPTIONS] [FILES] - convert FILES from one markup format to another\nIf no OPTIONS specified, converts from markdown to html.\nIf no FILES specified, input is read from STDIN.\nOptions:") options)
+                     hPutStrLn stdout (usageInfo (prg ++ " [OPTIONS] [FILES] - convert FILES from one markup format to another\nIf no OPTIONS specified, converts from markdown to html.\nIf no FILES specified, input is read from STDIN.\nOptions:") options)
                      exitWith ExitSuccess))
                  "Show help"
 
@@ -148,6 +148,8 @@ options =
                  (ReqArg
                   (\arg opt -> do
                      handle <- openFile arg WriteMode
+                     prg <- getProgName
+                     hPutStrLn stderr (prg ++ ":  writing output to " ++ arg)
                      return opt { optOutputHandle = handle })
                   "FILENAME")
                  "Name of output file"
@@ -312,7 +314,7 @@ main = do
 
   (readSources sources) >>= (hPutStrLn output . encodeUTF8 . (writer writerOptions) . 
                              (reader startParserState) .  filter .
-                             decodeUTF8 . (joinWithSep "\n"))
+                             decodeUTF8 . (joinWithSep "\n")) >> hClose output
 
   where 
     readSources [] = mapM readSource ["-"]
