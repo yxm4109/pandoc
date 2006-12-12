@@ -21,14 +21,9 @@ Any options appearing after \fIinput\-file\fR... on the command line
 will be passed directly to \fBpandoc\fR.  If no \fIinput-file\fR
 is specified, these options must be preceded by ` \fB\-\-\fR '.
 (In other cases, ` \fB\-\-\fR ' is optional.)  See \fBpandoc\fR(1)
-for a list of options that may be used.  Options specified in 
-this way will override PANDOC_OPTS (see below).  Example:
+for a list of options that may be used.  Example:
 .IP
 markdown2latex input.txt \-\- \-\-custom\-header=letterhead.tex
-.SH ENVIRONMENT
-Any command\-line options contained in the PANDOC_OPTS environment variable
-will be passed directly to \fBpandoc\fR.  See \fBpandoc\fR(1)
-for a list of options that may be used.
 .SH "SEE ALSO"
 \fBpandoc\fR(1),
 \fBmarkdown2html\fR(1),

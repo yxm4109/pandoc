@@ -13,14 +13,5 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-# Honor PANDOC_OPTS if not overwritten in the command line.
-if [ -z "$WRAPPEE_ARGS" ] && [ -n "$PANDOC_OPTS" ]; then
-    eval "set -- $PANDOC_OPTS"
-    # Pack opts with NEWLINE as the repack procedure expects this form.
-    for opt; do
-        WRAPPEE_ARGS="${WRAPPEE_ARGS}${NEWLINE}${opt}"
-    done
-fi
-
 # Unpack filename arguments.  Now "$@" will hold the filenames.
 oldifs="$IFS"; IFS="$NEWLINE"; set -- $WRAPPER_ARGS; IFS="$oldifs"

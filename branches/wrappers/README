@@ -182,27 +182,6 @@ arguments:
 
 	markdown2html -- tusks.txt -S -T Elephants
 
-Alternatively, the options may be put into the environment variable
-`PANDOC_OPTS`:
-
-	PANDOC_OPTS="-S -T Elephants" markdown2html tusks.txt > tusks.html
-
-To make these options persistent, use `export`:
-
-	export PANDOC_OPTS="-S -T Elephants"
-	markdown2html tusks.txt > tusks.html 
-	markdown2html trunk.txt > trunk.html
-
-If `pandoc` options are specified on the command line, `PANDOC_OPTS`
-will be ignored.
-
-Note:  `markdown2html` is designed to be used as a drop-in replacement
-for John Gruber's `Markdown.pl`, so by default it produces an HTML fragment,
-not a standalone HTML file.  To produce a standalone file, pass the
-`-s` option to `pandoc`:
-
-	markdown2html tusks.txt -- -s > tusks.html 
-
 # Command-line options
 
 Various command-line options can be used to customize the output.

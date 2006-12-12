@@ -46,14 +46,9 @@ command line will be passed directly to \fBpandoc\fR.  If no
 \fIinput-file\fR or \fIURL\fR is specified, these options must
 be preceded by ` \fB\-\-\fR '.  (In other cases, ` \fB\-\-\fR ' is
 optional.)  See \fBpandoc\fR(1) for a list of options that may be used.
-Options specified in this way will override PANDOC_OPTS (see below).
 Example:
 .IP
 html2markdown input.txt \-\- \-R
-.SH ENVIRONMENT
-Any command\-line options contained in the PANDOC_OPTS environment variable
-will be passed directly to \fBpandoc\fR.  See \fBpandoc\fR(1)
-for a list of options that may be used.
 .SH "SEE ALSO"
 \fBpandoc\fR(1),
 \fBmarkdown2html\fR(1),
