@@ -16,6 +16,7 @@ import Text.Pandoc.Writers.Markdown ( writeMarkdown )
 import Text.Pandoc.Writers.DefaultHeaders ( defaultHtmlHeader, defaultRTFHeader, defaultS5Header, defaultLaTeXHeader )
 import Text.Pandoc.Definition
 import Text.Pandoc.Shared
+import Text.Regex ( mkRegex, splitRegex )
 import System ( exitWith, getArgs, getProgName )
 import System.Exit
 import System.Console.GetOpt
@@ -232,13 +233,25 @@ options =
                   "FORMAT")
                  "Print default header for FORMAT"
     ]
+
+-- set default options based on start (starting options) and name of calling program
+setDefaultOpts start name =
+  case (splitRegex (mkRegex "2") (map toLower name)) of
+    [from, to] -> case ((lookup from readers), (lookup to writers)) of
+                    (Just reader, Just (writer, header)) -> start { optReader = reader, optWriter = writer, optDefaultHeader = header, optStandalone = True }
+                    _                                    -> start
+    _          -> start
+
 main = do
 
   args <- getArgs
   let (actions, sources, errors) = getOpt RequireOrder options args
 
+  name <- getProgName
+  let defaultOpts = setDefaultOpts startOpt name
+
   -- thread option data structure through all supplied option actions
-  opts <- foldl (>>=) (return startOpt) actions
+  opts <- foldl (>>=) (return defaultOpts) actions
 
   let Opt    { optPreserveTabs       = preserveTabs
               , optTabStop           = tabStop
