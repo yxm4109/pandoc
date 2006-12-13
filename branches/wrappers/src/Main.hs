@@ -234,8 +234,8 @@ allOptions =
     , Option "v" ["version"]
                  (NoArg
                   (\_ -> do
-                     hPutStrLn stdout ("Version " ++ version)
-                     exitWith ExitSuccess))
+                     hPutStrLn stderr ("Version " ++ version)
+                     exitWith $ ExitFailure 2))
                  "Print version"
 
     , Option "h" ["help"]
@@ -319,8 +319,8 @@ main = do
 
   if showUsage
     then do
-        hPutStrLn stdout (reformatUsageInfo $ usageInfo (name ++ " [OPTIONS] [FILES]") options)
-        exitWith ExitSuccess
+        hPutStrLn stderr (reformatUsageInfo $ usageInfo (name ++ " [OPTIONS] [FILES]") options)
+        exitWith $ ExitFailure 2
     else return ()
 
   output <- if (null outputFile) 

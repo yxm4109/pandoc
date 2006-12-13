@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 WORKING=$(pwd)
-REQUIRED=pdflatex
+REQUIRED=markdown2latex
 THIS=${0##*/}
 
 NEWLINE='
@@ -49,7 +49,8 @@ TEMPDIR=
 TEMPDIR="$(mktemp -d -t $THIS.XXXXXXXX)" || exit 1
 readonly TEMPDIR
 
-if ! pandoc "$@" -f markdown -t latex -s -d >$TEMPDIR/output.tex 2>$TEMPDIR/log; then
+if ! markdown2latex "$@" -s -d >$TEMPDIR/output.tex 2>$TEMPDIR/log; then
+    cat $TEMPDIR/log | sed -e 's/markdown2latex/markdown2pdf/g'
     exit 1
 fi
 
