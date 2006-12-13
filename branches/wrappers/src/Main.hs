@@ -117,7 +117,9 @@ options =
                  (NoArg
                   (\_ -> do
                      prg <- getProgName
-                     hPutStrLn stdout (usageInfo (prg ++ " [OPTIONS] [FILES] - convert FILES from one markup format to another\nIf no OPTIONS specified, converts from markdown to html.\nIf no FILES specified, input is read from STDIN.\nOptions:") options)
+                     let reformatUsageInfo = gsub "    *--" ", --" . 
+                                             gsub "   *([^- ])" "\n\t\\1" 
+                     hPutStrLn stdout (reformatUsageInfo $ usageInfo (prg ++ " [OPTIONS] [FILES] - convert FILES from one markup format to another\nIf no OPTIONS specified, converts from markdown to html.\nIf no FILES specified, input is read from STDIN.\nOptions:") options)
                      exitWith ExitSuccess))
                  "Show help"
 
@@ -159,7 +161,7 @@ options =
                   (\opt -> return opt { optPreserveTabs = True }))
                  "Preserve tabs instead of converting to spaces"
 
-    , Option "" ["tab-stop"]
+    , Option "b" ["tab-stop"]
                  (ReqArg
                   (\arg opt -> return opt { optTabStop = (read arg) } )
                   "TABSTOP")
@@ -250,14 +252,17 @@ options =
 setDefaultOpts start name =
   case (splitRegex (mkRegex "2") (map toLower name)) of
     [from, to] -> case ((lookup from readers), (lookup to writers)) of
-                    (Just reader, Just (writer, header)) -> start { optReader = reader, optWriter = writer, optDefaultHeader = header, optStandalone = True }
+                    (Just reader, Just (writer, header)) -> start { optReader = reader, 
+                                                                    optWriter = writer, 
+                                                                    optDefaultHeader = header, 
+                                                                    optStandalone = True }
                     _                                    -> start
     _          -> start
 
 main = do
 
   args <- getArgs
-  let (actions, sources, errors) = getOpt RequireOrder options args
+  let (actions, sources, errors) = getOpt Permute options args
 
   name <- getProgName
   let defaultOpts = setDefaultOpts startOpt name
