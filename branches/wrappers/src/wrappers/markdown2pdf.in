@@ -1,48 +1,32 @@
 #!/bin/sh -e
-# converts markdown to latex, then uses latex to make a PDF
 
-REQUIRED=pdflatex
+REQUIRED=markdown2latex
 
 ### common.sh
 
-outfile=
-while getopts o:h opt; do
-    case $opt in
-    o) outfile="$OPTARG" ;;
-    h|?) usage "[-o output_file] [-h] [input_file]..."; exit 2 ;;
-    esac
-done
-
-shift $(($OPTIND - 1))
-
-### postopts.sh
-
-### checkin.sh
-
-if [ -z "$outfile" ]; then
-    if [ -n "$1" ]; then
-        outfile="${1%.*}"
-    else
-        outfile="stdin" # input is STDIN, since no argument given
-    fi
-fi
-case "$outfile" in
-*.*) ;; # skip appending extension if one is already present
-*)   outfile="${outfile%.*}.pdf";;
-esac
-
 ### tempdir.sh
 
-# We should use a filename without white spaces for pdflatex.
-TEXNAME=$THIS
+if ! markdown2latex "$@" -s -d >$THIS_TEMPDIR/output.tex 2>$THIS_TEMPDIR/log; then
+    cat $THIS_TEMPDIR/log | sed -e 's/markdown2latex/markdown2pdf/g'
+    exit 1
+fi
 
-to_utf8 "$@" | runpandoc -w latex -s >$THIS_TEMPDIR/$TEXNAME.tex
+outfile="$(sed -ne '/^OUTPUT=/ s/^OUTPUT=\(.*\)/\1/p' $THIS_TEMPDIR/log)"
+if [ -f "$outfile" ]; then
+    mv "$outfile" $THIS_TEMPDIR/output.tex
+fi
+infiles="$(sed -ne '/^INPUT=/ s/^INPUT=\(.*\)/\1/p' $THIS_TEMPDIR/LOG)"
+infile="${infiles%%:*}"
+infilebase="${infile%.*}"
+defaultdest="${infilebase:-stdin}.pdf"
+destname="${outfile:-$defaultdest}"
+
 (
     cd $THIS_TEMPDIR
-    if ! pdflatex -interaction=batchmode $TEXNAME.tex >/dev/null 2>&1; then
+    if ! pdflatex -interaction=batchmode output.tex >/dev/null 2>&1; then
         err "LaTeX errors:"
-        from_utf8 $TEXNAME.log | sed -ne '/^!/,/^ *$/p' >&2
-        if grep -q "File \`ucs.sty' not found" $TEXNAME.log; then
+        cat output.log | sed -ne '/^!/,/^ *$/p' >&2
+        if grep -q "File \`ucs.sty' not found" output.log; then
             err "Please install the 'unicode' package from ctan.org."
         fi
         exit 1
@@ -50,15 +34,15 @@ to_utf8 "$@" | runpandoc -w latex -s >$THIS_TEMPDIR/$TEXNAME.tex
 )
 
 is_target_exists=
-if [ -f "$outfile" ]; then
+if [ -f "$destname" ]; then
     is_target_exists=1
-    mv -f "$outfile" "$outfile~"
+    mv "$destname" "$destname~" 
 fi
 
-mv -f $THIS_TEMPDIR/$TEXNAME.pdf "$outfile"
+mv -f $THIS_TEMPDIR/output.pdf "$destname"
 
-errn "Created '$outfile'"
+errn "Created $destname"
 [ -z "$is_target_exists" ] || {
-    errn " (previous file has been backed up as '$outfile~')"
+    errn " (previous file has been backed up as $destname~)"
 }
 err .

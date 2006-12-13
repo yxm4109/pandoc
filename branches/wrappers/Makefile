@@ -25,8 +25,10 @@ MAIN      := $(firstword $(EXECS))
 #-------------------------------------------------------------------------------
 # Install targets
 #-------------------------------------------------------------------------------
-WRAPPERS  := html2markdown latex2markdown markdown2html markdown2latex markdown2pdf
-PROGS     := $(EXECS) #$(WRAPPERS) 
+WRAPPERS  := web2markdown markdown2pdf
+SYMLINKS  := markdown2html markdown2latex markdown2s5 markdown2rst \
+			 markdown2rtf html2markdown latex2markdown rst2markdown
+PROGS     := $(EXECS) $(WRAPPERS) 
 DOCS      := README.html README BUGS TODO
 
 #-------------------------------------------------------------------------------
@@ -88,6 +90,12 @@ templates: $(SRCDIR)/templates
 $(SRCDIR)/templates:
 	$(MAKE) -C $(SRCDIR)/templates
 
+.PHONY: symlinks
+cleanup_files+=$(SYMLINKS)
+symlinks: $(SYMLINKS)
+$(SYMLINKS): $(MAIN)
+	ln -s ./$(MAIN) $@ 
+
 define generate-shell-script
 echo "Generating $@...";                                 \
 awk '                                                    \
@@ -127,7 +135,7 @@ build: templates configure
 	$(BUILDCMD) build
 
 .PHONY: build-exec
-build-exec: $(PROGS)
+build-exec: $(PROGS) $(SYMLINKS)
 cleanup_files+=$(EXECS)
 $(EXECS): build
 	for f in $@; do \
@@ -186,9 +194,13 @@ install-exec: build-exec
 			f=$$(readlink $$f); \
 		fi; \
 		$(INSTALL_PROGRAM) $$f $(BINPATH)/; \
+	done; \
+	for f in $(SYMLINKS); do \
+		ln -s $(BINPATH)/$(MAIN) $(BINPATH)/$$f; \
 	done
 uninstall-exec:
-	-for f in $(notdir $(PROGS)); do rm -f $(BINPATH)/$$f; done
+	-for f in $(notdir $(PROGS)); do rm -f $(BINPATH)/$$f; done ;
+	-for f in $(notdir $(SYMLINKS)); do rm -f $(BINPATH)/$$f; done
 
 # Program + user documents installation.
 .PHONY: install-program uninstall-program
@@ -273,15 +285,11 @@ osx-dmg: ../$(osx_dmg_name)
 	-rm -f $(osx_dmg_name)
 	mv $(osx_udzo_name) ../$(osx_dmg_name)
 
-.PHONY: test test-markdown test-wrapper
+.PHONY: test test-markdown
 test: $(MAIN)
 	@cd $(TESTDIR) && perl runtests.pl -s $(PWD)/$(MAIN)
 test-markdown: $(MAIN)
 	@cd $(TESTDIR)/MarkdownTest_1.0.3 && perl MarkdownTest.pl -s $(PWD)/$(MAIN) -tidy
-cleanup_files+=testwrapper
-test-wrappers: testwrapper
-	@echo "Running $<..."
-	@sh testwrapper
 
 # Stolen and slightly improved from a GPLed Makefile.  Credits to John Meacham.
 src_all:=$(shell find $(SRCDIR) -type f -name '*hs' | egrep -v '^\./(_darcs|lib|test)/')

@@ -1,8 +1,8 @@
 #!/bin/sh -e
-# converts html to markdown
+# converts HTML from a URL, file, or stdin to markdown
 # uses an available program to fetch URL and tidy to normalize it first
 
-REQUIRED=tidy
+REQUIRED="tidy html2markdown"
 
 ### common.sh
 
@@ -59,34 +59,64 @@ grab_url_with () {
     $prog "$@" "$url"
 }
 
+add_option() {
+    options="$options$NEWLINE$1"
+}
+
+options=
+argument=
 encoding=
 grabber=
-nograb=
-while getopts e:g:nh opt; do
-    case $opt in
-    e) encoding="$OPTARG" ;;
-    g) grabber="$OPTARG" ;;
-    n) nograb=1 ;;
-    h|?)
-        usage "[-e encoding] [-g grabber_command] [-n] [-h] [input_file|url]"
-        exit 2 ;;
+
+# Parse command-line arguments
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            html2markdown -h 2>&1 | sed -e 's/html2markdown/web2markdown/' 1>&2 
+            err "  -e ENCODING, --encoding=ENCODING"
+            err "        Specify character encoding of input"
+            err "  -g COMMAND, --grabber=COMMAND"
+            err "        Specify command to be used to grab contents of URL"
+            exit 0 ;;
+        -v|--version) 
+            html2markdown -v
+            exit 0 ;;
+        -e)
+            shift
+            encoding=$1 ;; 
+        --encoding=*)
+            wholeopt=$1
+            # extract encoding from after =
+            encoding=${wholeopt#*=} ;;
+        -g)
+            shift
+            grabber=$1 ;; 
+        --grabber=*)
+            wholeopt=$1
+            # extract encoding from after =
+            grabber=${wholeopt#*=} ;;
+        -o|-b|-H|-A|-C|-D) 
+            add_option $1
+            shift
+            add_option $1 ;;
+        -*) add_option $1 ;;
+        *) 
+            if [ -z "$argument" ]; then
+                argument=$1
+            else
+                err "Warning: extra argument '$1' will be ignored."
+            fi ;;            
     esac
+    shift
 done
 
-shift $(($OPTIND - 1))
-
-### postopts.sh
-
-### singlearg.sh
+# Unpack options.  Now "$@" will hold the html2markdown options.
+oldifs="$IFS"; IFS="$NEWLINE"; set -- $options; IFS="$oldifs"
 
 inurl=
-if [ -n "$1" ] && ! [ -f "$1" ]; then
-    if [ -n "$nograb" ]; then
-        err "'$1' not found; refusing to treat input as URL."
-        exit 1
-    fi
+if [ -n "$argument" ] && ! [ -f "$argument" ]; then
     # Treat given argument as an URL.
-    inurl="$1"
+    inurl="$argument"
 fi
 
 if [ -n "$inurl" ]; then
@@ -109,14 +139,14 @@ if [ -n "$inurl" ]; then
         exit 1
     fi
 
-    set -- $grabber_out
+    argument="$grabber_out"
 fi
 
-if [ -z "$encoding" ] && [ "x$@" != "x" ]; then
+if [ -z "$encoding" ] && [ "x$argument" != "x" ]; then
     # Try to determine character encoding unless not specified
     # and input is STDIN.
     encoding=$(
-        head "$@" |
+        head "$argument" |
         LC_ALL=C tr 'A-Z' 'a-z' |
         sed -ne '/<meta .*content-type.*charset=/ {
             s/.*charset=["'\'']*\([-a-zA-Z0-9]*\).*["'\'']*/\1/p
@@ -124,11 +154,19 @@ if [ -z "$encoding" ] && [ "x$@" != "x" ]; then
     )
 fi
 
-if [ -n "$encoding" ] && [ -n "$HAVE_ICONV" ]; then
+if [ -n "$encoding" ] && pathfind iconv; then
     alias to_utf8='iconv -f "$encoding" -t utf-8'
-elif [ -n "$inurl" ]; then # assume web pages are UTF-8
+else # assume UTF-8
     alias to_utf8='cat'
-fi # else just use local encoding
+fi 
 
-to_utf8 "$@" | tidy -utf8 2>/dev/null |
-runpandoc -r html -w markdown -s | from_utf8
+if [ -z "$argument" ]; then
+    tidy -utf8 2>/dev/null | html2markdown "$@"
+else
+    if [ -f "$argument" ]; then
+        to_utf8 "$argument" | tidy -utf8 2>/dev/null | html2markdown "$@"
+    else
+        err "File '$argument' not found."
+        exit 1
+    fi
+fi
