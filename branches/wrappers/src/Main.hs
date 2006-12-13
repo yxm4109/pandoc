@@ -226,7 +226,7 @@ allOptions =
                      let header = case (lookup arg writers) of
                                     Just (writer, head) -> head
                                     Nothing     -> error ("Unknown reader: " ++ arg) 
-                     hPutStrLn stdout header
+                     hPutStr stdout header
                      exitWith ExitSuccess)
                   "FORMAT")
                  "Print default header for FORMAT"
@@ -283,7 +283,8 @@ main = do
                             else "frtw" ++
                                    (if (to /= "html" && to /= "s5") then "SmcT" else "") ++
                                    (if (to /= "latex") then "N" else "") ++
-                                   (if (to /= "s5") then "i" else "")
+                                   (if (to /= "s5") then "i" else "") ++
+                                   (if (to == "markdown") then "D" else "")
 
   let options = filter (not . inOptList irrelevantOptions) allOptions
 
@@ -327,7 +328,7 @@ main = do
 
   if showUsage
     then do
-        hPutStrLn stderr (reformatUsageInfo $ usageInfo (name ++ " [OPTIONS] [FILES]") options)
+        hPutStr stderr (reformatUsageInfo $ usageInfo (name ++ " [OPTIONS] [FILES]") options)
         exitWith $ ExitFailure 2
     else return ()
 
