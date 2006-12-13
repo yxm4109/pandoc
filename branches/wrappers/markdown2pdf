@@ -12,12 +12,6 @@ WRAPPEE_ARGS=
 err ()  { echo "$*"   | fold -s -w ${COLUMNS:-110} >&2; }
 errn () { printf "$*" | fold -s -w ${COLUMNS:-110} >&2; }
 
-usage () {
-    synopsis="$@"
-    err "Usage:  $THIS $synopsis"
-    err "See $THIS(1) man file for details."
-}
-
 # Portable which(1).
 pathfind () {
     oldifs="$IFS"; IFS=':'
