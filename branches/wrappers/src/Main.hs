@@ -292,6 +292,14 @@ main = do
   args <- getArgs
   let (actions, sources, errors) = getOpt Permute options args
 
+  if (not (null errors))
+    then do
+      mapM (\e -> hPutStrLn stderr e) errors
+      hPutStrLn stderr (reformatUsageInfo $ usageInfo (name ++ " [OPTIONS] [FILES]") options)
+      exitWith $ ExitFailure 2
+    else
+      return ()
+
   -- thread option data structure through all supplied option actions
   opts <- foldl (>>=) (return defaultOpts) actions
 
