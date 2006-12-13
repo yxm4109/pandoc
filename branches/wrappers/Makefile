@@ -26,7 +26,7 @@ MAIN      := $(firstword $(EXECS))
 # Install targets
 #-------------------------------------------------------------------------------
 WRAPPERS  := html2markdown latex2markdown markdown2html markdown2latex markdown2pdf
-PROGS     := $(EXECS) $(WRAPPERS)
+PROGS     := $(EXECS) #$(WRAPPERS) 
 DOCS      := README.html README BUGS TODO
 
 #-------------------------------------------------------------------------------

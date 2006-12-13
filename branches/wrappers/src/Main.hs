@@ -72,12 +72,13 @@ data Opt = Opt
     , optCustomHeader       :: String           -- ^ Custom header to use, or "DEFAULT"
     , optDefaultHeader      :: String           -- ^ Default header
     , optTitlePrefix        :: String           -- ^ Optional prefix for HTML title
-    , optOutputHandle       :: Handle           -- ^ Handle for output
+    , optOutputFile         :: String           -- ^ Name of output file
     , optNumberSections     :: Bool             -- ^ If @True@, number sections in LaTeX
     , optIncremental        :: Bool             -- ^ If @True@, show lists incrementally in S5
     , optSmartypants        :: Bool             -- ^ If @True@, use smart quotes, dashes, ...
     , optASCIIMathML        :: Bool             -- ^ If @True@, use ASCIIMathML in HTML or S5
     , optShowUsage          :: Bool             -- ^ If @True@, show usage message and exit
+    , optDebug              :: Bool             -- ^ If @True@, output debug messages to stderr
     }
 
 -- | Defaults for command-line options.
@@ -96,31 +97,20 @@ startOpt = Opt
     , optCustomHeader      = "DEFAULT"
     , optDefaultHeader     = defaultHtmlHeader
     , optTitlePrefix       = ""
-    , optOutputHandle      = stdout
+    , optOutputFile        = ""    -- null for stdout
     , optNumberSections    = False
     , optIncremental       = False
     , optSmartypants       = False
     , optASCIIMathML       = False
     , optShowUsage         = False
+    , optDebug             = False
     }
 
 -- | A list of functions, each transforming the options data structure in response
 -- to a command-line option.
 allOptions :: [OptDescr (Opt -> IO Opt)]
 allOptions =
-    [ Option "v" ["version"]
-                 (NoArg
-                  (\_ -> do
-                     hPutStrLn stdout ("Version " ++ version)
-                     exitWith ExitSuccess))
-                 "Print version"
-
-    , Option "h" ["help"]
-                 (NoArg
-                  (\opt -> return opt { optShowUsage = True }))
-                 "Show help"
-
-    , Option "fr" ["from","read"]
+    [ Option "fr" ["from","read"]
                  (ReqArg
                   (\arg opt -> case (lookup (map toLower arg) readers) of
                                  Just reader -> return opt { optReader = reader }
@@ -146,10 +136,7 @@ allOptions =
     , Option "o" ["output"]
                  (ReqArg
                   (\arg opt -> do
-                     handle <- openFile arg WriteMode
-                     prg <- getProgName
-                     hPutStrLn stderr (prg ++ ":  writing output to " ++ arg)
-                     return opt { optOutputHandle = handle })
+                     return opt { optOutputFile = arg })
                   "FILENAME")
                  "Name of output file"
 
@@ -243,6 +230,23 @@ allOptions =
                      exitWith ExitSuccess)
                   "FORMAT")
                  "Print default header for FORMAT"
+
+    , Option "v" ["version"]
+                 (NoArg
+                  (\_ -> do
+                     hPutStrLn stdout ("Version " ++ version)
+                     exitWith ExitSuccess))
+                 "Print version"
+
+    , Option "h" ["help"]
+                 (NoArg
+                  (\opt -> return opt { optShowUsage = True }))
+                 "Show help"
+
+    , Option "d" ["debug"]
+                 (NoArg
+                  (\opt -> return opt { optDebug = True }))
+                 "Print debug messages to stderr"
     ]
 
 -- parse name of calling program and return default reader and writer descriptions
@@ -304,18 +308,29 @@ main = do
               , optCustomHeader      = customHeader
               , optDefaultHeader     = defaultHeader 
               , optTitlePrefix       = titlePrefix
-              , optOutputHandle      = output
+              , optOutputFile        = outputFile
               , optNumberSections    = numberSections
               , optIncremental       = incremental
               , optSmartypants       = smartypants
               , optASCIIMathML       = asciiMathML
               , optShowUsage         = showUsage
+			  , optDebug             = debug
              } = opts
 
   if showUsage
     then do
         hPutStrLn stdout (reformatUsageInfo $ usageInfo (name ++ " [OPTIONS] [FILES]") options)
         exitWith ExitSuccess
+    else return ()
+
+  output <- if (null outputFile) 
+              then return stdout 
+              else openFile outputFile WriteMode
+
+  if debug 
+	then do
+        hPutStrLn stderr ("OUTPUT=" ++ outputFile)
+        hPutStrLn stderr ("INPUT=" ++ (joinWithSep ":" sources))
     else return ()
 
   let writingS5 = (defaultHeader == defaultS5Header)
@@ -352,6 +367,5 @@ main = do
   where 
     readSources [] = mapM readSource ["-"]
     readSources sources = mapM readSource sources
-    readSource "-" = getContents 
+    readSource "-" = getContents
     readSource source = readFile source
-
