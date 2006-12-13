@@ -36,30 +36,30 @@ done
 pathfind mktemp || { err "Couldn't find 'mktemp'; aborting."; exit 1;  }
 
 trap 'exitcode=$?
-      [ -z "$TEMPDIR" ] || rm -rf "$TEMPDIR"
+      [ -z "$THIS_TEMPDIR" ] || rm -rf "$THIS_TEMPDIR"
       exit $exitcode' 0 1 2 3 13 15
 
-TEMPDIR=
-TEMPDIR="$(mktemp -d -t $THIS.XXXXXXXX)" || exit 1
-readonly TEMPDIR
+THIS_TEMPDIR=
+THIS_TEMPDIR="$(mktemp -d -t $THIS.XXXXXXXX)" || exit 1
+readonly THIS_TEMPDIR
 
-if ! markdown2latex "$@" -s -d >$TEMPDIR/output.tex 2>$TEMPDIR/log; then
-    cat $TEMPDIR/log | sed -e 's/markdown2latex/markdown2pdf/g'
+if ! markdown2latex "$@" -s -d >$THIS_TEMPDIR/output.tex 2>$THIS_TEMPDIR/log; then
+    cat $THIS_TEMPDIR/log | sed -e 's/markdown2latex/markdown2pdf/g'
     exit 1
 fi
 
-outfile="$(sed -ne '/^OUTPUT=/ s/^OUTPUT=\(.*\)/\1/p' $TEMPDIR/log)"
+outfile="$(sed -ne '/^OUTPUT=/ s/^OUTPUT=\(.*\)/\1/p' $THIS_TEMPDIR/log)"
 if [ -f "$outfile" ]; then
-    mv "$outfile" $TEMPDIR/output.tex
+    mv "$outfile" $THIS_TEMPDIR/output.tex
 fi
-infiles="$(sed -ne '/^INPUT=/ s/^INPUT=\(.*\)/\1/p' $TEMPDIR/LOG)"
+infiles="$(sed -ne '/^INPUT=/ s/^INPUT=\(.*\)/\1/p' $THIS_TEMPDIR/LOG)"
 infile="${infiles%%:*}"
 infilebase="${infile%.*}"
 defaultdest="${infilebase:-stdin}.pdf"
 destname="${outfile:-$defaultdest}"
 
 (
-    cd $TEMPDIR
+    cd $THIS_TEMPDIR
     if ! pdflatex -interaction=batchmode output.tex >/dev/null 2>&1; then
         err "LaTeX errors:"
         cat output.log | sed -ne '/^!/,/^ *$/p' >&2
@@ -76,7 +76,7 @@ if [ -f "$destname" ]; then
     mv "$destname" "$destname~" 
 fi
 
-mv -f $TEMPDIR/output.pdf "$destname"
+mv -f $THIS_TEMPDIR/output.pdf "$destname"
 
 errn "Created $destname"
 [ -z "$is_target_exists" ] || {
