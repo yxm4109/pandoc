@@ -77,6 +77,7 @@ data Opt = Opt
     , optIncremental        :: Bool             -- ^ If @True@, show lists incrementally in S5
     , optSmartypants        :: Bool             -- ^ If @True@, use smart quotes, dashes, ...
     , optASCIIMathML        :: Bool             -- ^ If @True@, use ASCIIMathML in HTML or S5
+    , optShowUsage          :: Bool             -- ^ If @True@, show usage message and exit
     }
 
 -- | Defaults for command-line options.
@@ -100,12 +101,13 @@ startOpt = Opt
     , optIncremental       = False
     , optSmartypants       = False
     , optASCIIMathML       = False
+    , optShowUsage         = False
     }
 
 -- | A list of functions, each transforming the options data structure in response
 -- to a command-line option.
-options :: [OptDescr (Opt -> IO Opt)]
-options =
+allOptions :: [OptDescr (Opt -> IO Opt)]
+allOptions =
     [ Option "v" ["version"]
                  (NoArg
                   (\_ -> do
@@ -115,12 +117,7 @@ options =
 
     , Option "h" ["help"]
                  (NoArg
-                  (\_ -> do
-                     prg <- getProgName
-                     let reformatUsageInfo = gsub "    *--" ", --" . 
-                                             gsub "   *([^- ])" "\n\t\\1" 
-                     hPutStrLn stdout (reformatUsageInfo $ usageInfo (prg ++ " [OPTIONS] [FILES] - convert FILES from one markup format to another\nIf no OPTIONS specified, converts from markdown to html.\nIf no FILES specified, input is read from STDIN.\nOptions:") options)
-                     exitWith ExitSuccess))
+                  (\opt -> return opt { optShowUsage = True }))
                  "Show help"
 
     , Option "fr" ["from","read"]
@@ -248,24 +245,48 @@ options =
                  "Print default header for FORMAT"
     ]
 
--- set default options based on start (starting options) and name of calling program
-setDefaultOpts start name =
-  case (splitRegex (mkRegex "2") (map toLower name)) of
-    [from, to] -> case ((lookup from readers), (lookup to writers)) of
-                    (Just reader, Just (writer, header)) -> start { optReader = reader, 
-                                                                    optWriter = writer, 
-                                                                    optDefaultHeader = header, 
-                                                                    optStandalone = True }
-                    _                                    -> start
-    _          -> start
+-- parse name of calling program and return default reader and writer descriptions
+parseProgName name =
+    case (splitRegex (mkRegex "2") (map toLower name)) of
+      [from, to] -> (from, to)
+      _          -> ("markdown", "html")
+
+-- set default options based on reader and writer descriptions; start is starting options
+setDefaultOpts from to start =
+    case ((lookup from readers), (lookup to writers)) of
+      (Just reader, Just (writer, header)) -> start { optReader        = reader, 
+                                                      optWriter        = writer, 
+                                                      optDefaultHeader = header }
+      _                                    -> start
+
+-- True if single-letter option is in option list
+inOptList :: [Char] -> OptDescr (Opt -> IO Opt) -> Bool
+inOptList list desc =
+  let (Option letters _ _ _) = desc in
+  any (\x -> x `elem` list) letters
+
+-- Reformat usage message so it doesn't wrap illegibly
+reformatUsageInfo = gsub "    *--" ", --" . 
+                    gsub "   *([^- ])" "\n\t\\1"
 
 main = do
 
+  name <- getProgName
+  let (from, to) = parseProgName name
+
+  let irrelevantOptions = if not ('2' `elem` name)
+                            then ""
+                            else "frtw" ++
+                                   (if (to /= "html" && to /= "s5") then "SmcT" else "") ++
+                                   (if (to /= "latex") then "N" else "") ++
+                                   (if (to /= "s5") then "i" else "")
+
+  let options = filter (not . inOptList irrelevantOptions) allOptions
+
+  let defaultOpts = setDefaultOpts from to startOpt
+
   args <- getArgs
   let (actions, sources, errors) = getOpt Permute options args
-
-  name <- getProgName
-  let defaultOpts = setDefaultOpts startOpt name
 
   -- thread option data structure through all supplied option actions
   opts <- foldl (>>=) (return defaultOpts) actions
@@ -288,7 +309,14 @@ main = do
               , optIncremental       = incremental
               , optSmartypants       = smartypants
               , optASCIIMathML       = asciiMathML
+              , optShowUsage         = showUsage
              } = opts
+
+  if showUsage
+    then do
+        hPutStrLn stdout (reformatUsageInfo $ usageInfo (name ++ " [OPTIONS] [FILES]") options)
+        exitWith ExitSuccess
+    else return ()
 
   let writingS5 = (defaultHeader == defaultS5Header)
   let tabFilter = if preserveTabs then id else (tabsToSpaces tabStop)
