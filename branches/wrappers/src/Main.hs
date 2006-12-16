@@ -281,12 +281,11 @@ main = do
 
   let irrelevantOptions = if not ('2' `elem` name)
                             then ""
-                            else "frtw" ++
+                            else "frtwD" ++
                                    (if (to /= "html" && to /= "s5") then "SmcT" else "") ++
                                    (if (to /= "latex") then "N" else "") ++
-                                   (if (to /= "s5") then "i" else "") ++
-                                   (if (to == "markdown") then "D" else "")
-
+                                   (if (to /= "s5") then "i" else "")
+  
   let options = filter (not . inOptList irrelevantOptions) allOptions
 
   let defaultOpts = setDefaultOpts from to startOpt

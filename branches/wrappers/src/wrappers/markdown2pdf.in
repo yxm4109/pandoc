@@ -6,7 +6,7 @@ REQUIRED=markdown2latex
 
 ### tempdir.sh
 
-if ! markdown2latex "$@" -s -d >$THIS_TEMPDIR/output.tex 2>$THIS_TEMPDIR/log; then
+if ! markdown2latex -s -d "$@" >$THIS_TEMPDIR/output.tex 2>$THIS_TEMPDIR/log; then
     cat $THIS_TEMPDIR/log | sed -e 's/markdown2latex/markdown2pdf/g'
     exit 1
 fi

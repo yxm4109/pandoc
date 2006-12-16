@@ -196,7 +196,7 @@ install-exec: build-exec
 		$(INSTALL_PROGRAM) $$f $(BINPATH)/; \
 	done; \
 	for f in $(SYMLINKS); do \
-		ln -s $(BINPATH)/$(MAIN) $(BINPATH)/$$f; \
+		ln -sf $(BINPATH)/$(MAIN) $(BINPATH)/$$f; \
 	done
 uninstall-exec:
 	-for f in $(notdir $(PROGS)); do rm -f $(BINPATH)/$$f; done ;
