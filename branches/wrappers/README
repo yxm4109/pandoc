@@ -134,25 +134,43 @@ programs take an appropriately restricted subset of `pandoc`'s
 options.  (Run them with the `-h` flag for a full list of allowed
 options.)
 
+Like `pandoc`, all of these programs produce fragments by default.
+If you want to produce a standalone file, complete with a header
+and footer appropriate to the format, use the `-s` option:
+
+   markdown2latex -s sample.txt > sample.tex 
+
 Two shell scripts have also been included:
 
-- `markdown2pdf` produces a PDF file from markdown-formatted
-  text, using `markdown2latex` and `pdflatex`.
-- `web2markdown` grabs a web page from a file or URL and converts
-  it to markdown-formatted text, using `html2markdown`.
+1.  `markdown2pdf` produces a PDF file from markdown-formatted
+    text, using `markdown2latex` and `pdflatex`.  The default
+    behavior of `markdown2pdf` is to create a file with the same
+    base name as the first argument and the extension `pdf`; thus,
+    for example,
 
-The default behavior of `markdown2pdf` is to create a file with the same
-base name as the first argument and the extension `pdf`; thus, for example,
+	    markdown2pdf sample.txt endnotes.txt
 
-	markdown2pdf sample.txt endnotes.txt
+    will produce `sample.pdf`.  (If `sample.pdf` exists already,
+    it will be backed up before being overwritten.)  An output file
+    name can be specified explicitly using the `-o` option:
 
-will produce `sample.pdf`.  (If `sample.pdf` exists already, it will be
-backed up before being overwritten.)  An output file name can be specified
-explicitly using the `-o` option:
+	    markdown2pdf -o "My Book.pdf" chap1.txt chap2.txt chap3.txt  
 
-	markdown2pdf -o "My Book.pdf" chap1.txt chap2.txt chap3.txt  
+    If no input file is specified, input will be taken from STDIN.
 
-If no input file is specified, input will be taken from STDIN.
+2.  `web2markdown` grabs a web page from a file or URL and converts
+    it to markdown-formatted text, using `html2markdown`.  Unless
+    input is from STDIN, an attempt is made to determine the character
+    encoding of the page from the "Content-type" meta tag.  If this
+    is not present, UTF-8 is assumed.  Alternatively, a character
+    encoding may be specified explicitly using the `-e` option.
+
+    `web2markdown` searches for an available program (`wget`, `curl`,
+    or a text-mode browser) to fetch the contents of a URL.
+    Optionally, the `-g` command may be used to specify the command
+    to be used:
+
+        web2markdown -g 'wget --user=foo --password=bar' mysite.com
 
 # Command-line options
 
