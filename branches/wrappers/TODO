@@ -1,1 +1,56 @@
 # TODO
+
+*   Use XHTML library for HTML writer?
+
+*   Revisions for building with windows under cygwin:
+    Cabal under windows produces 'pandoc.exe', and some of the scripts
+    expect 'pandoc'.  (See if this has now been fixed by Makefile change.)
+
+*   Windows binary distribution:  pandoc.exe.  Work this into the website
+    target.
+
+*   Consider allowing 'a.', 'b.', etc. to mark ordered lists.  Perhaps
+    also '(a)', '(1)', 'a)', '1)', etc., as in rst.  This does depart from
+    markdown syntax.
+
+*   Consider making section headers block titles rather than blocks.
+    Instead of:  [Header 1 "My title", Block1, Block2, Block3],
+    Section "My title" [Block1, Block2, Block3].
+    This seems cleaner and would facilitate a docbook writer.
+    It might also simplify the rst reader.
+
+*   Consider merging changes in pandoc-wrappers (symlinks rather than
+    wrapper scripts, except web2markdown and markdown2pdf).  This also
+    needs documentation.
+
+*   pandoc's HTML output fails to validate completely (w3c).
+    There are a few quirks:
+    + HTML doesn't like the \> at the end of <meta tags.
+      But if we remove them, we'll have trouble with S5 output,
+      which seems to need the xhtml header?
+    + There's also a problem with the email obfuscation scheme.
+      <noscript> isn't allowed inside <p> blocks.  <script> is
+      allowed!  Options:
+          - come up with another scheme, perhaps more like markdown.pl's
+          - ignore the validation problems
+          - others?
+
+*   Consider adding support for acronyms.
+    Perhaps like this:  [AAAS]
+      [AAAS]: "American association for the advancement of science"
+    <acronym title="American association for the advancement 
+    of science">AAAS</acronym>
+
+*   Consider changing footnote syntax so that all footnotes in markdown
+    are embedded (and automatic).^[Like this.  Here's a footnote.  It
+    is parsed like a block, so you can have embedded code blocks:
+
+         like this { code }
+
+    ] That was the end of the note.  This means having block elements
+    embedded in inline elements, which is possible.
+    Advantage:  Much easier to write.  You don't have to pick a label,
+    move down to type your note, move back up.
+    Disadvantage:  Perhaps slightly harder to read.  (But HTML and LaTeX
+    output will still be easy to read.)
+

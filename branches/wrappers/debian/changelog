@@ -1,6 +1,4 @@
-pandoc (0.3) unstable; urgency=low
-
-  * New release with new build system and proper debian package
+pandoc (0.22) unstable; urgency=low
 
   [ Recai Oktaş ]
 
@@ -15,7 +13,7 @@ pandoc (0.3) unstable; urgency=low
       Cabal versions.
 
   * Refactored template processing (fillTemplates.pl).
-	
+
   * Modified wrapper scripts to make them more robust.
 
   * Added '--output' option to markdown2pdf.
@@ -41,6 +39,20 @@ pandoc (0.3) unstable; urgency=low
       compressed disk image containing the package.
     + New osx directory contains files needed for construction
       of the package.
+
+  * Added website target to generate pandoc's website automatically.
+
+  * Added code to html2markdown that tries to determine the character 
+    encoding of an HTML file, by parsing the "Content-type" meta tag.
+    + If the encoding can't be determined, then if the content is local,
+      the local encoding is used; if it comes from a URL, UTF-8 is used 
+      by default.
+    + Encoding can be specified explicitly using '-e' option.
+
+  * Improved warning messages:
+    + Print warning if iconv not available
+    + More user-friendly error messages in markdown2pdf, when
+      pdflatex fails.
 
   * Rewrote documentation and man pages.  Split README into INSTALL
     and README.

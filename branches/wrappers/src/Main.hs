@@ -369,7 +369,7 @@ main = do
                                       writerIncludeBefore  = includeBefore, 
                                       writerIncludeAfter   = includeAfter }
 
-  (readSources sources) >>= (hPutStrLn output . encodeUTF8 . (writer writerOptions) . 
+  (readSources sources) >>= (hPutStr output . encodeUTF8 . (writer writerOptions) . 
                              (reader startParserState) .  filter .
                              decodeUTF8 . (joinWithSep "\n")) >> hClose output
 
