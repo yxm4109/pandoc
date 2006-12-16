@@ -145,7 +145,7 @@ allOptions =
                   (\opt -> return opt { optPreserveTabs = True }))
                  "Preserve tabs instead of converting to spaces"
 
-    , Option "b" ["tab-stop"]
+    , Option "" ["tab-stop"]
                  (ReqArg
                   (\arg opt -> return opt { optTabStop = (read arg) } )
                   "TABSTOP")
@@ -270,7 +270,8 @@ inOptList list desc =
   any (\x -> x `elem` list) letters
 
 -- Reformat usage message so it doesn't wrap illegibly
-reformatUsageInfo = gsub "    *--" ", --" . 
+reformatUsageInfo = gsub "   *--" "  --" .
+                    gsub "(-[A-Za-z0-9])   *--" "\\1, --" . 
                     gsub "   *([^- ])" "\n\t\\1"
 
 main = do
