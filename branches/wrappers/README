@@ -68,8 +68,10 @@ constructs expressible in unextended markdown.  But for simple documents
 it should be adequate.  The `latex` and `html` readers are also limited
 in what they can do.
 
-`pandoc` writes its output to STDOUT.  If you want to write to a file,
-use redirection:
+By default, `pandoc` writes its output to STDOUT.  If you want to
+write to a file, use the `-o` option or shell redirection:
+
+    pandoc -o hello.html hello.txt
 
 	pandoc hello.txt > hello.html
 
@@ -77,13 +79,13 @@ Note that you can specify multiple input files on the command line.
 `pandoc` will concatenate them all (with blank lines between them)
 before parsing:
 
-	pandoc -s chapter1.txt chapter2.txt chapter3.txt references.txt > book.html
+	pandoc -s chapter1.txt chapter2.txt references.txt > book.html
 
 (The `-s` option here tells `pandoc` to produce a standalone HTML file,
 with a proper header, rather than a fragment.  For more details on this
 and many other command-line options, see below.)
 
-# Character encodings
+## Character encodings
 
 Unfortunately, due to limitations in GHC, `pandoc` does not automatically
 detect the system's local character encoding.  Hence, all input and
@@ -118,38 +120,26 @@ before the files can be found by TeX.)
 [CTAN]: http://www.ctan.org
 [unicode]: http://www.ctan.org/tex-archive/macros/latex/contrib/unicode/
 
-# The shell scripts 
+# Convenience programs and wrapper scripts 
 
-Five shell scripts have been included that make it easy to run
-`pandoc` without worrying about character encodings, and without
-remembering all the command-line options:
+For convenience, eight variant programs  are  included with Pandoc:
+`markdown2html` (which is equivalent to `pandoc  -w  html`),
+`markdown2latex` (equivalent to `pandoc -w latex`), `markdown2rst`
+(equivalent to `pandoc -w rst`), `markdown2rtf` (equivalent to
+`pandoc -w rtf`), `markdown2s5` (equivalent to `pandoc -w s5`),
+`html2markdown` (equivalent to `pandoc -r html -w markdown`),
+`latex2markdown` (equivalent to `pandoc -r latex -w markdown`), and
+`rst2markdown` (equivalent to `pandoc -r rst -w markdown`).  These
+programs take an appropriately restricted subset of `pandoc`'s
+options.  (Run them with the `-h` flag for a full list of allowed
+options.)
 
-- `markdown2html` converts markdown-formatted text to HTML
-- `markdown2latex` converts markdown-formatted text to LaTeX
+Two shell scripts have also been included:
+
 - `markdown2pdf` produces a PDF file from markdown-formatted
-  text, using `pdflatex`.
-- `html2markdown` converts HTML to markdown-formatted text
-- `latex2markdown` converts LaTeX to markdown-formatted text
-
-All of the scripts use `iconv` (if available) to convert to and from
-the local character encoding.  All of the scripts presuppose that
-`pandoc` is in the path, and some have additional requirements.  (For
-example, `html2markdown` uses `tidy`, and `markdown2pdf` uses
-`pdflatex`.)
-
-When no arguments are specified, text will be read from standard
-input.  Arguments specify input files (limited to one in the case of
-`latex2markdown` and `html2markdown`; the other scripts accept any number
-of arguments).  `html2markdown` may take a URL as argument instead of
-a filename; in this case, `curl`, `wget`, or an available text-based
-browser will be used to fetch the contents of the URL.  (The `-n` option
-inhibits this behavior; the `-g` option allows the user to specify a
-custom command that will be used to fetch from a URL.)
-
-With the exception of `markdown2pdf`, the scripts write to standard output.
-Output can be sent to a file using shell output redirection:
-
-	latex2markdown sample.tex > sample.txt
+  text, using `markdown2latex` and `pdflatex`.
+- `web2markdown` grabs a web page from a file or URL and converts
+  it to markdown-formatted text, using `html2markdown`.
 
 The default behavior of `markdown2pdf` is to create a file with the same
 base name as the first argument and the extension `pdf`; thus, for example,
@@ -162,25 +152,7 @@ explicitly using the `-o` option:
 
 	markdown2pdf -o "My Book.pdf" chap1.txt chap2.txt chap3.txt  
 
-Options specific to the scripts, like `-o`, `-g`, and `-n`, must
-be specified *before* any command-line arguments (file names or URLs).
-Any options specified *after* the command-line arguments will be
-passed directly to `pandoc`. For example,
-
-	markdown2html tusks.txt -S -T Elephants
-
-will convert `tusks.txt` to `tusks.html` using smart quotes, ellipses,
-and dashes, with "Elephants" as the page title prefix.  (For a
-complete list of `pandoc` options, see below.)  When there are no
-command-line arguments (because input is from STDIN), `pandoc`
-options must be preceded by ` -- `:
-
-	cat tusks.txt | markdown2html -- -S -T Elephants
-
-The ` -- ` separator may optionally be used when there are command-line
-arguments:
-
-	markdown2html -- tusks.txt -S -T Elephants
+If no input file is specified, input will be taken from STDIN.
 
 # Command-line options
 
@@ -207,9 +179,11 @@ specified.)
 complete with appropriate document headers.  By default, `pandoc`
 produces a fragment.
 
-`--custom-header` can be used to specify a custom document header.  To
-see the headers used by default, use the `-D` option: for example,
-`pandoc -D html` prints the default HTML header.
+`-o` or `--output-file` can be used to specify an output file.
+
+`-C` or `--custom-header` can be used to specify a custom document
+header.  To see the headers used by default, use the `-D` option:
+for example, `pandoc -D html` prints the default HTML header.
 
 `-c` or `--css` allows the user to specify a custom stylesheet that
 will be linked to in HTML and S5 output.
