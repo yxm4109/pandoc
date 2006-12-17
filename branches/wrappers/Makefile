@@ -97,7 +97,7 @@ $(SRCDIR)/templates:
 cleanup_files+=$(SYMLINKS)
 symlinks: $(SYMLINKS)
 $(SYMLINKS): $(MAIN)
-	ln -s ./$(MAIN) $@ 
+	ln -sf ./$(MAIN) $@ 
 
 define generate-shell-script
 echo "Generating $@...";                                 \
