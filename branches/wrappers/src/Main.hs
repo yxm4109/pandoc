@@ -344,7 +344,7 @@ main = do
   if debug 
 	then do
         hPutStrLn stderr ("OUTPUT=" ++ outputFile)
-        hPutStrLn stderr ("INPUT=" ++ (joinWithSep "|" sources))
+        hPutStr stderr $ concatMap (\s -> "INPUT=" ++ s ++ "\n") sources
     else return ()
 
   let writingS5 = (defaultHeader == defaultS5Header)

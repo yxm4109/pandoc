@@ -249,14 +249,17 @@ output.  By default, sections are not numbered.
 The format of the message is as follows:
 
     OUTPUT=foo
-    INPUT=bar|baz
+    INPUT=bar
+    INPUT=Foo Baz
 
 Here `OUTPUT=` is followed by the name of the output file specified
-using `-o` (if any).  `INPUT=` is followed by the names of the input
-files, if any, separated by `|`.  The `-d` option forces output to be
-written to STDOUT, even if an output file was specified using the
-`-o` option.  (This option is provided to make it easier to write
-wrappers for `pandoc`.)
+using `-o`, if any.  If no output file was specified, `OUTPUT=`
+will appear with nothing following it.  Lines beginning `INPUT=`
+specify input files.  If there are no input files, no `INPUT=` lines
+will be printed.  The `-d` option forces output to be written to
+STDOUT, even if an output file was specified using the `-o` option.
+(This option is provided to make it easier to write wrappers for
+`pandoc`.)
 
 `-v` or `--version` prints the version number to STDERR.
 
