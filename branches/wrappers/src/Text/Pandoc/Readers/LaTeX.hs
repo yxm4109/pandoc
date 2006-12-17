@@ -58,7 +58,7 @@ isArg other = False
 -- | Returns list of options and arguments of a LaTeX command
 commandArgs = many optOrArg
 
--- | Parses LaTeX command, returns (name, star, list of options/arguments).
+-- | Parses LaTeX command, returns (name, star, list of options or arguments).
 command = try (do
   char '\\'
   name <- many1 alphaNum
