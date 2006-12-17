@@ -29,6 +29,9 @@ import Control.Monad ( (>>=) )
 version :: String
 version = "0.3"
 
+copyrightMessage :: String
+copyrightMessage = "\nCopyright (C) 2006 John MacFarlane\nWeb:  http://sophos.berkeley.edu/macfarlane/pandoc\nThis is free software; see the source for copying conditions.  There is no\nwarranty, not even for merchantability or fitness for a particular purpose."
+
 -- | Association list of formats and readers.
 readers :: [(String, ParserState -> String -> Pandoc)]
 readers = [("native"   , readPandoc)
@@ -231,10 +234,17 @@ allOptions =
                   "FORMAT")
                  "Print default header for FORMAT"
 
+    , Option "d" ["debug"]
+                 (NoArg
+                  (\opt -> return opt { optDebug = True }))
+                 "Print debug messages to stderr, output to stdout"
+    
     , Option "v" ["version"]
                  (NoArg
                   (\_ -> do
-                     hPutStrLn stderr ("Version " ++ version)
+                     prg <- getProgName
+                     hPutStrLn stderr (prg ++ " " ++ version ++ 
+                                       copyrightMessage)
                      exitWith $ ExitFailure 2))
                  "Print version"
 
@@ -242,11 +252,6 @@ allOptions =
                  (NoArg
                   (\opt -> return opt { optShowUsage = True }))
                  "Show help"
-
-    , Option "d" ["debug"]
-                 (NoArg
-                  (\opt -> return opt { optDebug = True }))
-                 "Print debug messages to stderr"
     ]
 
 -- parse name of calling program and return default reader and writer descriptions
@@ -332,14 +337,14 @@ main = do
         exitWith $ ExitFailure 2
     else return ()
 
-  output <- if (null outputFile) 
+  output <- if ((null outputFile) || debug)
               then return stdout 
               else openFile outputFile WriteMode
 
   if debug 
 	then do
         hPutStrLn stderr ("OUTPUT=" ++ outputFile)
-        hPutStrLn stderr ("INPUT=" ++ (joinWithSep ":" sources))
+        hPutStrLn stderr ("INPUT=" ++ (joinWithSep "|" sources))
     else return ()
 
   let writingS5 = (defaultHeader == defaultS5Header)

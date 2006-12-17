@@ -15,11 +15,8 @@ if ! markdown2latex -s -d "$@" >$THIS_TEMPDIR/$texname.tex 2>$logfile; then
 fi
 
 outfile="$(sed -ne 's/^OUTPUT=//p' $logfile)"
-if [ -f "$outfile" ]; then
-    mv "$outfile" $THIS_TEMPDIR/$texname.tex
-fi
 infiles="$(sed -ne 's/^INPUT=//p' $logfile)"
-infile="${infiles%%:*}"
+infile="${infiles%%|*}" # get name of first input file
 infilebase="${infile%.*}"
 defaultdest="${infilebase:-stdin}.pdf"
 destname="${outfile:-$defaultdest}"
