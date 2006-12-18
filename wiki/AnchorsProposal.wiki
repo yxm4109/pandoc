@@ -1,0 +1,28 @@
+#summary Proposal to add invisible navigation anchors to every heading.
+
+This input
+
+{{{
+# Introduction
+
+... text ...
+
+## The *easy* problem
+}}}
+
+would produce this output:
+
+{{{
+<a id="Introduction></a>
+<h1>Introduction</h1>
+
+... text ...
+
+<a id="The_*easy*_problem></a>
+<h2>The <emph>easy</emph> problem</h2>
+}}}
+
+You can then create a link that jumps to the Introduction as follows:
+{{{
+[back to Introduction](#Introduction)
+}}}
