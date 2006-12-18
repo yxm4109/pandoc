@@ -197,13 +197,10 @@ install-exec: build-exec
 			f=$$(readlink $$f); \
 		fi; \
 		$(INSTALL_PROGRAM) $$f $(BINPATH)/; \
-	done; \
-	for f in $(SYMLINKS); do \
-		ln -sf $(BINPATH)/$(MAIN) $(BINPATH)/$$f; \
 	done
+	cd $(BINPATH); for f in $(SYMLINKS); do ln -sf $(MAIN) $$f; done
 uninstall-exec:
-	-for f in $(notdir $(PROGS)); do rm -f $(BINPATH)/$$f; done ;
-	-for f in $(notdir $(SYMLINKS)); do rm -f $(BINPATH)/$$f; done
+	-for f in $(notdir $(PROGS) $(SYMLINKS)); do rm -f $(BINPATH)/$$f; done ;
 
 # Program + user documents installation.
 .PHONY: install-program uninstall-program
