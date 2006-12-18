@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-REQUIRED=markdown2latex
+REQUIRED="markdown2latex pdflatex"
 
 ### common.sh
 
