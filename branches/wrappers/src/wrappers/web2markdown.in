@@ -59,7 +59,7 @@ grab_url_with () {
     $prog "$@" "$url"
 }
 
-add_option() {
+add_option () {
     options="$options$NEWLINE$1"
 }
 
@@ -95,7 +95,9 @@ while [ $# -gt 0 ]; do
             wholeopt=$1
             # extract encoding from after =
             grabber=${wholeopt#*=} ;;
-        -o|--output|-b|--tab-stop|-H|--include-in-header|-A|--include-after-body|-C|-B|--include-before-body|-C|--custom-header|-T|--title-prefix) 
+        -o|--output|-b|--tab-stop|-H|--include-in-header| \
+        -A|--include-after-body|-C|-B|--include-before-body| \
+        -C|--custom-header|-T|--title-prefix) 
             add_option $1
             shift
             add_option $1 ;;
@@ -126,8 +128,7 @@ if [ -n "$inurl" ]; then
 
     grabber_out=$THIS_TEMPDIR/grabber.out
     grabber_log=$THIS_TEMPDIR/grabber.log
-    if ! grab_url_with "$inurl" "$grabber" 1>$grabber_out \
-                                           2>$grabber_log; then
+    if ! grab_url_with "$inurl" "$grabber" 1>$grabber_out 2>$grabber_log; then
         errn "grab_url_with failed"
         if [ -f $grabber_log ]; then
             err " with the following error log."
