@@ -10,7 +10,8 @@ texname=output
 logfile=$THIS_TEMPDIR/log
 
 if ! markdown2latex -s -d "$@" >$THIS_TEMPDIR/$texname.tex 2>$logfile; then
-    [ -f $logfile ] && sed -e 's/markdown2latex/markdown2pdf/g' $logfile >&2
+    [ -f $logfile ] && sed -e 's/markdown2latex/markdown2pdf/g' \
+        -e '/^INPUT=/d' -e '/^OUTPUT=/d' $logfile >&2
     exit 1
 fi
 
@@ -27,11 +28,16 @@ destname="${outfile:-$defaultdest}"
         err "LaTeX errors:"
         sed -ne '/^!/,/^ *$/p' $texname.log >&2
         if grep -q "File \`ucs.sty' not found" $texname.log; then
-            err "Please install the 'unicode' package from ctan.org."
+            err "Please install the 'unicode' package from CTAN:"
+            err "http://www.ctan.org/tex-archive/macros/latex/contrib/unicode/"
+        fi
+        if grep -q "File \`fancyvrb.sty' not found" $texname.log; then
+            err "Please install the 'fancyvrb' package from CTAN:"
+            err "http://www.ctan.org/tex-archive/macros/latex/contrib/fancyvrb/"
         fi
         exit 1
     fi
-)
+) || exit 1
 
 is_target_exists=
 if [ -f "$destname" ]; then

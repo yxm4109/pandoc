@@ -105,20 +105,24 @@ The shell scripts (described below) automatically convert the input
 from the local encoding to UTF-8 before running them through `pandoc`,
 then convert the output back to the local encoding.
 
-## LaTeX and UTF-8 
+## LaTeX requirements
 
-LaTeX sources produced by Pandoc use `ucs.sty`, which is included in many
-LaTeX distributions.  This allows LaTeX to process UTF-8 characters.
-If your installation of LaTeX does not include `ucs.sty`, you will get an
-error when you try to compile a LaTeX file produced by Pandoc, or when
-you use the `markdown2pdf` script (described below).  If this happens,
-install the [unicode] package from [CTAN].  (Get the `unicode.zip`
-file from CTAN, unpack it, and copy the whole `unicode` directory into
-`~/texmf/tex/latex/`.  You may also need to run `mktexlsr` or `texhash`
-before the files can be found by TeX.)
+LaTeX sources produced by Pandoc use the [unicode] and [fancyvrb]
+packages, which are included in many LaTeX distributions.  The
+[unicode] package allows LaTeX to process UTF-8 characters.  [fancyvrb]
+allows code blocks and verbatim text to be used within footnotes.
+If your installation of LaTeX does not include these packages, you
+will get an error (complaining about missing `ucs.sty` or `fancyvrb.sty`)
+when you try to compile a LaTeX file produced by Pandoc, or when
+you use the `markdown2pdf` script (described below).  If this
+happens, install the [unicode] and [fancyvrb] packages package from
+[CTAN].  (Get the zip file from CTAN and unpack it into
+`~/texmf/tex/latex/`.  You may also need to run `mktexlsr` or
+`texhash` before the files can be found by TeX.)
 
 [CTAN]: http://www.ctan.org
 [unicode]: http://www.ctan.org/tex-archive/macros/latex/contrib/unicode/
+[fancyvrb]: http://www.ctan.org/tex-archive/macros/latex/contrib/fancyvrb/
 
 # Convenience programs and wrapper scripts 
 
