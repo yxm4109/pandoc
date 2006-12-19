@@ -289,7 +289,8 @@ main = do
                             else "frtwD" ++
                                    (if (to /= "html" && to /= "s5") then "SmcT" else "") ++
                                    (if (to /= "latex") then "N" else "") ++
-                                   (if (to /= "s5") then "i" else "")
+                                   (if (to /= "s5") then "i" else "") ++
+                                   (if (from /= "html" && from /= "latex") then "R" else "")
   
   let options = filter (not . inOptList irrelevantOptions) allOptions
 
