@@ -37,7 +37,7 @@ destname="${outfile:-$defaultdest}"
         fi
         exit 1
     fi
-) || exit 1
+) || exit $?
 
 is_target_exists=
 if [ -f "$destname" ]; then
