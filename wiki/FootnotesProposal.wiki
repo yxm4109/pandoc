@@ -44,9 +44,7 @@ subsequent blocks must be indented (at least in the first line).
 Inline footnotes:
 
 {{{
-Here's an inline note.[^1](Quick aside.)
-This simplified syntax should also work.[^](Quick aside.)
-And why not also this?^(Quick aside.)
+Here's an inline note.^[Quick aside.]
 }}}
 
 = Implementation =
