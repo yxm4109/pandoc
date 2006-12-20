@@ -1,4 +1,5 @@
 #summary Proposal to add invisible navigation anchors to every heading.
+#labels Deprecated
 
 This input
 
@@ -18,7 +19,7 @@ would produce this output:
 
 ... text ...
 
-<a id="The_*easy*_problem></a>
+<a id="The_easy_problem"></a>
 <h2>The <emph>easy</emph> problem</h2>
 }}}
 
