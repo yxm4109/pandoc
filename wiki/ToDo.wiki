@@ -1,5 +1,5 @@
 #labels Phase-Implementation
-#To-do list.
+# To-do list.
 
 *For 0.3 release*
 
@@ -61,4 +61,3 @@ yields
 {{{
 <acronym title="American association for the advancement of science">AAAS</acronym>
 }}}
-
