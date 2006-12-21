@@ -1,0 +1,64 @@
+% Pandoc
+
+Pandoc is a [Haskell] library for converting from one markup format
+to another, and a command-line tool that uses this library. It can read
+[markdown] and (subsets of) [reStructuredText], [HTML], and [LaTeX],
+and it can write [markdown], [reStructuredText], [HTML], [LaTeX], [RTF],
+and [S5] HTML slide shows. Pandoc's version of markdown contains some
+enhancements, like footnotes and embedded LaTeX.
+
+In contrast to existing tools for converting markdown to HTML, which
+use regex substitutions, Pandoc has a modular design: it consists of a
+set of readers, which parse text in a given format and produce a native
+representation of the document, and a set of writers, which convert
+this native representation into a target format. Thus, adding an input
+or output format requires only adding a reader or writer.
+
+For more information, see the [README](README.html) file.
+
+Pandoc is free software, released under the [GPL].
+
+**Source distribution:** [`@TARBALL_NAME@`](@TARBALL_NAME@). 
+To install, unpack the archive and follow the instructions in the
+[INSTALL](INSTALL.html) file. You'll need the [GHC] Haskell compiler,
+version 6.4 or higher.
+
+**MacOS X binary package:** [`@OSX_DMG_NAME@`](@OSX_DMG_NAME@).
+To install, just double-click the package icon in the disk
+image.  See the [installation notes](osx-notes.html) for important
+information about setting your `PATH`.  Note:  This package was
+compiled on a G4 Mac; it will also work on an Intel Mac via emulation.
+
+**Debian binary package:**  [`@DEB_NAME@`](@DEB_NAME@).
+To install (on x86 Debian-based linux systems only):
+
+        sudo dpkg -i @DEB_NAME@
+
+**Windows executable:**  [`@WINDOWS_EXE_NAME@`](@WINDOWS_EXE_NAME@).
+
+**Repository:**  Pandoc has a publicly accesible subversion repository
+at Google Code (<http://code.google.com/p/pandoc>).  To check out the
+latest, bleeding-edge source code:
+
+        svn checkout http://pandoc.googlecode.com/svn/trunk/ pandoc
+
+**Bugs:**  You may view existing bug reports and submit new ones at 
+<http://code.google.com/p/pandoc/issues/list>.
+
+**API:**  You can browse the API documentation for the Pandoc Haskell
+libraries [here](doc/index.html).
+
+This is an early, "alpha" release. It carries no warranties of any
+kind.
+
+[John MacFarlane]: http://sophos.berkeley.edu/macfarlane/
+[markdown]: http://daringfireball.net/projects/markdown/
+[reStructuredText]: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
+[S5]: http://meyerweb.com/eric/tools/s5/
+[HTML]:  http://www.w3.org/TR/html40/
+[LaTeX]:  http://www.latex-project.org/
+[RTF]:  http://en.wikipedia.org/wiki/Rich_Text_Format
+[Haskell]:  http://www.haskell.org/
+[GHC]:  http://www.haskell.org/ghc/
+[GPL]:  http://www.gnu.org/copyleft/gpl.html
+
