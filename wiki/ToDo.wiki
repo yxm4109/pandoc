@@ -28,6 +28,12 @@ zip -r pandoc-0.3-windows.zip pandoc.exe README.txt COPYRIGHT.txt COPYING.txt
 Do we need a special version of README for the windows binary?  Presumably yes -- 
 we need to remove reference to the wrappers (easy with sed).  Perhaps we also need an INSTALL-WIN file.
 
+Website:
+  * Download links need to point to Google Code downloads.
+  * roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
+
+Look into options for a binary package for linux.  Perhaps this is not needed, with the debian packages, but not everyone uses debs.  How hard would it be to make an rpm?  Or just a tarball with a simplified Makefile that just has the install targets?
+
 *Improvements*
 
 Consider changing the default Pandoc data structure so that it is more "hierarchical":
