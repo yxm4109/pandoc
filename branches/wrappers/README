@@ -20,19 +20,63 @@ or output format requires only adding a reader or writer.
 [reStructuredText]: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
 [S5]: http://meyerweb.com/eric/tools/s5/
 [HTML]:  http://www.w3.org/TR/html40/
-[LaTeX]:  http://www.latex-project.org/
+[LaTeX]: http://www.latex-project.org/
 [RTF]:  http://en.wikipedia.org/wiki/Rich_Text_Format
 [Haskell]:  http://www.haskell.org/
 
-(c) 2006 John MacFarlane (jgm At berkeley.edu). Released under the
+(c) 2006 John MacFarlane (jgm at berkeley dot edu). Released under the
 [GPL], version 2 or greater.  This software carries no warranty of
-any kind.  (See LICENSE for full copyright and warranty notices.)
-Recai Oktaş (roktas At debian.org) deserves credit for the build
+any kind.  (See COPYRIGHT for full copyright and warranty notices.)
+Recai Oktaş (roktas at debian dot org) deserves credit for the build
 system, the debian package, and the robust wrapper scripts.
 
-[GPL]: http://www.gnu.org/copyleft/gpl.html
+[GPL]: http://www.gnu.org/copyleft/gpl.html "GNU General Public License"
 
-# Using Pandoc
+Requirements
+============
+
+The `pandoc` program itself does not depend on any external libraries
+or programs.  The convenience programs `markdown2html`, `markdown2latex`,
+`markdown2rst`, `markdown2rtf`, `markdown2s5`, `html2markdown`,
+`latex2markdown`, and `rst2markdown` are implemented as symbolic links to
+`pandoc`.
+
+The wrapper script `web2markdown` requires
+
+  - `html2markdown` (included with Pandoc)
+  - a POSIX-compliant shell (installed by default on all linux and unix
+    systems, including Mac OS X, and in [Cygwin] for Windows),
+  - `HTML Tidy`
+  - `iconv` (for character encoding conversion).  (If `iconv` is absent,
+    `web2markdown` will still work, but it will treat everything as UTF-8.)
+
+[Cygwin]:  http://www.cygwin.com/ 
+[HTML Tidy]:  http://tidy.sourceforge.net/
+[`iconv`]: http://www.gnu.org/software/libiconv/
+
+The wrapper script `markdown2pdf` requires
+
+  - `markdown2latex` (included with Pandoc)
+  - a POSIX-compliant shell
+  - `pdflatex`, which should be part of any [LaTeX] distribution
+  - the [unicode] and [fancyvrb] LaTeX packages, which are included
+    in many LaTeX distributions.  The [unicode] package allows LaTeX to
+    process UTF-8 characters.  [fancyvrb] allows code blocks and verbatim
+    text to be used within footnotes.  If your installation of LaTeX
+    does not include these packages, you will get an error (complaining
+    about missing `ucs.sty` or `fancyvrb.sty`) when you try to compile
+    a LaTeX file produced by Pandoc, or when you use the `markdown2pdf`
+    script (described below).  If this happens, install the [unicode] and
+    [fancyvrb] packages package from [CTAN].  (Get the zip file from CTAN
+    and unpack it into `~/texmf/tex/latex/`.  You may also need to run
+    `mktexlsr` or `texhash` before the files can be found by TeX.)
+
+[CTAN]: http://www.ctan.org "Comprehensive TeX Archive Network"
+[unicode]: http://www.ctan.org/tex-archive/macros/latex/contrib/unicode/
+[fancyvrb]: http://www.ctan.org/tex-archive/macros/latex/contrib/fancyvrb/
+
+Using Pandoc
+============
 
 If you run `pandoc` without arguments, it will accept input from
 STDIN.  If you run it with file names as arguments, it will take input
@@ -66,7 +110,9 @@ a subset of reStructuredText syntax.  For example, it doesn't handle
 tables, definition lists, option lists, or footnotes.  It handles only the
 constructs expressible in unextended markdown.  But for simple documents
 it should be adequate.  The `latex` and `html` readers are also limited
-in what they can do.
+in what they can do.  Because the `html` reader is picky about the HTML
+it parses, it is recommended that you pipe HTML through [HTML Tidy] before
+sending it to `pandoc`, or use the `web2markdown` script described below.
 
 By default, `pandoc` writes its output to STDOUT.  If you want to
 write to a file, use the `-o` option or shell redirection:
@@ -85,7 +131,8 @@ before parsing:
 with a proper header, rather than a fragment.  For more details on this
 and many other command-line options, see below.)
 
-## Character encodings
+Character encodings
+-------------------
 
 Unfortunately, due to limitations in GHC, `pandoc` does not automatically
 detect the system's local character encoding.  Hence, all input and
@@ -99,34 +146,14 @@ will convert `source.txt` from the local encoding to UTF-8, then
 convert it to HTML, then convert back to the local encoding,
 putting the output in `output.html`.
 
-[`iconv`]: http://www.gnu.org/software/libiconv/
-
 The shell scripts (described below) automatically convert the input 
 from the local encoding to UTF-8 before running them through `pandoc`,
 then convert the output back to the local encoding.
 
-## LaTeX requirements
+Convenience programs and wrapper scripts 
+========================================
 
-LaTeX sources produced by Pandoc use the [unicode] and [fancyvrb]
-packages, which are included in many LaTeX distributions.  The
-[unicode] package allows LaTeX to process UTF-8 characters.  [fancyvrb]
-allows code blocks and verbatim text to be used within footnotes.
-If your installation of LaTeX does not include these packages, you
-will get an error (complaining about missing `ucs.sty` or `fancyvrb.sty`)
-when you try to compile a LaTeX file produced by Pandoc, or when
-you use the `markdown2pdf` script (described below).  If this
-happens, install the [unicode] and [fancyvrb] packages package from
-[CTAN].  (Get the zip file from CTAN and unpack it into
-`~/texmf/tex/latex/`.  You may also need to run `mktexlsr` or
-`texhash` before the files can be found by TeX.)
-
-[CTAN]: http://www.ctan.org
-[unicode]: http://www.ctan.org/tex-archive/macros/latex/contrib/unicode/
-[fancyvrb]: http://www.ctan.org/tex-archive/macros/latex/contrib/fancyvrb/
-
-# Convenience programs and wrapper scripts 
-
-For convenience, eight variant programs  are  included with Pandoc:
+For convenience, eight variant programs are included with Pandoc:
 `markdown2html` (which is equivalent to `pandoc  -w  html`),
 `markdown2latex` (equivalent to `pandoc -w latex`), `markdown2rst`
 (equivalent to `pandoc -w rst`), `markdown2rtf` (equivalent to
@@ -163,10 +190,10 @@ Two shell scripts have also been included:
     If no input file is specified, input will be taken from STDIN.
 
 2.  `web2markdown` grabs a web page from a file or URL and converts
-    it to markdown-formatted text, using `html2markdown`.  Unless
-    input is from STDIN, an attempt is made to determine the character
-    encoding of the page from the "Content-type" meta tag.  If this
-    is not present, UTF-8 is assumed.  Alternatively, a character
+    it to markdown-formatted text, using `tidy` and `html2markdown`.
+    Unless input is from STDIN, an attempt is made to determine the
+    character encoding of the page from the "Content-type" meta tag.
+    If this is not present, UTF-8 is assumed.  Alternatively, a character
     encoding may be specified explicitly using the `-e` option.
 
     `web2markdown` searches for an available program (`wget`, `curl`,
@@ -176,7 +203,8 @@ Two shell scripts have also been included:
 
         web2markdown -g 'wget --user=foo --password=bar' mysite.com
 
-# Command-line options
+Command-line options
+====================
 
 Various command-line options can be used to customize the output.
 For a complete list, type 
@@ -269,15 +297,18 @@ STDOUT, even if an output file was specified using the `-o` option.
 
 `-h` or `--help` prints a usage message to STDERR.
 
-# Pandoc's markdown vs. standard markdown
+Pandoc's markdown vs. standard markdown
+=======================================
 
 In parsing markdown, Pandoc departs from and extends [standard markdown]
 in a few respects.  (To run Pandoc on the official
 markdown test suite, type `make test-markdown`.)
 
 [standard markdown]:  http://daringfireball.net/projects/markdown/syntax
+  "Markdown syntax description"
 
-## Lists
+Lists
+-----
 
 Pandoc behaves differently from standard markdown on some "edge
 cases" involving lists.  Consider this source: 
@@ -328,7 +359,8 @@ the example above:
         B)  Fie
     C)  Third
 
-## Literal quotes in titles
+Literal quotes in titles
+------------------------
 
 Standard markdown allows unescaped literal quotes in titles, as
 in 
@@ -339,7 +371,8 @@ Pandoc requires all quotes within titles to be escaped:
 
 	[foo]: "bar \"embedded\" baz"
 
-## Reference links
+Reference links
+---------------
 
 Pandoc allows implicit reference links in either of two styles:
 
@@ -353,7 +386,8 @@ will appear as regular bracketed text.  Note: even `[link][]` will
 appear as `[link]` if there's no reference for `link`.  If you want
 `[link][]`, use a backslash escape: `\[link]\[]`.
 
-## Footnotes
+Footnotes
+---------
 
 Pandoc's markdown allows footnotes, using the following syntax:
 
@@ -377,7 +411,8 @@ Pandoc's markdown allows footnotes, using the following syntax:
 The identifiers in footnote references may not contain spaces, tabs,
 or newlines.
 
-## Embedded HTML
+Embedded HTML
+-------------
 
 Pandoc treats embedded HTML in markdown a bit differently than
 Markdown 1.0.  While Markdown 1.0 leaves HTML blocks exactly as they
@@ -410,7 +445,8 @@ markdown with HTML block elements.  For example, one can surround
 a block of markdown text with `<div>` tags without preventing it
 from being interpreted as markdown.
 
-## Title blocks
+Title blocks
+------------
 
 If the file begins with a title block
 
@@ -443,7 +479,8 @@ If a title prefix is specified with `-T` and no title block appears
 in the document, the title prefix will be used by itself as the
 HTML title.
 
-## Box-style blockquotes
+Box-style blockquotes
+---------------------
 
 Pandoc supports emacs-style boxquote block quotes, in addition to
 standard markdown (email-style) boxquotes:
@@ -452,7 +489,8 @@ standard markdown (email-style) boxquotes:
 	| They look like this.
 	`----
 
-## Inline LaTeX
+Inline LaTeX
+------------
 
 Anything between two $ characters will be parsed as LaTeX math.  The
 opening $ must have a character immediately to its right, while the
@@ -484,7 +522,8 @@ You can also use LaTeX environments.  For example,
 Note, however, that material between the begin and end tags will
 be interpreted as raw LaTeX, not as markdown.
 
-## Custom headers
+Custom headers
+--------------
 
 When run with the "standalone" option (`-s`), `pandoc` creates a
 standalone file, complete with an appropriate header.  To see the
@@ -499,13 +538,14 @@ it and specify it on the command line as follows:
 
 	pandoc --header=MyHeaderFile
 
-# Producing S5 with Pandoc
+Producing S5 with Pandoc
+========================
 
-Producing an [S5] slide show with Pandoc is easy.  A title page is
-constructed automatically from the document's title block (see above).
-Each section (with a level-one header) produces a single slide.  (Note
-that if the section is too big, the slide will not fit on the page; S5
-is not smart enough to produce multiple pages.)
+Producing an [S5] web-based slide show with Pandoc is easy.  A title
+page is constructed automatically from the document's title block (see
+above).  Each section (with a level-one header) produces a single slide.
+(Note that if the section is too big, the slide will not fit on the page;
+S5 is not smart enough to produce multiple pages.)
 
 Here's the markdown source for a simple slide show, `eating.txt`:
 
