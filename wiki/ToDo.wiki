@@ -1,7 +1,6 @@
 ﻿#summary To-do list.
-#labels Phase-Implementation
 
-= For 0.3 release =
+== For 0.3 release ==
 
 When ready:
   * Tag 0.3 branch
@@ -34,7 +33,7 @@ Website:
 
 Look into options for a binary package for linux.  Perhaps this is not needed, with the debian packages, but not everyone uses debs.  How hard would it be to make an rpm?  Or just a tarball with a simplified Makefile that just has the install targets?
 
-= Improvements =
+== Improvements ==
 
 Consider changing the default Pandoc data structure so that it is more "hierarchical":
   * Instead of section heading blocks, it would have section blocks, each with a title and a list of other elements, which might in turn be sections.
@@ -52,7 +51,7 @@ Note that pandoc's HTML output fails to validate completely (w3c), either as HTM
   * But if we remove them, we'll have trouble with S5 output, which seems to need the xhtml header?
   * There's also a problem with the email obfuscation scheme. `<noscript>` isn't allowed inside `<p>` blocks.  `<script>` _is_ allowed!  This doesn't seem to be a practical problem with the browsers I've tried, but it would be nice to validate.  We could move to a different email obfuscation technique (see e.g. the nice idea at http://subversion.tigris.org/security.html), but this one allows us to have mailto links.
 
-= New feature ideas =
+== New feature ideas ==
 
 Add format-independent "table of contents" macro.  Something like this:
 {{{
@@ -60,7 +59,7 @@ Add format-independent "table of contents" macro.  Something like this:
 %contents
 
 }}}
-in a block by itself.  To implement this, we might add a Table\Of\Contents
+in a block by itself.  To implement this, we might add a TableOfContents
 block type.  In latex output, this would come out as `\tableofcontents`,
 in HTML, Markdown, and RTF, we'd have to parse the document for headers
 (or sections - see below) and build a nested list with internal links.
