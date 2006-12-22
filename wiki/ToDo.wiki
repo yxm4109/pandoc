@@ -59,7 +59,7 @@ Add format-independent "table of contents" macro.  Something like this:
 %contents
 
 }}}
-in a block by itself.  To implement this, we might add a TableOfContents
+in a block by itself.  To implement this, we might add a 'TableOfContents'
 block type.  In latex output, this would come out as `\tableofcontents`,
 in HTML, Markdown, and RTF, we'd have to parse the document for headers
 (or sections - see below) and build a nested list with internal links.
