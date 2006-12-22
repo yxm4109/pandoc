@@ -607,14 +607,21 @@ Here is a movie ![movie](movie.jpg) icon.
 
 # Footnotes
 
-Here is a footnote reference[^1], and another[^longnote]. This
-should *not* be a footnote reference, because it contains a
-space[\^my note].
+Here is a footnote reference,[^1] and another.[^2] This should
+*not* be a footnote reference, because it contains a space.[\^my
+note] Here is an inline note.[^3]
 
-[^1]: Here is the footnote. It can go anywhere in the document, not just
-    at the end.
+> Notes can go in quotes.[^4]
 
-[^longnote]: Here's the other note. This one contains multiple blocks.
+1.  And in list items.[^5]
+
+This paragraph should not be part of the note, as it is not
+indented.
+
+[^1]: Here is the footnote. It can go anywhere after the footnote
+    reference. It need not be placed at the end of the document.
+
+[^2]: Here's the long note. This one contains multiple blocks.
     
     Subsequent blocks are indented to show that they belong to the
     footnote (as with list items).
@@ -623,4 +630,13 @@ space[\^my note].
     
     If you want, you can indent every line, but you can also be lazy
     and just indent the first line of each block.
+
+[^3]: This is *easier* to type. Inline notes may contain
+    [links](http://google.com) and `]` verbatim characters.
+
+[^4]: In quote.
+
+
+[^5]: In list.
+
 

@@ -1,4 +1,32 @@
--- | Converts LaTeX to 'Pandoc' document.
+{-
+Copyright (C) 2006 John MacFarlane <jgm at berkeley dot edu>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-}
+
+{- |
+   Module      : Text.Pandoc.Readers.LaTeX
+   Copyright   : Copyright (C) 2006 John MacFarlane
+   License     : GNU GPL, version 2 or above 
+
+   Maintainer  : John MacFarlane <jgm at berkeley dot edu>
+   Stability   : alpha
+   Portability : portable
+
+Conversion of LaTeX to 'Pandoc' document.
+-}
 module Text.Pandoc.Readers.LaTeX ( 
                                   readLaTeX,
                                   rawLaTeXInline,
@@ -81,7 +109,8 @@ end name = try (do
   spaces
   return name)
 
--- | Returns a list of block elements containing the contents of an environment.
+-- | Returns a list of block elements containing the contents of an
+-- environment.
 environment name = try (do
   begin name
   spaces
@@ -104,15 +133,16 @@ anyEnvironment =  try (do
 
 -- | Process LaTeX preamble, extracting metadata.
 processLaTeXPreamble = do
-  manyTill (choice [bibliographic, comment, unknownCommand, nullBlock]) (try (string "\\begin{document}"))
+  manyTill (choice [bibliographic, comment, unknownCommand, nullBlock]) 
+           (try (string "\\begin{document}"))
   spaces
 
 -- | Parse LaTeX and return 'Pandoc'.
 parseLaTeX = do
-  option () processLaTeXPreamble    -- preamble might not be present, if a fragment
+  option () processLaTeXPreamble -- preamble might not be present (fragment)
   blocks <- parseBlocks
   spaces
-  option "" (string "\\end{document}") -- if parsing a fragment, this might not be present
+  option "" (string "\\end{document}") -- might not be present (in fragment)
   spaces
   eof
   state <- getState
@@ -122,7 +152,8 @@ parseLaTeX = do
   let title' = stateTitle state
   let authors' = stateAuthors state
   let date' = stateDate state
-  return (Pandoc (Meta title' authors' date') (blocks' ++ (reverse noteBlocks) ++ (reverse keyBlocks)))
+  return (Pandoc (Meta title' authors' date') 
+          (blocks' ++ (reverse noteBlocks) ++ (reverse keyBlocks)))
 
 --
 -- parsing blocks
@@ -133,9 +164,10 @@ parseBlocks = do
   result <- many block
   return result
 
-block = choice [ hrule, codeBlock, header, list, blockQuote, mathBlock, comment, 
-                 bibliographic, para, specialEnvironment, itemBlock, unknownEnvironment, 
-                 unknownCommand ] <?> "block"
+block = choice [ hrule, codeBlock, header, list, blockQuote, mathBlock,
+                 comment, bibliographic, para, specialEnvironment,
+                 itemBlock, unknownEnvironment, unknownCommand ] <?>
+                 "block"
 
 --
 -- header blocks
@@ -157,7 +189,8 @@ headerLevel n = try (do
 --
 
 hrule = try (do
-  oneOfStrings [ "\\begin{center}\\rule{3in}{0.4pt}\\end{center}\n\n", "\\newpage" ]
+  oneOfStrings [ "\\begin{center}\\rule{3in}{0.4pt}\\end{center}\n\n", 
+                 "\\newpage" ]
   spaces
   return HorizontalRule)
 
@@ -166,8 +199,10 @@ hrule = try (do
 --
 
 codeBlock = try (do
-  string "\\begin{verbatim}"  -- don't use begin function because it gobbles whitespace
-  option "" blanklines        -- we want to gobble blank lines, but not leading space
+  string "\\begin{verbatim}"  -- don't use begin function because it 
+                              -- gobbles whitespace
+  option "" blanklines        -- we want to gobble blank lines, but not 
+                              -- leading space
   contents <- manyTill anyChar (try (string "\\end{verbatim}"))
   spaces
   return (CodeBlock (stripTrailingNewlines contents)))
@@ -266,7 +301,8 @@ authors = try (do
   string "\\author{"
   authors <- manyTill anyChar (char '}')
   spaces
-  let authors' = map removeLeadingTrailingSpace $ lines $ gsub "\\\\\\\\" "\n" authors
+  let authors' = map removeLeadingTrailingSpace $ lines $
+                 gsub "\\\\\\\\" "\n" authors
   updateState (\state -> state { stateAuthors = authors' })
   return Null)
 
@@ -286,21 +322,19 @@ date = try (do
 itemBlock = try (do
   ("item", _, args) <- command
   state <- getState
-  if (stateParserContext state == ListItemState) then 
-      fail "item should be handled by list block"
-    else
-      if null args then
-          return Null
-        else
-          return (Plain [Str (stripFirstAndLast (head args))]))
+  if (stateParserContext state == ListItemState)
+     then fail "item should be handled by list block"
+     else if null args 
+             then return Null
+             else return (Plain [Str (stripFirstAndLast (head args))]))
 
 --
 -- raw LaTeX 
 --
 
 specialEnvironment = do  -- these are always parsed as raw
-  followedBy' (choice (map (\name -> begin name)  ["tabular", "figure", "tabbing", "eqnarry", 
-                                                   "picture", "table", "verse", "theorem"]))
+  followedBy' (choice (map (\name -> begin name)  ["tabular", "figure",
+              "tabbing", "eqnarry", "picture", "table", "verse", "theorem"]))
   rawLaTeXEnvironment
 
 -- | Parse any LaTeX environment and return a Para block containing
@@ -316,18 +350,20 @@ rawLaTeXEnvironment = try (do
   args <- option [] commandArgs
   let argStr = concat args
   contents <- manyTill (choice [(many1 (noneOf "\\")), 
-                                (do{ (Para [TeX str]) <- rawLaTeXEnvironment; return str }),
-                                string "\\"]) (end name')
+                                 (do 
+                                    (Para [TeX str]) <- rawLaTeXEnvironment
+                                    return str),
+                                 string "\\" ]) 
+                       (end name')
   spaces
   return (Para [TeX ("\\begin{" ++ name' ++ "}" ++ argStr ++ 
-                                (concat contents) ++ "\\end{" ++ name' ++ "}")]))
+          (concat contents) ++ "\\end{" ++ name' ++ "}")]))
 
 unknownEnvironment = try (do
   state <- getState
-  result <- if stateParseRaw state then  -- check to see whether we should include raw TeX
-                rawLaTeXEnvironment      -- if so, get the whole raw environment
-            else
-                anyEnvironment           -- otherwise just the contents
+  result <- if stateParseRaw state -- check whether we should include raw TeX 
+               then rawLaTeXEnvironment -- if so, get whole raw environment
+               else anyEnvironment      -- otherwise just the contents
   return result)
 
 unknownCommand = try (do
@@ -338,14 +374,12 @@ unknownCommand = try (do
   spaces
   let argStr = concat args
   state <- getState
-  if (name == "item") && ((stateParserContext state) == ListItemState) then
-      fail "should not be parsed as raw"
-    else
-      string ""
-  if stateParseRaw state then
-      return (Plain [TeX ("\\" ++ name ++ star ++ argStr)])
-    else
-      return (Plain [Str (joinWithSep " " args)]))
+  if (name == "item") && ((stateParserContext state) == ListItemState)
+     then fail "should not be parsed as raw"
+     else string ""
+  if stateParseRaw state
+     then return (Plain [TeX ("\\" ++ name ++ star ++ argStr)])
+     else return (Plain [Str (joinWithSep " " args)]))
 
 -- latex comment
 comment = try (do
@@ -358,9 +392,9 @@ comment = try (do
 -- inline
 --
 
-inline =  choice [ strong, emph, ref, lab, code, linebreak, math, ldots, accentedChar, 
-                 specialChar, specialInline, escapedChar, unescapedChar, str, 
-                 endline, whitespace ] <?> "inline"
+inline =  choice [ strong, emph, ref, lab, code, linebreak, math, ldots,
+                   accentedChar, specialChar, specialInline, escapedChar,
+                   unescapedChar, str, endline, whitespace ] <?> "inline"
 
 specialInline = choice [ link, image, footnote, rawLaTeXInline ] <?> 
                 "link, raw TeX, note, or image"
@@ -397,8 +431,8 @@ accentTable =
     ('o', [('`', 242), ('\'', 243), ('^', 244), ('~', 245), ('"', 246)]),
     ('u', [('`', 249), ('\'', 250), ('^', 251), ('"', 252)]) ]
 
-specialAccentedChar = choice [ ccedil, aring, iuml, szlig, aelig, oslash, pound, 
-                               euro, copyright, sect ]
+specialAccentedChar = choice [ ccedil, aring, iuml, szlig, aelig,
+                              oslash, pound, euro, copyright, sect ]
 
 ccedil = try (do
   char '\\'
@@ -550,8 +584,7 @@ link = try (do
   url <- manyTill anyChar (char '}')
   char '{'
   label <- manyTill inline (char '}') 
-  ref <- generateReference url ""
-  return (Link (normalizeSpaces label) ref))
+  return (Link (normalizeSpaces label) (Src url "")))
 
 image = try (do
   ("includegraphics", _, args) <- command
@@ -564,18 +597,18 @@ image = try (do
 
 footnote = try (do
   (name, _, (contents:[])) <- command
-  if ((name == "footnote") || (name == "thanks")) then
-      string ""
-    else
-      fail "not a footnote or thanks command"
+  if ((name == "footnote") || (name == "thanks"))
+     then string ""
+     else fail "not a footnote or thanks command"
   let contents' = stripFirstAndLast contents
-  let blocks = case runParser parseBlocks defaultParserState "footnote" contents of
-                 Left err -> error $ "Input:\n" ++ show contents' ++
-                             "\nError:\n" ++ show err
-                 Right result -> result
+  -- parse the extracted block, which may contain various block elements:
+  rest <- getInput
+  setInput $ contents'
+  blocks <- parseBlocks
+  setInput rest
   state <- getState
   let notes = stateNoteBlocks state
-  let nextRef  = case notes of
+  let nextRef = case notes of 
                    []                   -> "1"
                    (Note ref body):rest -> (show ((read ref) + 1))
   setState (state { stateNoteBlocks = (Note nextRef blocks):notes })
@@ -587,8 +620,7 @@ rawLaTeXInline = try (do
   (name, star, args) <- command
   let argStr = concat args
   state <- getState
-  if ((name == "begin") || (name == "end") || (name == "item")) then
-      fail "not an inline command" 
-    else
-      string ""
+  if ((name == "begin") || (name == "end") || (name == "item"))
+     then fail "not an inline command" 
+     else string ""
   return (TeX ("\\" ++ name ++ star ++ argStr)))

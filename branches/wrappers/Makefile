@@ -33,7 +33,7 @@ EXTENSION := $(shell uname | tr '[:upper:]' '[:lower:]' | \
 EXECS     := $(addsuffix $(EXTENSION),$(EXECSBASE))
 # First entry in Cabal's executable stanza is the main executable.
 MAIN      := $(firstword $(EXECS))
-DOCS      := README.html README BUGS TODO
+DOCS      := README.html README BUGS 
 
 #-------------------------------------------------------------------------------
 # Variables to setup through environment
