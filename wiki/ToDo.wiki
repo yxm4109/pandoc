@@ -25,7 +25,8 @@ zip -r pandoc-0.3-windows.zip pandoc.exe README.txt COPYRIGHT.txt COPYING.txt
 }}}
 
 Do we need a special version of README for the windows binary?  Presumably yes -- 
-we need to remove reference to the wrappers (easy with sed).  Perhaps we also need an INSTALL-WIN file.
+we need to remove reference to the wrappers (easy with sed).  Perhaps we also need an INSTALL-WIN file.  (Now underway with README-WINDOWS.  This is tricky.  Some may have
+Cygwin, so perhaps we should include wrappers in the binary distribution?)
 
 Website:
   * Download links need to point to Google Code downloads.
