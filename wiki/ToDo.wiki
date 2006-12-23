@@ -9,9 +9,8 @@ When ready:
 
 Proposed naming scheme:
   * `pandoc-0.3.tar.gz` - source tarball
-  * `pandoc-osx-ppc-0.3.dmg` - OSX disk image (compiled on PPC)
-  * `pandoc-osx-intel-0.3.dmg` - OSX disk image (compiled on Intel)
-  * `pandoc-windows-0.3.zip` - zip file containing Windows binary and documentation
+  * `pandoc-0.3-osx.dmg` - OSX disk image (compiled on PPC but will work on all Macs)
+  * `pandoc-0.3-windows.zip` - zip file containing Windows binary and documentation
 
 Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
