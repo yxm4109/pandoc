@@ -2,33 +2,29 @@
 
 == For 0.3 release ==
 
+Prerequisites for 0.3 release:
+  * Test all Makefile targets on various machines (including Windows/Cygwin). 
+  * Test Windows binary package on a Windows machine.
+  * Test Mac OSX dmg.
+  * Update website target:  sample files produced in various formats as demo
+  * Update debian/changelog
+
 When ready:
   * Tag 0.3 branch
-  * Create source tarball
-  * Create OSX disk image and Windows exe (Note: Makefile target for OSX package will have to be changed to conform to the naming scheme below.)
-
+  * Check out fresh copy, create tarball, OSX dmg, Windows zip
+  * Upload tarball, dmg, and zip to Google Code downloads section.
+  * Create debian packages and start upload to debian
+  * Create and upload website.
+  * Announce release on Freshmeat, and on pandoc-announce (create!), markdown list, docutils list, haskell list, etc.
+ 
 Proposed naming scheme:
   * `pandoc-0.3.tar.gz` - source tarball
-  * `pandoc-0.3-osx.dmg` - OSX disk image (compiled on PPC but will work on all Macs)
-  * `pandoc-0.3-windows.zip` - zip file containing Windows binary and documentation
+  * `pandoc-0.3.dmg` - OSX disk image (compiled on PPC)
+  * `pandoc-0.3.zip` - zip file containing Windows binary and documentation
 
 Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
-Add a Makefile target to create windows zipfile (given `pandoc.exe`).  Something like this:
-{{{
-FILES=README COPYING COPYRIGHT
-for f in $(FILES); do
-  sed -e 's/$'"/`echo \\\r`/" $$f > $$f.txt # converts line endings;
-done
-zip -r pandoc-0.3-windows.zip pandoc.exe README.txt COPYRIGHT.txt COPYING.txt
-}}}
-
-Do we need a special version of README for the windows binary?  Presumably yes -- 
-we need to remove reference to the wrappers (easy with sed).  Perhaps we also need an INSTALL-WIN file.  (Now underway with README-WINDOWS.  This is tricky.  Some may have
-Cygwin, so perhaps we should include wrappers in the binary distribution?)
-
 Website:
-  * Download links need to point to Google Code downloads.
   * roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
 
 Look into options for a binary package for linux.  Perhaps this is not needed, with the debian packages, but not everyone uses debs.  How hard would it be to make an rpm?  Or just a tarball with a simplified Makefile that just has the install targets?
