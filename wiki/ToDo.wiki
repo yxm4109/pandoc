@@ -24,6 +24,12 @@ Proposed naming scheme:
 
 Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
+Test report:  win-pkg seems to work fine.  Source package compiles on
+Cygwin, but the symlinks don't work properly.  (pandoc thinks it's being
+called as 'pandoc', apparently.)  Hence the wrappers don't work.
+Could redo wrappers with 'pandoc' instead of the symlinks, but then
+we don't get tailored usage messages...  Think about this.
+
 Website:
   * roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
 
