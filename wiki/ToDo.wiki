@@ -3,11 +3,11 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
+  * Update website target:  sample files produced in various formats as demo
+  * Update debian/changelog
   * Test all Makefile targets on various machines (including Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
-  * Update website target:  sample files produced in various formats as demo
-  * Update debian/changelog
 
 When ready:
   * Tag 0.3 branch
