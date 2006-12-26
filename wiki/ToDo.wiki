@@ -3,9 +3,11 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
-  * Update website target:  sample files produced in various formats as demo
-  * Update debian/changelog
-  * Test all Makefile targets on various machines (including Windows/Cygwin). 
+  * Fix problem with Windows/Cygwin install (see below)
+  * Update website target:  sample files produced in various formats as demo?
+  * Update debian/changelog (ignore 0.22, which was tagged but never released)
+  * New target to make linux/unix i386 binary package? (install.sh, uninstall.sh, installs into /usr/local tree).
+  * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
 
@@ -21,19 +23,22 @@ Proposed naming scheme:
   * `pandoc-0.3.tar.gz` - source tarball
   * `pandoc-0.3.dmg` - OSX disk image (compiled on PPC)
   * `pandoc-0.3.zip` - zip file containing Windows binary and documentation
+  * `pandoc-0.3_i386.tar.gz` - generic nix binary package for i386?
 
 Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
-Test report:  win-pkg seems to work fine.  Source package compiles on
-Cygwin, but the symlinks don't work properly.  (pandoc thinks it's being
-called as 'pandoc', apparently.)  Hence the wrappers don't work.
-Could redo wrappers with 'pandoc' instead of the symlinks, but then
-we don't get tailored usage messages...  Think about this.
+Windows/Cygwin:  Source package compiles on Cygwin, but the symlinks
+don't work properly.  (getProgName returns 'pandoc' even when the running
+program is 'markdown2latex'.)  This seems to be a problem with Cygwin's
+simulation of symlinks.  Solutions?  (1) Ignore and document as a
+limitation of Cygwin.  (2) Get rid of the symlinks.  Do we need them?
+They don't add that much convenience.  We'd also have to modify Main.hs
+to remove the name-dependent behavior (or we could just keep it...).
+And we'd have to modify markdown2pdf and web2markdown to call 'pandoc'
+instead of the symlink programs.  Some modification would also be
+required to give good usage messages.
 
-Website:
-  * roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
-
-Look into options for a binary package for linux.  Perhaps this is not needed, with the debian packages, but not everyone uses debs.  How hard would it be to make an rpm?  Or just a tarball with a simplified Makefile that just has the install targets?
+Website:  roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
 
 == Improvements ==
 
