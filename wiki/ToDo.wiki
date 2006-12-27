@@ -30,13 +30,16 @@ Note:  debs will be available elsewhere, so we need not put them in Downloads.
 Windows/Cygwin:  Source package compiles on Cygwin, but the symlinks
 don't work properly.  (getProgName returns 'pandoc' even when the running
 program is 'markdown2latex'.)  This seems to be a problem with Cygwin's
-simulation of symlinks.  Solutions?  (1) Ignore and document as a
-limitation of Cygwin.  (2) Get rid of the symlinks.  Do we need them?
+simulation of symlinks.  Solution:  Get rid of the symlinks.
 They don't add that much convenience.  We'd also have to modify Main.hs
 to remove the name-dependent behavior (or we could just keep it...).
 And we'd have to modify markdown2pdf and web2markdown to call 'pandoc'
 instead of the symlink programs.  Some modification would also be
 required to give good usage messages.
+
+Another suggestion by roktas:  have the default reader and writer
+determined by the extensions of the input and output files, unless
+reader and writer are specified explicitly using `-f` and `-t`.
 
 Website:  roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
 
