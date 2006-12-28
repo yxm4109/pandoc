@@ -3,7 +3,6 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
-  * Update website target:  sample files produced in various formats as demo?
   * Update debian/changelog (ignore 0.22, which was tagged but never released)
   * New target to make linux/unix i386 binary package? (install.sh, uninstall.sh, installs into /usr/local tree).
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
@@ -25,8 +24,6 @@ Proposed naming scheme:
   * `pandoc-0.3_i386.tar.gz` - generic nix binary package for i386?
 
 Note:  debs will be available elsewhere, so we need not put them in Downloads.
-
-Website:  roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
 
 == Improvements ==
 
