@@ -33,8 +33,7 @@ Website:  roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. 
 Consider changing the default Pandoc data structure so that it is more "hierarchical":
   * Instead of section heading blocks, it would have section blocks, each with a title and a list of other elements, which might in turn be sections.
   * It wouldn't be too hard to change the readers to parse this way.  And this would allow more flexibility for the writers, especially for the proposed Docbook writer, which needs a hierarchical structure of sections. 
-  * Potential problem:  some existing code assumes e.g. that note blocks are
-at the outer level (see RTF writer); this would have to be rewritten.
+  * Potential problem:  some existing code assumes e.g. that note blocks are at the outer level (see RTF writer); this would have to be rewritten.
   * It would be good to have a general "tree walker" utility function that makes it easy to, say, walk through the hierarchy filtering out note blocks.
 
 Use XHTML library for HTML writer?  Not yet - it's not standard with 6.4.2 (but is with 6.6).  When we can drop support for 6.4.2, we can use it.
