@@ -3,7 +3,6 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
-  * Fix problem with Windows/Cygwin install (see below)
   * Update website target:  sample files produced in various formats as demo?
   * Update debian/changelog (ignore 0.22, which was tagged but never released)
   * New target to make linux/unix i386 binary package? (install.sh, uninstall.sh, installs into /usr/local tree).
@@ -26,20 +25,6 @@ Proposed naming scheme:
   * `pandoc-0.3_i386.tar.gz` - generic nix binary package for i386?
 
 Note:  debs will be available elsewhere, so we need not put them in Downloads.
-
-Windows/Cygwin:  Source package compiles on Cygwin, but the symlinks
-don't work properly.  (getProgName returns 'pandoc' even when the running
-program is 'markdown2latex'.)  This seems to be a problem with Cygwin's
-simulation of symlinks.  Solution:  Get rid of the symlinks.
-They don't add that much convenience.  We'd also have to modify Main.hs
-to remove the name-dependent behavior (or we could just keep it...).
-And we'd have to modify markdown2pdf and web2markdown to call 'pandoc'
-instead of the symlink programs.  Some modification would also be
-required to give good usage messages.
-
-Another suggestion by roktas:  have the default reader and writer
-determined by the extensions of the input and output files, unless
-reader and writer are specified explicitly using `-f` and `-t`.
 
 Website:  roktas suggests having `README.pdf`, `README.rtf`, `README.rst`, etc. on the website, so people can see what Pandoc can do.  Alternatively, have an Examples section, including S5 examples.
 
