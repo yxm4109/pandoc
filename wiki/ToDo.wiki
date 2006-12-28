@@ -4,7 +4,6 @@
 
 Prerequisites for 0.3 release:
   * Update debian/changelog (ignore 0.22, which was tagged but never released)
-  * New target to make linux/unix i386 binary package? (install.sh, uninstall.sh, installs into /usr/local tree).
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
@@ -21,7 +20,6 @@ Proposed naming scheme:
   * `pandoc-0.3.tar.gz` - source tarball
   * `pandoc-0.3.dmg` - OSX disk image (compiled on PPC)
   * `pandoc-0.3.zip` - zip file containing Windows binary and documentation
-  * `pandoc-0.3_i386.tar.gz` - generic nix binary package for i386?
 
 Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
