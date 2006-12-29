@@ -3,7 +3,6 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
-  * Think about changing the empty `<a>` tags with IDs; put the IDs directly on the headers, or use the `{}` link syntax suggested in [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   Or just remove this feature.  Note that the syntax suggested in the thread isn't ideal for pandoc, as it is very HTML-centric.
   * See Gruber's comment about "markdown" meaning no extensions.  Consider calling the text format 'pandoc format', noting that it is a light revision and extension of markdown.  Or adding a flag to turn on extra features.  Perhaps change the names of 'markdown2pdf' and 'web2markdown' to 'txt2pdf' and 'web2txt'?  Consider adding a full-compatibility mode (how much trouble would this be, for html blocks and lists and quotes in titles?).
   * Update debian/changelog (ignore 0.22, which was tagged but never released)
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
@@ -27,10 +26,7 @@ Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
 == Improvements ==
 
-The current method of inserting empty <a> tags for headers is probably not ideal:
-  * It will give you non-unique IDs when you have headers with duplicate titles (see the thread for an example of this).
-  * Even apart from this, it would be better just to assign the ID attribute directly to the header.
-  * The proposed syntax in the thread, using {} tags, is probably better.  But there are some unanswered questions about it.  (What about attaching attributes to lists, etc.?)
+Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   
 
 Consider changing the default Pandoc data structure so that it is more "hierarchical":
   * Instead of section heading blocks, it would have section blocks, each with a title and a list of other elements, which might in turn be sections.
