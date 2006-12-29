@@ -3,6 +3,8 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
+  * Think about changing the empty <a> tags with IDs; put the IDs directly on the headers, or use the {} syntax suggested in the thread, see below.  Or just remove this feature.
+  * See Gruber's comment about "markdown" meaning no extensions.  Consider revising documentation, or adding a flag to turn on extra features.
   * Update debian/changelog (ignore 0.22, which was tagged but never released)
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
@@ -25,6 +27,13 @@ Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
 == Improvements ==
 
+Attributes:  see the thread at http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html
+
+The current method of inserting empty <a> tags for headers is probably not ideal:
+  * It will give you non-unique IDs when you have headers with duplicate titles (see the thread for an example of this).
+  * Even apart from this, it would be better just to assign the ID attribute directly to the header.
+  * The proposed syntax in the thread, using {} tags, is probably better.  But there are some unanswered questions about it.  (What about attaching attributes to lists, etc.?)
+
 Consider changing the default Pandoc data structure so that it is more "hierarchical":
   * Instead of section heading blocks, it would have section blocks, each with a title and a list of other elements, which might in turn be sections.
   * It wouldn't be too hard to change the readers to parse this way.  And this would allow more flexibility for the writers, especially for the proposed Docbook writer, which needs a hierarchical structure of sections. 
@@ -41,6 +50,8 @@ Note that pandoc's HTML output fails to validate completely (w3c), either as HTM
   * There's also a problem with the email obfuscation scheme. `<noscript>` isn't allowed inside `<p>` blocks.  `<script>` _is_ allowed!  This doesn't seem to be a practical problem with the browsers I've tried, but it would be nice to validate.  We could move to a different email obfuscation technique (see e.g. the nice idea at http://subversion.tigris.org/security.html), but this one allows us to have mailto links.
 
 == New feature ideas ==
+
+Configuration file?
 
 Add format-independent "table of contents" macro.  Something like this:
 {{{
