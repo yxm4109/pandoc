@@ -4,7 +4,6 @@
 
 Prerequisites for 0.3 release:
   * See [http://six.pairlist.net/pipermail/markdown-discuss/2006-December/000387.html John Gruber's comment] about "Markdown" as a consistent format across implementations.  Consider calling the text format 'pandoc format', noting that it is a light revision and extension of markdown.  Or adding a flag to turn on extra features.  Perhaps change the names of 'markdown2pdf' and 'web2markdown' to 'pandoc2pdf' and 'web2pandoc'?  Consider adding a full-compatibility mode (how much trouble would this be, for html blocks and lists and quotes in titles?).
-  * Update debian/changelog (ignore 0.22, which was tagged but never released)
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
