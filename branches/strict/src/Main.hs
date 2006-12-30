@@ -407,7 +407,8 @@ main = do
   let filter = tabFilter . addBlank . removeCRs
   let startParserState = defaultParserState { stateParseRaw     = parseRaw,
                                               stateTabStop      = tabStop, 
-                                              stateStandalone   = standalone }
+                                              stateStandalone   = standalone,
+                                              stateStrict       = strict }
   let csslink = if (css == "")
                    then "" 
                    else "<link rel=\"stylesheet\" href=\"" ++ css ++ 
@@ -426,7 +427,8 @@ main = do
                                       writerIncremental    = incremental, 
                                       writerNumberSections = numberSections,
                                       writerIncludeBefore  = includeBefore, 
-                                      writerIncludeAfter   = includeAfter }
+                                      writerIncludeAfter   = includeAfter,
+                                      writerStrictMarkdown = strict }
 
   (readSources sources) >>= (hPutStr output . encodeUTF8 . 
                              (writer writerOptions) . 
