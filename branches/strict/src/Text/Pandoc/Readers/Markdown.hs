@@ -107,6 +107,11 @@ skipNonindentSpaces = do
   let tabStop = stateTabStop state
   choice (map (\n -> (try (count n (char ' ')))) (reverse [0..(tabStop - 1)]))
 
+-- | Fail if reader is in strict markdown syntax mode.
+failIfStrict = do
+    state <- getState
+    if stateStrict state then fail "Strict markdown mode" else return ()
+
 --
 -- document structure
 --
@@ -132,6 +137,7 @@ dateLine = try (do
   return (removeTrailingSpace date))
 
 titleBlock = try (do
+  failIfStrict
   title <- option [] titleLine
   author <- option [] authorsLine
   date <- option "" dateLine
@@ -165,7 +171,7 @@ parseBlocks = do
   return result
 
 block = choice [ codeBlock, note, referenceKey, header, hrule, list, 
-                 blockQuote, rawHtmlBlocks, rawLaTeXEnvironment, para,
+                 blockQuote, rawHtmlBlocks, rawLaTeXEnvironment', para,
                  plain, blankBlock, nullBlock ] <?> "block"
 
 --
@@ -256,6 +262,7 @@ rawLines = do
     return (concat lines)
 
 note = try (do
+  failIfStrict
   ref <- noteMarker
   char ':'
   skipSpaces
@@ -280,6 +287,7 @@ note = try (do
 --
 
 emacsBoxQuote = try (do
+  failIfStrict
   string ",----"
   manyTill anyChar newline
   raw <- manyTill (try (do 
@@ -336,8 +344,9 @@ bulletListStart = try (do
 orderedListStart = try (do
   option ' ' newline -- if preceded by a Plain block in a list context
   skipNonindentSpaces
-  many1 digit <|> count 1 letter
-  oneOf orderedListDelimiters
+  many1 digit <|> (do{failIfStrict; count 1 letter})
+  delim <- oneOf orderedListDelimiters
+  if delim /= '.' then failIfStrict else return ()
   oneOf spaceChars
   skipSpaces)
 
@@ -411,7 +420,7 @@ para = try (do
   result <- many1 inline
   newline
   choice [ (do 
-              followedBy' (oneOfStrings [">", ",----"])
+              followedBy' (oneOfStrings [">", ",----", "#"])
               return "" ), 
            blanklines ]  
   let result' = normalizeSpaces result
@@ -450,6 +459,14 @@ referenceKey = try (do
   blanklines 
   return (Key label (Src (removeTrailingSpace src) tit))) 
 
+--
+-- LaTeX
+--
+
+rawLaTeXEnvironment' = do
+  failIfStrict
+  rawLaTeXEnvironment
+
 -- 
 -- inline
 --
@@ -457,7 +474,7 @@ referenceKey = try (do
 text = choice [ math, strong, emph, code2, code1, str, linebreak, tabchar, 
                 whitespace, endline ] <?> "text"
 
-inline = choice [ rawLaTeXInline, escapedChar, special, hyphens, text, 
+inline = choice [ rawLaTeXInline', escapedChar, special, hyphens, text, 
                   ltSign, symbol ] <?> "inline"
 
 special = choice [ noteRef, inlineNote, link, referenceLink, rawHtmlInline, 
@@ -507,6 +524,7 @@ mathWord = many1 (choice [ (noneOf (" \t\n\\" ++ [mathEnd])),
                                    return c))])
 
 math = try (do
+  failIfStrict
   char mathStart
   notFollowedBy space
   words <- sepBy1 mathWord (many1 space)
@@ -549,13 +567,14 @@ str = do
 -- an endline character that can be treated as a space, not a structural break
 endline = try (do
   newline
-  -- next line would allow block quotes without preceding blank line
-  -- Markdown.pl does allow this, but there's a chance of a wrapped
-  -- greater-than sign triggering a block quote by accident...
-  -- notFollowedBy' (choice [emailBlockQuoteStart, string ",----"])  
+  st <- getState
+  if stateStrict st 
+    then do
+           notFollowedBy' emailBlockQuoteStart
+           notFollowedBy' (char '#')
+    else return () 
   notFollowedBy blankline
   -- parse potential list-starts differently if in a list:
-  st <- getState
   if (stateParserContext st) == ListItemState
      then do
             notFollowedBy' orderedListStart
@@ -645,6 +664,7 @@ noteMarker = try (do
   manyTill (noneOf " \t\n") (char labelEnd))
 
 noteRef = try (do
+  failIfStrict
   ref <- noteMarker
   state <- getState
   let identifiers = (stateNoteIdentifiers state) ++ [ref] 
@@ -652,6 +672,7 @@ noteRef = try (do
   return (NoteRef (show (length identifiers))))
 
 inlineNote = try (do
+  failIfStrict
   char noteStart
   char labelStart
   contents <- manyTill inline (char labelEnd)
@@ -663,4 +684,8 @@ inlineNote = try (do
                           stateNoteBlocks = 
                                (Note ref [Para contents]):noteBlocks})
   return (NoteRef ref))
+
+rawLaTeXInline' = do
+  failIfStrict
+  rawLaTeXInline
 
