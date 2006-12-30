@@ -36,9 +36,10 @@ import Text.ParserCombinators.Pandoc
 import Text.Pandoc.Definition
 import Text.Pandoc.Readers.LaTeX ( rawLaTeXInline, rawLaTeXEnvironment )
 import Text.Pandoc.Shared 
-import Text.Pandoc.Readers.HTML ( rawHtmlInline, rawHtmlBlock, 
+import Text.Pandoc.Readers.HTML ( rawHtmlBlock, 
                                   anyHtmlBlockTag, anyHtmlInlineTag,
-                                  anyHtmlTag, htmlEndTag, extractTagType,
+                                  anyHtmlTag, anyHtmlEndTag,
+                                  htmlEndTag, extractTagType,
                                   htmlBlockElement )
 import Text.Pandoc.HtmlEntities ( decodeEntities )
 import Text.Regex ( matchRegex, mkRegex )
@@ -113,6 +114,11 @@ skipNonindentSpaces = do
 failIfStrict = do
     state <- getState
     if stateStrict state then fail "Strict markdown mode" else return ()
+
+-- | Fail unless we're at beginning of a line.
+failUnlessBeginningOfLine = do
+  pos <- getPosition
+  if sourceColumn pos == 1 then return () else fail "not beginning of line"
 
 --
 -- document structure
@@ -445,8 +451,11 @@ htmlBlock = do
   st <- getState
   if stateStrict st
     then do
-           contents <- many1 (htmlElement <|> (many1 space))
-           return (RawHtml (concat contents))
+           failUnlessBeginningOfLine
+           first <- htmlElement
+           finalSpace <- many (oneOf spaceChars)
+           finalNewlines <- many newline
+           return (RawHtml (first ++ finalSpace ++ finalNewlines))
     else rawHtmlBlocks
 
 -- True if tag is self-closing
@@ -457,7 +466,7 @@ selfClosing tag = case (matchRegex (mkRegex "\\/[[:space:]]*>$") tag) of
 strictHtmlBlock = try (do
   tag <- anyHtmlBlockTag 
   let tag' = extractTagType tag
-  if selfClosing tag || tag' == "br" || tag' == "hr" 
+  if selfClosing tag || tag' == "hr" 
      then return tag
      else do
             contents <- many (do{notFollowedBy' (htmlEndTag tag'); 
@@ -507,7 +516,7 @@ text = choice [ math, strong, emph, code2, code1, str, linebreak, tabchar,
 inline = choice [ rawLaTeXInline', escapedChar, special, hyphens, text, 
                   ltSign, symbol ] <?> "inline"
 
-special = choice [ noteRef, inlineNote, link, referenceLink, rawHtmlInline, 
+special = choice [ noteRef, inlineNote, link, referenceLink, rawHtmlInline', 
                    autoLink, image ] <?> "link, inline html, note, or image"
 
 escapedChar = escaped anyChar
@@ -718,4 +727,11 @@ inlineNote = try (do
 rawLaTeXInline' = do
   failIfStrict
   rawLaTeXInline
+
+rawHtmlInline' = do
+  st <- getState
+  result <- if stateStrict st
+              then choice [htmlBlockElement, anyHtmlTag, anyHtmlEndTag] 
+              else choice [htmlBlockElement, anyHtmlInlineTag]
+  return (HtmlInline result)
 

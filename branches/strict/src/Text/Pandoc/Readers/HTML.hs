@@ -34,6 +34,7 @@ module Text.Pandoc.Readers.HTML (
                                  anyHtmlBlockTag, 
                                  anyHtmlInlineTag,  
                                  anyHtmlTag,
+                                 anyHtmlEndTag,
                                  htmlEndTag,
                                  extractTagType,
                                  htmlBlockElement 
