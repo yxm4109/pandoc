@@ -1,0 +1,70 @@
+#summary List of cases where `Markdown.pl` fails and Pandoc does the right thing.
+
+== Indented code in list item ==
+
+{{{
+Just a small test
+
+     This is some code
+
+         and some indented code
+
+and this is the end
+
+1.  Just a small test
+
+         This is some code
+
+             and some indented code
+
+     and this is the end
+}}}
+
+`Markdown.pl` yields
+
+{{{
+<p>Just a small test</p>
+
+<pre><code> This is some code
+
+     and some indented code
+</code></pre>
+
+<p>and this is the end</p>
+
+<ol>
+<li><p>Just a small test</p>
+
+<pre><code> This is some code
+
+
+<pre><code> and some indented code
+</code></pre>
+
+</code></pre>
+
+<p>and this is the end</p></li>
+</ol>
+}}}
+
+== Nested divs ==
+
+{{{
+<div>
+<div>
+text
+</div>
+</div>
+}}}
+
+`Markdown.pl` yields
+
+{{{
+<div>
+<div>
+text
+</div>
+
+<p></div></p>
+}}}
+
