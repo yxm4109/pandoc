@@ -264,8 +264,6 @@ inlineToHtml options (Link text (Src src tit)) =
      else "<a href=\"" ++ (codeStringToHtml src) ++ "\"" ++ 
           (if tit /= "" then " title=\"" ++ title  ++ "\">" else ">") ++ 
           (inlineListToHtml options text) ++ "</a>"
-inlineToHtml options (Link text (Ref [])) = 
-  "[" ++ (inlineListToHtml options text) ++ "]" 
 inlineToHtml options (Link text (Ref ref)) = 
   "[" ++ (inlineListToHtml options text) ++ "][" ++ 
   (inlineListToHtml options ref) ++ "]"  
@@ -276,8 +274,6 @@ inlineToHtml options (Image alt (Src source tit)) =
   "<img src=\"" ++ source ++ "\"" ++ 
   (if tit /= "" then " title=\"" ++ title ++ "\"" else "") ++ 
   (if alternate /= "" then " alt=\"" ++ alternate ++ "\"" else "") ++ ">"
-inlineToHtml options (Image alternate (Ref [])) = 
-  "![" ++ (inlineListToHtml options alternate) ++ "]"
 inlineToHtml options (Image alternate (Ref ref)) = 
   "![" ++ (inlineListToHtml options alternate) ++ "][" ++ 
   (inlineListToHtml options ref) ++ "]"

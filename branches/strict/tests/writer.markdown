@@ -539,7 +539,7 @@ Indented [twice].
 
 Indented [thrice].
 
-This should [not] be a link.
+This should [not][] be a link.
 
 
   [once]: /url

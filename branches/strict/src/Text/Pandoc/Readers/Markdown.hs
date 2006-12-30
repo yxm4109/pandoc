@@ -161,7 +161,14 @@ parseMarkdown = do
   updateState (\state -> state { stateParseRaw = True }) 
   -- need to parse raw HTML, since markdown allows it
   (title, author, date) <- option ([],[],"") titleBlock
-  blocks <- parseBlocks
+  oldState <- getState
+  oldInput <- getInput
+  parseBlocks -- go through once just to get list of reference keys
+  newState <- getState
+  let keysUsed = stateKeysUsed newState
+  setInput oldInput
+  setState (oldState { stateKeysUsed = keysUsed })
+  blocks <- parseBlocks  -- go through again, for real
   let blocks' = filter (/= Null) blocks
   state <- getState
   let keys = reverse $ stateKeyBlocks state
@@ -496,7 +503,10 @@ referenceKey = try (do
   option ' ' (char autoLinkEnd)
   tit <- option "" title 
   blanklines 
-  return (Key label (Src (removeTrailingSpace src) tit))) 
+  state <- getState
+  let keysUsed = stateKeysUsed state
+  updateState (\st -> st { stateKeysUsed = (label:keysUsed) })
+  return $ Key label (Src (removeTrailingSpace src) tit))
 
 --
 -- LaTeX
@@ -627,8 +637,12 @@ endline = try (do
 reference = do
   char labelStart
   notFollowedBy (char noteStart)
-  label <- manyTill inline (char labelEnd)
-  return (normalizeSpaces label)
+  -- allow for embedded brackets:
+  label <- manyTill ((do{res <- reference;
+                         return $ [Str "["] ++ res ++ [Str "]"]}) <|>
+                      count 1 inline)
+                    (char labelEnd)
+  return (normalizeSpaces (concat label))
 
 -- source for a link, with optional title
 source = try (do 
@@ -673,12 +687,19 @@ referenceLinkDouble = try (do
   skipEndline
   skipSpaces
   ref <- reference 
-  return (Link label (Ref ref))) 
+  let ref' = if null ref then label else ref
+  state <- getState
+  if ref' `elem` (stateKeysUsed state)
+     then return () else fail "no corresponding key"
+  return (Link label (Ref ref'))) 
 
 -- a link like [this]
 referenceLinkSingle = try (do
   label <- reference
-  return (Link label (Ref []))) 
+  state <- getState
+  if label `elem` (stateKeysUsed state)
+     then return () else fail "no corresponding key"
+  return (Link label (Ref label))) 
 
 -- a link <like.this.com>
 autoLink = try (do
