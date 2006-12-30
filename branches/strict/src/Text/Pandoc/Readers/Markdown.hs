@@ -37,7 +37,9 @@ import Text.Pandoc.Definition
 import Text.Pandoc.Readers.LaTeX ( rawLaTeXInline, rawLaTeXEnvironment )
 import Text.Pandoc.Shared 
 import Text.Pandoc.Readers.HTML ( rawHtmlInline, rawHtmlBlock, 
-                                  anyHtmlBlockTag, anyHtmlInlineTag )
+                                  anyHtmlBlockTag, anyHtmlInlineTag,
+                                  anyHtmlTag, htmlEndTag, extractTagType,
+                                  htmlScript, htmlComment )
 import Text.Pandoc.HtmlEntities ( decodeEntities )
 import Text.Regex ( matchRegex, mkRegex )
 import Text.ParserCombinators.Parsec
@@ -171,7 +173,7 @@ parseBlocks = do
   return result
 
 block = choice [ codeBlock, note, referenceKey, header, hrule, list, 
-                 blockQuote, rawHtmlBlocks, rawLaTeXEnvironment', para,
+                 blockQuote, htmlBlock, rawLaTeXEnvironment', para,
                  plain, blankBlock, nullBlock ] <?> "block"
 
 --
@@ -435,6 +437,34 @@ plain = do
 -- 
 -- raw html
 --
+
+htmlElement = choice [strictHtmlBlock,
+                      htmlScript,
+                      htmlComment] <?> "html element"
+
+htmlBlock = do
+  st <- getState
+  if stateStrict st
+    then do
+           contents <- many1 (htmlElement <|> (many1 space))
+           return (RawHtml (concat contents))
+    else rawHtmlBlocks
+
+-- True if tag is self-closing
+selfClosing tag = case (matchRegex (mkRegex "\\/[[:space:]]*>$") tag) of
+                      Just _  -> True
+                      Nothing -> False
+
+strictHtmlBlock = try (do
+  tag <- anyHtmlBlockTag 
+  let tag' = extractTagType tag
+  if selfClosing tag || tag' == "br" || tag' == "hr" 
+     then return tag
+     else do
+            contents <- many (do{notFollowedBy' (htmlEndTag tag'); 
+                                 htmlElement <|> (count 1 anyChar)})
+            end <- htmlEndTag tag'
+            return $ tag ++ (concat contents) ++ end)
 
 rawHtmlBlocks = try (do
   htmlBlocks <- many1 rawHtmlBlock    
