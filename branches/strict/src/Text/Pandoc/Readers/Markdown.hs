@@ -196,8 +196,7 @@ setextHeader = choice $
                map (\x -> setextH x) (enumFromTo 1 (length setextHChars))
 
 setextH n = try (do
-  txt <- many1 (do {notFollowedBy newline; inline})
-  endline
+  txt <- many1Till inline newline
   many1 (char (setextHChars !! (n-1)))
   skipSpaces
   newline
@@ -419,10 +418,12 @@ bulletList = try (do
 para = try (do 
   result <- many1 inline
   newline
-  choice [ (do 
-              followedBy' (oneOfStrings [">", ",----", "#"])
-              return "" ), 
-           blanklines ]  
+  st <- getState
+  if stateStrict st
+     then choice [followedBy' blockQuote, followedBy' header, 
+                  (do{blanklines; return ()})]
+     else choice [followedBy' emacsBoxQuote, 
+                  (do{blanklines; return ()})]
   let result' = normalizeSpaces result
   return (Para result'))
 
@@ -567,19 +568,17 @@ str = do
 -- an endline character that can be treated as a space, not a structural break
 endline = try (do
   newline
+  notFollowedBy blankline
   st <- getState
   if stateStrict st 
     then do
            notFollowedBy' emailBlockQuoteStart
-           notFollowedBy' (char '#')
+           notFollowedBy' header
     else return () 
-  notFollowedBy blankline
   -- parse potential list-starts differently if in a list:
   if (stateParserContext st) == ListItemState
-     then do
-            notFollowedBy' orderedListStart
-            notFollowedBy' bulletListStart
-     else option () pzero
+     then notFollowedBy' (orderedListStart <|> bulletListStart)
+     else return ()
   return Space)
 
 --
