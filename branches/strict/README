@@ -354,18 +354,6 @@ the example above:
         B)  Fie
     C)  Third
 
-Literal quotes in titles
-------------------------
-
-Standard markdown allows unescaped literal quotes in titles, as
-in 
-
-	[foo]: "bar "embedded" baz"
-
-Pandoc requires all quotes within titles to be escaped:
-
-	[foo]: "bar \"embedded\" baz"
-
 Reference links
 ---------------
 

@@ -608,8 +608,10 @@ titleWith startChar endChar = try (do
   skipEndline  -- a title can be on the next line from the source
   skipSpaces
   char startChar
-  tit <- manyTill (choice [ try (do {char '\\'; char endChar}), 
-                            (noneOf (endChar:endLineChars)) ]) (char endChar) 
+  tit <- manyTill anyChar (try (do
+                                  char endChar
+                                  skipSpaces
+                                  followedBy' (char ')' <|> newline)))
   let tit' = gsub "\"" "&quot;" tit
   return tit')
 
