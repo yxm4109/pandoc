@@ -66,7 +66,7 @@ paragraph.  Since "Second" is followed by a list, and not a blank
 line, it isn't treated as a paragraph.  The fact that the list
 is followed by a blank line is irrelevant. 
 
-`--strict` mode harder here. Ideas?
+`--strict` mode harder here. Ideas?  [Note: this is the only markdown test we don't pass at this point, in --strict mode.]
 
 Unlike standard markdown, Pandoc allows ordered list items to be
 marked with single letters, instead of numbers.  So, for example,
@@ -126,9 +126,7 @@ appear as `[link]` if there's no reference for `link`:
 
 If you want `[link][]`, use a backslash escape: `\[link]\[]`.
 
-`--strict` mode here would be somewhat difficult.  We'd have to store the original
-text somehow, so that it could be recovered if no reference is found.  This might
-require a change to the Pandoc data structure, which I'd be unhappy about.
+`--strict` mode:  DONE in Readers and Writers.  At a big performance cost!
 
 == HTML blocks ==
 
@@ -168,7 +166,7 @@ markdown with HTML block elements.  For example, one can surround
 a block of markdown text with `<div>` tags without preventing it
 from being interpreted as markdown.
 
-`--strict` mode: Reader DONE.  (I think!  May need some refactoring, and may not be quite right.)
+`--strict` mode: DONE.
 
 == Block quotes and headers ==
 
