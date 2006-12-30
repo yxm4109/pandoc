@@ -91,12 +91,15 @@ obfuscateLink options text src =
                         then name ++ " at " ++ domain'
                         else text' ++ " (" ++ name ++ " at " ++ 
                              domain' ++ ")" in 
-      "<script type=\"text/javascript\">\n<!--\nh='" ++ 
-      obfuscateString domain ++ "';a='" ++ at' ++ "';n='" ++ 
-      obfuscateString name ++ "';e=n+a+h;\n" ++
-      "document.write('<a h'+'ref'+'=\"ma'+'ilto'+':'+e+'\">'+" ++ 
-      linkText  ++ "+'<\\/'+'a'+'>');\n// -->\n</script><noscript>" ++ 
-      obfuscateString altText ++ "</noscript>"
+      if writerStrictMarkdown options
+        then "<a href=\"" ++ obfuscateString src' ++ "\">" ++ 
+             obfuscateString text' ++ "</a>"
+        else "<script type=\"text/javascript\">\n<!--\nh='" ++ 
+             obfuscateString domain ++ "';a='" ++ at' ++ "';n='" ++ 
+             obfuscateString name ++ "';e=n+a+h;\n" ++
+             "document.write('<a h'+'ref'+'=\"ma'+'ilto'+':'+e+'\">'+" ++ 
+             linkText  ++ "+'<\\/'+'a'+'>');\n// -->\n</script><noscript>" ++ 
+             obfuscateString altText ++ "</noscript>"
     _ -> "<a href=\"" ++ src ++ "\">" ++ text' ++ "</a>" -- malformed email
 
 -- | Obfuscate character as entity.
