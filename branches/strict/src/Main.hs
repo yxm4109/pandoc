@@ -406,7 +406,8 @@ main = do
   let filter = tabFilter . addBlank . removeCRs
   let startParserState = defaultParserState { stateParseRaw     = parseRaw,
                                               stateTabStop      = tabStop, 
-                                              stateStandalone   = standalone,
+                                              stateStandalone   = standalone &&
+                                                                  (not strict),
                                               stateStrict       = strict }
   let csslink = if (css == "")
                    then "" 
@@ -417,10 +418,12 @@ main = do
                    then defaultHeader
                    else customHeader) ++ 
                csslink ++ asciiMathMLLink ++ includeHeader
-  let writerOptions = WriterOptions { writerStandalone     = standalone, 
+  let writerOptions = WriterOptions { writerStandalone     = standalone &&
+                                                             (not strict), 
                                       writerHeader         = header, 
                                       writerTitlePrefix    = titlePrefix,
-                                      writerSmart          = smart, 
+                                      writerSmart          = smart && 
+                                                             (not strict), 
                                       writerTabStop        = tabStop, 
                                       writerS5             = (writerName=="s5"),
                                       writerIncremental    = incremental, 
