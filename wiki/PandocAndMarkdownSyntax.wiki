@@ -1,14 +1,15 @@
 #summary Differences between pandoc syntax and standard markdown syntax.
 #labels Phase-Design
 
+Note: strict mode must be implemented in both markdown reader and markdown writer.
+
 = Extensions =
 
 == Footnotes ==
 
 See the description in README.
 
-`--strict` mode here would be easy:  just exclude footnotes from definition of
-block and inline.
+`--strict` mode -- Reader DONE.
 
 == Reference links ==
 
@@ -28,19 +29,19 @@ Pandoc allows implicit reference links in either of two styles:
 
 See the description in README.
 
-`--strict` mode easy:  just exclude from def of block.
+`--strict` mode: Reader DONE.
 
 == Box-style block quotes ==
 
 See the description in README.
 
-`--strict` mode easy:  just exclude from def of block.
+`--strict` mode: Reader DONE.
 
 == Inline LaTeX ==
 
 See the description in README.
 
-`--strict` mode easy:  just exclude from def of inline (and block?).
+`--strict` mode: Reader DONE.
 
 = Other differences =
 
@@ -79,7 +80,7 @@ this source yields a nested ordered list:
 3.  Third
 }}}
 
-`--strict` mode should be fairly easy here.
+`--strict` mode: Reader DONE.
 
 Pandoc also extends standard markdown in allowing list item markers
 to be terminated by ')':
@@ -92,8 +93,7 @@ to be terminated by ')':
 3)  Third
 }}}
 
-`--strict` mode trivial here:  just make the definition of list terminator
-conditional.
+`--strict` mode: Reader DONE.
 
 == Quotes in link titles ==
 
@@ -175,4 +175,4 @@ from being interpreted as markdown.
 Pandoc requires blank lines before block quotes and headers; Markdown.pl
 does not.
 
-`--strict` mode here is easy:  a couple of lines need to be changed.
+`--strict` mode: Reader DONE.  Writer NOT NEEDED.
