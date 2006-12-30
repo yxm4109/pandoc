@@ -7,6 +7,9 @@
 
 See the description in README.
 
+`--strict` mode here would be easy:  just exclude footnotes from definition of
+block and inline.
+
 == Reference links ==
 
 Pandoc allows implicit reference links in either of two styles:
@@ -20,17 +23,24 @@ Pandoc allows implicit reference links in either of two styles:
 
 (In newer versions of Markdown.pl, I believe these are both supported as well.)
 
+
 == Title blocks ==
 
 See the description in README.
+
+`--strict` mode easy:  just exclude from def of block.
 
 == Box-style block quotes ==
 
 See the description in README.
 
+`--strict` mode easy:  just exclude from def of block.
+
 == Inline LaTeX ==
 
 See the description in README.
+
+`--strict` mode easy:  just exclude from def of inline (and block?).
 
 = Other differences =
 
@@ -55,6 +65,8 @@ paragraph.  Since "Second" is followed by a list, and not a blank
 line, it isn't treated as a paragraph.  The fact that the list
 is followed by a blank line is irrelevant. 
 
+`--strict` mode harder here. Ideas?
+
 Unlike standard markdown, Pandoc allows ordered list items to be
 marked with single letters, instead of numbers.  So, for example,
 this source yields a nested ordered list:
@@ -67,6 +79,8 @@ this source yields a nested ordered list:
 3.  Third
 }}}
 
+`--strict` mode should be fairly easy here.
+
 Pandoc also extends standard markdown in allowing list item markers
 to be terminated by ')':
 
@@ -77,6 +91,9 @@ to be terminated by ')':
     B)  Fie
 3)  Third
 }}}
+
+`--strict` mode trivial here:  just make the definition of list terminator
+conditional.
 
 == Quotes in link titles ==
 
@@ -93,6 +110,8 @@ Pandoc requires all quotes within titles to be escaped:
 [foo]: "bar \"embedded\" baz"
 }}}
 
+`--strict` mode here might take some work.
+
 == Reference links ==
 
 If there's no corresponding reference, an implicit reference link
@@ -106,6 +125,10 @@ appear as `[link]` if there's no reference for `link`:
 }}}
 
 If you want `[link][]`, use a backslash escape: `\[link]\[]`.
+
+`--strict` mode here would be somewhat difficult.  We'd have to store the original
+text somehow, so that it could be recovered if no reference is found.  This might
+require a change to the Pandoc data structure, which I'd be unhappy about.
 
 == HTML blocks ==
 
@@ -145,7 +168,11 @@ markdown with HTML block elements.  For example, one can surround
 a block of markdown text with `<div>` tags without preventing it
 from being interpreted as markdown.
 
+`--strict` mode here would take some work. Not sure how to approach it.
+
 == Block quotes and headers ==
 
 Pandoc requires blank lines before block quotes and headers; Markdown.pl
 does not.
+
+`--strict` mode here is easy:  a couple of lines need to be changed.
