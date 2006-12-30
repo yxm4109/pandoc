@@ -39,7 +39,7 @@ import Text.Pandoc.Shared
 import Text.Pandoc.Readers.HTML ( rawHtmlInline, rawHtmlBlock, 
                                   anyHtmlBlockTag, anyHtmlInlineTag,
                                   anyHtmlTag, htmlEndTag, extractTagType,
-                                  htmlScript, htmlComment )
+                                  htmlBlockElement )
 import Text.Pandoc.HtmlEntities ( decodeEntities )
 import Text.Regex ( matchRegex, mkRegex )
 import Text.ParserCombinators.Parsec
@@ -439,8 +439,7 @@ plain = do
 --
 
 htmlElement = choice [strictHtmlBlock,
-                      htmlScript,
-                      htmlComment] <?> "html element"
+                      htmlBlockElement] <?> "html element"
 
 htmlBlock = do
   st <- getState

@@ -36,8 +36,7 @@ module Text.Pandoc.Readers.HTML (
                                  anyHtmlTag,
                                  htmlEndTag,
                                  extractTagType,
-                                 htmlScript, 
-                                 htmlComment
+                                 htmlBlockElement 
                                 ) where
 
 import Text.Regex ( matchRegex, mkRegex )
@@ -188,10 +187,11 @@ htmlScript = try (do
   rest <- manyTill anyChar (htmlEndTag "script")
   return (open ++ rest ++ "</script>"))
 
+htmlBlockElement = choice [ htmlScript, htmlComment, xmlDec, definition ]
+
 rawHtmlBlock = try (do
   notFollowedBy' (choice [htmlTag "/body", htmlTag "/html"])
-  body <- choice [htmlScript, anyHtmlBlockTag, htmlComment, xmlDec, 
-                  definition]
+  body <- htmlBlockElement <|> anyHtmlBlockTag
   sp <- (many space)
   state <- getState
   if stateParseRaw state then return (RawHtml (body ++ sp)) else return Null)
