@@ -91,13 +91,12 @@ writeDoc options = prettyPandoc
 
 -- | Data structure for command line options.
 data Opt = Opt
-    { optPreserveTabs      :: Bool    -- ^ If @False@, convert tabs to spaces
+    { optPreserveTabs      :: Bool    -- ^ Convert tabs to spaces
     , optTabStop           :: Int     -- ^ Number of spaces per tab
-    , optStandalone        :: Bool    -- ^ If @True@, include header, footer
+    , optStandalone        :: Bool    -- ^ Include header, footer
     , optReader            :: String  -- ^ Reader format
     , optWriter            :: String  -- ^ Writer format
-    , optParseRaw          :: Bool    -- ^ If @True@, parse unconvertable 
-                                      -- HTML and TeX
+    , optParseRaw          :: Bool    -- ^ Parse unconvertable HTML and TeX
     , optCSS               :: String  -- ^ CSS file to link to
     , optIncludeInHeader   :: String  -- ^ File to include in header
     , optIncludeBeforeBody :: String  -- ^ File to include at top of body
