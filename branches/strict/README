@@ -213,6 +213,9 @@ preserved, rather than converted to spaces (the default).
 
 `--tabstop` allows the user to set the tab stop (which defaults to 4).
 
+`--strict` specifies that strict markdown syntax is to be used, without
+pandoc's usual extensions and variants (described below).
+
 `-R` or `--parse-raw` causes the HTML and LaTeX readers to parse HTML
 codes and LaTeX environments that it can't translate as raw HTML or
 LaTeX.  Raw HTML can be printed in markdown, reStructuredText, HTML,
@@ -293,7 +296,8 @@ Pandoc's markdown vs. standard markdown
 
 In parsing markdown, Pandoc departs from and extends [standard markdown]
 in a few respects.  (To run Pandoc on the official
-markdown test suite, type `make test-markdown`.)
+markdown test suite, type `make test-markdown`.)  These differences can
+be suppressed by specifying the `--strict` command-line option.
 
 [standard markdown]:  http://daringfireball.net/projects/markdown/syntax
   "Markdown syntax description"

@@ -105,11 +105,12 @@ data Opt = Opt
     , optCustomHeader      :: String  -- ^ Custom header to use, or "DEFAULT"
     , optTitlePrefix       :: String  -- ^ Optional prefix for HTML title
     , optOutputFile        :: String  -- ^ Name of output file
-    , optNumberSections    :: Bool    -- ^ If @True@, number sections in LaTeX
-    , optIncremental       :: Bool    -- ^ If @True@, incremental lists in S5
-    , optSmart             :: Bool    -- ^ If @True@, use smart typography
-    , optASCIIMathML       :: Bool    -- ^ If @True@, use ASCIIMathML in HTML
-    , optDebug             :: Bool    -- ^ If @True@, output debug messages 
+    , optNumberSections    :: Bool    -- ^ Number sections in LaTeX
+    , optIncremental       :: Bool    -- ^ Use incremental lists in S5
+    , optSmart             :: Bool    -- ^ Use smart typography
+    , optASCIIMathML       :: Bool    -- ^ Use ASCIIMathML in HTML
+    , optDebug             :: Bool    -- ^ Output debug messages 
+    , optStrict            :: Bool    -- ^ Use strict markdown syntax
     }
 
 -- | Defaults for command-line options.
@@ -133,6 +134,7 @@ defaultOpts = Opt
     , optSmart             = False
     , optASCIIMathML       = False
     , optDebug             = False
+    , optStrict            = False
     }
 
 -- | A list of functions, each transforming the options data structure
@@ -174,6 +176,11 @@ options =
                   (\arg opt -> return opt { optTabStop = (read arg) } )
                   "TABSTOP")
                  "Tab stop (default 4)"
+
+    , Option "" ["strict"]
+                 (NoArg
+                  (\opt -> return opt { optStrict = True } ))
+                 "Use strict markdown syntax with no extensions"
 
     , Option "R" ["parse-raw"]
                  (NoArg
@@ -364,6 +371,7 @@ main = do
               , optSmart             = smart
               , optASCIIMathML       = asciiMathML
 			  , optDebug             = debug
+              , optStrict            = strict
              } = opts
 
   -- assign reader and writer based on options and filenames
