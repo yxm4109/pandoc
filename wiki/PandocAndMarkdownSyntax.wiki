@@ -110,7 +110,7 @@ Pandoc requires all quotes within titles to be escaped:
 [foo]: "bar \"embedded\" baz"
 }}}
 
-`--strict` mode here might take some work.
+`--strict` mode:  Reader DONE.  Actually, this is fixed for both strict and nonstrict modes!
 
 == Reference links ==
 
