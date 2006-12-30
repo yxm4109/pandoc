@@ -364,11 +364,6 @@ Pandoc allows implicit reference links in either of two styles:
 
 	[link]: linky.com
 
-If there's no corresponding reference, the implicit reference link
-will appear as regular bracketed text.  Note: even `[link][]` will
-appear as `[link]` if there's no reference for `link`.  If you want
-`[link][]`, use a backslash escape: `\[link]\[]`.
-
 Footnotes
 ---------
 
