@@ -529,17 +529,17 @@ Foo [bar][a].
 
   [a]: /url/
 
-With [embedded [brackets][]][b].
+With [embedded [brackets]][b].
 
-[b][] by itself should be a link.
+[b] by itself should be a link.
 
-Indented [once][].
+Indented [once].
 
-Indented [twice][].
+Indented [twice].
 
-Indented [thrice][].
+Indented [thrice].
 
-This should [not][] be a link.
+This should [not] be a link.
 
 
   [once]: /url
@@ -550,7 +550,7 @@ This should [not][] be a link.
 
   [b]: /url/
 
-Foo [bar][].
+Foo [bar].
 
 Foo [biz](/url/ "Title with &quot;quote&quot; inside").
 

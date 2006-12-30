@@ -628,7 +628,7 @@ explicitLink = try (do
 
 referenceLink = choice [referenceLinkDouble, referenceLinkSingle]
 
--- a link like [this][/url/]
+-- a link like [this][ref]
 referenceLinkDouble = try (do
   label <- reference
   skipSpaces

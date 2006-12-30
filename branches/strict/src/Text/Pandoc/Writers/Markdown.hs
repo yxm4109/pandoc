@@ -169,7 +169,7 @@ inlineToMarkdown (Link txt (Src src tit)) =
       then text (" \"" ++ (escapeLinkTitle tit) ++ "\"") 
       else empty) <> char ')'
 inlineToMarkdown (Link txt (Ref [])) = 
-  char '[' <> inlineListToMarkdown txt <> text "][]"
+  char '[' <> inlineListToMarkdown txt <> text "]"
 inlineToMarkdown (Link txt (Ref ref)) = 
   char '[' <> inlineListToMarkdown txt <> char ']' <> char '[' <> 
   inlineListToMarkdown ref <> char ']'
