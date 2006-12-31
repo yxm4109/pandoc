@@ -1,15 +1,13 @@
 #summary Differences between pandoc syntax and standard markdown syntax.
 #labels Phase-Design
 
-Note: strict mode must be implemented in both markdown reader and markdown writer.
+Note: using the `--strict` option in Pandoc suppresses all of these differences, except the one about `<p>` tags in lists.
 
 = Extensions =
 
 == Footnotes ==
 
 See the description in README.
-
-`--strict` mode -- Reader DONE.
 
 == Reference links ==
 
@@ -22,26 +20,19 @@ Pandoc allows implicit reference links in either of two styles:
 [link]: linky.com
 }}}
 
-(In newer versions of Markdown.pl, I believe these are both supported as well.)
-
+(In newer versions of Markdown.pl, these are both supported as well.)
 
 == Title blocks ==
 
 See the description in README.
 
-`--strict` mode: Reader DONE.
-
 == Box-style block quotes ==
 
 See the description in README.
 
-`--strict` mode: Reader DONE.
-
 == Inline LaTeX ==
 
 See the description in README.
-
-`--strict` mode: Reader DONE.
 
 = Other differences =
 
@@ -66,7 +57,7 @@ paragraph.  Since "Second" is followed by a list, and not a blank
 line, it isn't treated as a paragraph.  The fact that the list
 is followed by a blank line is irrelevant. 
 
-`--strict` mode harder here. Ideas?  [Note: this is the only markdown test we don't pass at this point, in --strict mode.]
+[Note: this is the only markdown test we don't pass at this point.]
 
 Unlike standard markdown, Pandoc allows ordered list items to be
 marked with single letters, instead of numbers.  So, for example,
@@ -80,8 +71,6 @@ this source yields a nested ordered list:
 3.  Third
 }}}
 
-`--strict` mode: Reader DONE.
-
 Pandoc also extends standard markdown in allowing list item markers
 to be terminated by ')':
 
@@ -92,41 +81,6 @@ to be terminated by ')':
     B)  Fie
 3)  Third
 }}}
-
-`--strict` mode: Reader DONE.
-
-== Quotes in link titles ==
-
-Standard markdown allows unescaped literal quotes in link titles, as
-in 
-
-{{{
-[foo]: "bar "embedded" baz"
-}}}
-
-Pandoc requires all quotes within titles to be escaped:
-
-{{{
-[foo]: "bar \"embedded\" baz"
-}}}
-
-`--strict` mode:  Reader DONE.  Actually, this is fixed for both strict and nonstrict modes!
-
-== Reference links ==
-
-If there's no corresponding reference, an implicit reference link
-will appear as regular bracketed text.  So, all of the following will
-appear as `[link]` if there's no reference for `link`:
-
-{{{
-[link]
-[link] []
-[link][]
-}}}
-
-If you want `[link][]`, use a backslash escape: `\[link]\[]`.
-
-`--strict` mode:  DONE in Readers and Writers.  At a big performance cost!
 
 == HTML blocks ==
 
@@ -158,19 +112,15 @@ into
 whereas Markdown 1.0 will preserve it as is.
 
 There is one exception to this rule:  text between `<script>` and
-`</script>` tags is not interpreted as markdown.  (Question:  Should
-there be other exceptions, e.g. for CDATA?)
+`</script>` tags is not interpreted as markdown.
 
 This departure from standard markdown should make it easier to mix
 markdown with HTML block elements.  For example, one can surround
 a block of markdown text with `<div>` tags without preventing it
 from being interpreted as markdown.
 
-`--strict` mode: DONE.
-
 == Block quotes and headers ==
 
 Pandoc requires blank lines before block quotes and headers; Markdown.pl
-does not.
-
-`--strict` mode: Reader DONE.  Writer NOT NEEDED.
+does not.  (Note:  John Gruber has said that this may change in future versions
+of Markdown.)
