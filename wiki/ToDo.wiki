@@ -3,7 +3,6 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
-    * See [http://six.pairlist.net/pipermail/markdown-discuss/2006-December/000387.html John Gruber's comment] about "Markdown" as a consistent format across implementations.  Added a `--strict` flag to turn off extra features.  Perhaps change the names of 'markdown2pdf' and 'web2markdown' to 'pandoc2pdf' and 'web2pandoc'?  See PandocAndMarkdownSyntax.
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
@@ -26,6 +25,23 @@ Note:  debs will be available elsewhere, so we need not put them in Downloads.
 == Improvements ==
 
 Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   
+
+More flexible way of specifying metadata at beginning?
+{{{
+Title:   My title
+Author:  JM
+Author:  Q. Xargz
+Date:    12 Dec 2007
+Company: X Corp.
+}}}
+Or use RST's way, which is less likely to conflict with anything:
+{{{
+:Title:   My title
+:Author:  JM
+:Author:  Q. Xargz
+:Date:    12 Dec 2007
+:Company: X Corp.
+}}}
 
 Consider changing the default Pandoc data structure so that it is more "hierarchical":
   * Instead of section heading blocks, it would have section blocks, each with a title and a list of other elements, which might in turn be sections.
