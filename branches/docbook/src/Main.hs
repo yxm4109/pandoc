@@ -426,6 +426,7 @@ main = do
                                       writerSmart          = smart && 
                                                              (not strict), 
                                       writerTabStop        = tabStop, 
+                                      writerNotes          = [],
                                       writerS5             = (writerName=="s5"),
                                       writerIncremental    = incremental, 
                                       writerNumberSections = numberSections,
