@@ -56,6 +56,23 @@ hierarchicalize (block:rest) =
                              (Sec title (hierarchicalize thisSection)):(hierarchicalize rest') 
     x                     -> (Blk x):(hierarchicalize rest)
 
+authorToDocbook options name = indentedInTags options "author" $ 
+  if ',' `elem` name
+    then -- last name first
+      let (lastname, rest) = break (==',') name 
+          firstname = removeLeadingSpace rest in
+      inTags "firstname" (text $ stringToXML options firstname) <> 
+      inTags "surname" (text $ stringToXML options lastname) 
+    else -- last name last
+      let namewords = words name
+          lengthname = length namewords 
+          (firstname, lastname) = case lengthname of
+            0  -> ("","") 
+            1  -> ("", name)
+            n  -> (joinWithSep " " (take (n-1) namewords), last namewords) in
+       inTags "firstname" (text $ stringToXML options firstname) $$ 
+       inTags "surname" (text $ stringToXML options lastname) 
+
 -- | Convert Pandoc document to string in Docbook format.
 writeDocbook :: WriterOptions -> Pandoc -> String
 writeDocbook options (Pandoc (Meta title authors date) blocks) = 
@@ -63,9 +80,10 @@ writeDocbook options (Pandoc (Meta title authors date) blocks) =
                 then text (writerHeader options)
                 else empty
       meta = if (writerStandalone options)
-                then indentedInTags options "artheader" 
-                     (inTags "title" (text "title here!") $$ inTags "author" 
-                     (text "<firstname>author here!</firstname>"))
+                then indentedInTags options "articleinfo" $
+                     (inTags "title" (inlinesToDocbook options title)) $$ 
+                     (vcat (map (authorToDocbook options) authors)) $$ 
+                     (inTags "date" (text date)) 
                 else empty
       blocks' = replaceReferenceLinks blocks
       (noteBlocks, blocks'') = partition isNoteBlock blocks' 
@@ -104,60 +122,17 @@ wrap :: WriterOptions -> [Inline] -> Doc
 wrap options lst = fsep $ map (fcat . (map (inlineToDocbook options))) (splitBySpace lst)
 
 -- fill in XML/HTML differences later!
-stringToSmartXML = stringToSmartHtml
-stringToXML = stringToHtml
+stringToXML options = if writerSmart options
+                        then stringToHtml
+                        else stringToSmartHtml
 
-inlineToDocbook options (Str str) = 
-  if writerSmart options 
-    then text (stringToSmartXML str)
-    else text (stringToXML str)
+inlinesToDocbook options lst = hcat (map (inlineToDocbook options) lst)
+
+inlineToDocbook options (Str str) = text $ stringToXML options str 
 inlineToDocbook options Space = char ' '
 inlineToDocbook options _ = char '?'
 
 {-
--- | Escape string, preserving character entities and quote.
-stringToHtml :: String -> String
-stringToHtml str = escapePreservingRegex stringToHtmlString 
-                   (mkRegex "\"|(&[[:alnum:]]*;)") str
-
--- | Escape string as in 'stringToHtml' but add smart typography filter.
-stringToSmartHtml :: String -> String
-stringToSmartHtml = 
-  let escapeDoubleQuotes = 
-        gsub "(\"|&quot;)" "&rdquo;" . -- rest are right quotes
-        gsub "(\"|&quot;)(&r[sd]quo;)" "&rdquo;\\2" . 
-             -- never left quo before right quo
-        gsub "(&l[sd]quo;)(\"|&quot;)" "\\2&ldquo;" . 
-             -- never right quo after left quo
-        gsub "([ \t])(\"|&quot;)" "\\1&ldquo;" . 
-             -- never right quo after space 
-        gsub "(\"|&quot;)([^,.;:!?^) \t-])" "&ldquo;\\2" . -- "word left
-        gsub "(\"|&quot;)('|`|&lsquo;)" "&rdquo;&rsquo;" . 
-             -- right if it got through last filter
-        gsub "(\"|&quot;)('|`|&lsquo;)([^,.;:!?^) \t-])" "&ldquo;&lsquo;\\3" .
-             -- "'word left
-        gsub "``" "&ldquo;" .
-        gsub "''" "&rdquo;"
-      escapeSingleQuotes =
-        gsub "'" "&rsquo;"  . -- otherwise right
-        gsub "'(&r[sd]quo;)" "&rsquo;\\1" . -- never left quo before right quo
-        gsub "(&l[sd]quo;)'" "\\1&lsquo;" . -- never right quo after left quo
-        gsub "([ \t])'" "\\1&lsquo;" . -- never right quo after space 
-        gsub "`" "&lsquo;"  . -- ` is left
-        gsub "([^,.;:!?^) \t-])'" "\\1&rsquo;" .  -- word' right
-        gsub "^('|`)([^,.;:!?^) \t-])" "&lsquo;\\2" . -- 'word left 
-        gsub "('|`)(\"|&quot;|&ldquo;|``)" "&lsquo;&ldquo;" .  -- '"word left
-        gsub "([^,.;:!?^) \t-])'(s|S)" "\\1&rsquo;\\2" . -- possessive
-        gsub "([[:space:]])'([^,.;:!?^) \t-])" "\\1&lsquo;\\2" . -- 'word left
-        gsub "'([0-9][0-9](s|S))" "&rsquo;\\1"  -- '80s - decade abbrevs.
-      escapeDashes = 
-        gsub " ?-- ?" "&mdash;" .
-        gsub " ?--- ?" "&mdash;" .
-        gsub "([0-9])--?([0-9])" "\\1&ndash;\\2" 
-      escapeEllipses = gsub "\\.\\.\\.|\\. \\. \\." "&hellip;" in
-  escapeSingleQuotes . escapeDoubleQuotes . escapeDashes . 
-  escapeEllipses . stringToHtml 
-
 -- | Escape code string as needed for HTML.
 codeStringToHtml :: String -> String
 codeStringToHtml [] = []
@@ -169,23 +144,6 @@ codeStringToHtml (x:xs) = case x of
 -- | Escape string to HTML appropriate for attributes
 attributeStringToHtml :: String -> String
 attributeStringToHtml = gsub "\"" "&quot;"
-
--- | Returns an HTML header with appropriate bibliographic information.
-htmlHeader :: WriterOptions -> Meta -> String
-htmlHeader options (Meta title authors date) = 
-  let titletext = "<title>" ++ (inlineListToHtml options title) ++ 
-                  "</title>\n"
-      authortext = if (null authors) 
-                      then "" 
-                      else "<meta name=\"author\" content=\"" ++ 
-                           (joinWithSep ", " (map stringToHtml authors)) ++ 
-                           "\" />\n" 
-      datetext = if (date == "")
-                    then "" 
-                    else "<meta name=\"date\" content=\"" ++ 
-                         (stringToHtml date) ++ "\" />\n" in
-  (writerHeader options) ++ authortext ++ datetext ++ titletext ++ 
-  "</head>\n<body>\n"
 
 -- | Convert Pandoc block element to HTML.
 blockToHtml :: WriterOptions -> Block -> String
