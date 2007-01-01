@@ -79,12 +79,14 @@ my %processor = (
 	proc     => sub {
 	    my ($template) = @_;
 
-	    my $html  = escape_for_haskell(slurp "headers/HtmlHeader");
-	    my $latex = escape_for_haskell(slurp "headers/LaTeXHeader");
-	    my $rtf   = escape_for_haskell(slurp "headers/RTFHeader");
-	    my $s5    = escape_for_haskell(slurp "headers/S5Header");
+	    my $html    = escape_for_haskell(slurp "headers/HtmlHeader");
+	    my $docbook = escape_for_haskell(slurp "headers/DocbookHeader");
+	    my $latex   = escape_for_haskell(slurp "headers/LaTeXHeader");
+	    my $rtf     = escape_for_haskell(slurp "headers/RTFHeader");
+	    my $s5      = escape_for_haskell(slurp "headers/S5Header");
 
 	    $template =~ s/\@HtmlHeader@/$html/;
+	    $template =~ s/\@DocbookHeader@/$docbook/;
 	    $template =~ s/\@LaTeXHeader@/$latex/;
 	    $template =~ s/\@RTFHeader@/$rtf/;
 	    $template =~ s/\@S5Header@/$s5/;
