@@ -114,7 +114,7 @@ inTags tagType contents = inTagsWithAttrib tagType [] contents
 -- | Put the supplied contents in indented block btw start and end tags.
 indentedInTags :: WriterOptions -> [Char] -> Doc -> Doc
 indentedInTags options tagType contents = text ("<" ++ tagType ++ ">") $$
-  nest (writerTabStop options) contents $$ text ("</" ++ tagType ++ ">") 
+  nest 2 contents $$ text ("</" ++ tagType ++ ">") 
 
 -- | Convert an Element to Docbook.
 elementToDocbook :: WriterOptions -> Element -> Doc
