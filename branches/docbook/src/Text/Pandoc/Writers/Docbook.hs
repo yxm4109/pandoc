@@ -83,7 +83,7 @@ writeDocbook options (Pandoc (Meta title authors date) blocks) =
                 then text (writerHeader options)
                 else empty
       meta = if (writerStandalone options)
-                then indentedInTags options "artheader" $
+                then indentedInTags options "articleinfo" $
                      (inTags "title" (inlinesToDocbook options title)) $$ 
                      (vcat (map (authorToDocbook options) authors)) $$ 
                      (inTags "date" (text date)) 
@@ -151,7 +151,7 @@ blockToDocbook options (Para lst) =
 blockToDocbook options (BlockQuote blocks) =
   indentedInTags options "blockquote" (blocksToDocbook options blocks)
 blockToDocbook options (CodeBlock str) = 
-  indentedInTags options "programlisting" (cdata str)
+  text "<programlisting>" <> (cdata str) <> text "</programlisting>"
 blockToDocbook options (BulletList lst) = 
   indentedInTags options "itemizedlist" $ listItemsToDocbook options lst 
 blockToDocbook options (OrderedList lst) = 
@@ -164,7 +164,7 @@ blockToDocbook options _ = indentedInTags options "para" (text "Unknown block ty
 
 -- | Put string in CDATA section
 cdata :: String -> Doc
-cdata str = text $ "<![CDATA[\n" ++ str ++ "]]>"
+cdata str = text $ "<![CDATA[" ++ str ++ "]]>"
 
 -- | Take list of inline elements and return wrapped doc.
 wrap :: WriterOptions -> [Inline] -> Doc
