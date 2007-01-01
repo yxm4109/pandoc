@@ -334,6 +334,8 @@ defaultWriterName x =
     Just ["text"]     -> "markdown"
     Just ["md"]       -> "markdown"
     Just ["markdown"] -> "markdown"
+    Just ["db"]       -> "docbook"
+    Just ["xml"]      -> "docbook"
     Just _            -> "html"
 
 main = do
