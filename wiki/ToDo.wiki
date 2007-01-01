@@ -3,7 +3,6 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
-  * Include docbook writer??
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
@@ -74,10 +73,6 @@ block type.  In latex output, this would come out as `\tableofcontents`,
 in HTML, Markdown, and RTF, we'd have to parse the document for headers
 (or sections - see below) and build a nested list with internal links.
 In RST, we could just use the existing contents directive. 
-
-Docbook writer (nearly complete in docbook branch).
-
-ODF writer.
 
 Acronyms?  Perhaps like this:
 {{{
