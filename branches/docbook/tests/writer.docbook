@@ -925,11 +925,6 @@ Cat    &amp; 1      \\ \hline
       Here is a movie
       <inlinemediaobject>
         <imageobject>
-          <objectinfo>
-            <title>
-              
-            </title>
-          </objectinfo>
           <imagedata fileref="movie.jpg" />
         </imageobject>
       </inlinemediaobject>

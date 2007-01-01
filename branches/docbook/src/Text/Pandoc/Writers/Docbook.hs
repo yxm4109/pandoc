@@ -217,11 +217,14 @@ inlineToDocbook options (Link txt (Src src tit)) =
                    inlinesToDocbook options txt
 inlineToDocbook options (Link text (Ref ref)) = empty -- shouldn't occur
 inlineToDocbook options (Image alt (Src src tit)) = 
+  let titleDoc = if null tit
+                   then empty
+                   else indentedInTags options "objectinfo" $
+                        indentedInTags options "title" 
+                        (text $ stringToXML options tit) in
   indentedInTags options "inlinemediaobject" $ 
   indentedInTags options "imageobject" $
-  (indentedInTags options "objectinfo" $
-   indentedInTags options "title" (text $ stringToXML options tit)) $$
-  inTagsWithAttrib "imagedata" [("fileref", src)] empty 
+  titleDoc $$ inTagsWithAttrib "imagedata" [("fileref", src)] empty 
 inlineToDocbook options (Image alternate (Ref ref)) = empty --shouldn't occur
 inlineToDocbook options (NoteRef ref) = 
   let notes = writerNotes options
