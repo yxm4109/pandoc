@@ -14,7 +14,7 @@ unless (-x $script)   { die "$script is not executable.\n"; }
 
 print "Writer tests:\n";
 
-my @writeformats = ("html", "smart.html", "latex", "docbook", "rst", "rtf", "markdown", "native"); # s5 separately
+my @writeformats = ("html", "smart.html", "latex", "rst", "rtf", "markdown", "native"); # s5 separately
 my @readformats = ("latex", "native"); # handle html,markdown & rst separately
 my $source = "testsuite.native";
 
@@ -51,6 +51,11 @@ foreach my $format (@writeformats)
 
     test_results("$format writer", "tmp.$extension", "writer.$format");
 }
+
+print "Testing docbook writer...";
+# remove HTML block tests, as this produces invalid docbook...
+`sed -e '/^, Header 1 \\[Str "HTML",Space,Str "Blocks"\\]/,/^, HorizontalRule/d' testsuite.native | $script -r native -w docbook -s > tmp.docbook`;
+test_results("docbook writer", "tmp.docbook", "writer.docbook");
 
 print "Testing s5 writer (basic)...";
 `$script -r native -w s5 -s s5.native > tmp.html`;

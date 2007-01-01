@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
                   "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 
@@ -17,7 +17,7 @@
   </articleinfo>
   <para>
     This is a set of tests for pandoc. Most of them are adapted from
-    John Gruber&rsquo;s markdown test suite.
+    John Gruber's markdown test suite.
   </para>
   <section>
     <title>Headers</title>
@@ -30,6 +30,8 @@
           <title>Level 4</title>
           <section>
             <title>Level 5</title>
+            <para>
+            </para>
           </section>
         </section>
       </section>
@@ -56,7 +58,7 @@
   <section>
     <title>Paragraphs</title>
     <para>
-      Here&rsquo;s a regular paragraph.
+      Here's a regular paragraph.
     </para>
     <para>
       In Markdown 1.0.0 and earlier. Version 8. This line turns into a
@@ -64,12 +66,11 @@
       looked like a list item.
     </para>
     <para>
-      Here&rsquo;s one with a bullet. * criminey.
+      Here's one with a bullet. * criminey.
     </para>
     <para>
       There should be a hard line
-      break<literallayout>
-</literallayout>here.
+      break<literallayout></literallayout>here.
     </para>
   </section>
   <section>
@@ -147,7 +148,7 @@
       </orderedlist>
     </blockquote>
     <para>
-      Here&rsquo;s a nested one:
+      Here's a nested one:
     </para>
     <blockquote>
       <para>
@@ -155,7 +156,7 @@
       </para>
       <blockquote>
         <para>
-          Don&rsquo;t quote me.
+          Don't quote me.
         </para>
       </blockquote>
     </blockquote>
@@ -398,8 +399,8 @@ These should not be escaped:  \$ \\ \> \[ \{]]></programlisting>
             Item 1, graf one.
           </para>
           <para>
-            Item 1. graf two. The quick brown fox jumped over the lazy
-            dog&rsquo;s back.
+            Item 1. graf two. The quick brown fox jumped over the lazy dog's
+            back.
           </para>
         </listitem>
         <listitem>
@@ -438,7 +439,7 @@ These should not be escaped:  \$ \\ \> \[ \{]]></programlisting>
         </listitem>
       </itemizedlist>
       <para>
-        Here&rsquo;s another:
+        Here's another:
       </para>
       <orderedlist>
         <listitem>
@@ -541,127 +542,6 @@ These should not be escaped:  \$ \\ \> \[ \{]]></programlisting>
     </section>
   </section>
   <section>
-    <title>HTML Blocks</title>
-    <para>
-      Simple block on one line:
-    </para>
-    <div>
-    foo
-    </div>
-
-    <para>
-      And nested without indentation:
-    </para>
-    <div>
-<div>
-<div>
-    foo
-    </div>
-</div>
-<div>
-    bar
-    </div>
-</div>
-
-    <para>
-      Interpreted markdown in a table:
-    </para>
-    <table>
-<tr>
-<td>
-    This is <emphasis>emphasized</emphasis>
-    </td>
-<td>
-    And this is <emphasis role="strong">strong</emphasis>
-    </td>
-</tr>
-</table>
-
-<script type="text/javascript">document.write('This *should not* be interpreted as markdown');</script>
-
-    <para>
-      Here&rsquo;s a simple block:
-    </para>
-    <div>
-    
-    foo
-    </div>
-
-    <para>
-      This should be a code block, though:
-    </para>
-    <programlisting><![CDATA[<div>
-    foo
-</div>]]></programlisting>
-    <para>
-      As should this:
-    </para>
-    <programlisting><![CDATA[<div>foo</div>]]></programlisting>
-    <para>
-      Now, nested:
-    </para>
-    <div>
-    <div>
-        <div>
-            
-    foo
-    </div>
-    </div>
-</div>
-
-    <para>
-      This should just be an HTML comment:
-    </para>
-    <!-- Comment -->
-
-    <para>
-      Multiline:
-    </para>
-    <!--
-Blah
-Blah
--->
-
-<!--
-    This is another comment.
--->
-
-    <para>
-      Code block:
-    </para>
-    <programlisting><![CDATA[<!-- Comment -->]]></programlisting>
-    <para>
-      Just plain comment, with trailing spaces on the line:
-    </para>
-    <!-- foo -->   
-
-    <para>
-      Code:
-    </para>
-    <programlisting><![CDATA[<hr />]]></programlisting>
-    <para>
-      Hr&rsquo;s:
-    </para>
-    <hr>
-
-<hr />
-
-<hr />
-
-<hr>   
-
-<hr />  
-
-<hr /> 
-
-<hr class="foo" id="bar" />
-
-<hr class="foo" id="bar" />
-
-<hr class="foo" id="bar">
-
-  </section>
-  <section>
     <title>Inline Markup</title>
     <para>
       This is <emphasis>emphasized</emphasis>, and so
@@ -697,34 +577,29 @@ Blah
   <section>
     <title>Smart quotes, ellipses, dashes</title>
     <para>
-      &ldquo;Hello,&rdquo; said the spider. &ldquo;&lsquo;Shelob&rsquo;
-      is my name.&rdquo;
+      "Hello," said the spider. "'Shelob' is my name."
     </para>
     <para>
-      &lsquo;A&rsquo;, &lsquo;B&rsquo;, and &lsquo;C&rsquo; are letters.
+      'A', 'B', and 'C' are letters.
     </para>
     <para>
-      &lsquo;Oak,&rsquo; &lsquo;elm,&rsquo; and &lsquo;beech&rsquo; are
-      names of trees. So is &lsquo;pine.&rsquo;
+      'Oak,' 'elm,' and 'beech' are names of trees. So is 'pine.'
     </para>
     <para>
-      &lsquo;He said, &ldquo;I want to go.&rdquo;&rsquo; Were you alive
-      in the 70&rsquo;s?
+      'He said, "I want to go."' Were you alive in the 70's?
     </para>
     <para>
-      Here is some quoted &rsquo;<literal>code</literal>&rsquo; and a
-      &rdquo;
-      <ulink url="http://example.com/?foo=1&bar=2">quoted link</ulink>
-      &rdquo;.
+      Here is some quoted '<literal>code</literal>' and a
+      "<ulink url="http://example.com/?foo=1&amp;bar=2">quoted link</ulink>".
     </para>
     <para>
-      Some dashes: one&mdash;two &mdash; three&mdash;four &mdash; five.
+      Some dashes: one---two --- three--four -- five.
     </para>
     <para>
       Dashes between numbers: 5-7, 255-66, 1987-1999.
     </para>
     <para>
-      Ellipses&hellip;and. . .and . . . .
+      Ellipses...and. . .and . . . .
     </para>
   </section>
   <section>
@@ -772,13 +647,13 @@ Blah
       </listitem>
       <listitem>
         <para>
-          Here&rsquo;s one that has a line break in it:
+          Here's one that has a line break in it:
           <literal>$\alpha + \omega \times x^2$</literal>.
         </para>
       </listitem>
     </itemizedlist>
     <para>
-      These shouldn&rsquo;t be math:
+      These shouldn't be math:
     </para>
     <itemizedlist>
       <listitem>
@@ -789,7 +664,7 @@ Blah
       <listitem>
         <para>
           $22,000 is a <emphasis>lot</emphasis> of money. So is $34,000. (It
-          worked if &ldquo;lot&rdquo; is emphasized.)
+          worked if "lot" is emphasized.)
         </para>
       </listitem>
       <listitem>
@@ -800,7 +675,7 @@ Blah
       </listitem>
     </itemizedlist>
     <para>
-      Here&rsquo;s a LaTeX table:
+      Here's a LaTeX table:
     </para>
     <para>
       <literal>\begin{tabular}{|l|l|}\hline
@@ -861,7 +736,7 @@ Cat    &amp; 1      \\ \hline
       Backslash: \
     </para>
     <para>
-      Backtick: &lsquo;
+      Backtick: `
     </para>
     <para>
       Asterisk: *
@@ -929,7 +804,7 @@ Cat    &amp; 1      \\ \hline
         <ulink url="/url/">URL and title</ulink>
       </para>
       <para>
-        <ulink url="mailto:nobody@nowhere.net">Email link</ulink>
+        <email>nobody@nowhere.net</email>
       </para>
       <para>
         <ulink url="">Empty</ulink>.
@@ -975,29 +850,26 @@ Cat    &amp; 1      \\ \hline
     <section>
       <title>With ampersands</title>
       <para>
-        Here&rsquo;s a
-        <ulink url="http://example.com/?foo=1&bar=2">link with an ampersand in the URL</ulink>
-        .
+        Here's a
+        <ulink url="http://example.com/?foo=1&amp;bar=2">link with an ampersand in the URL</ulink>.
       </para>
       <para>
-        Here&rsquo;s a link with an amersand in the link text:
+        Here's a link with an amersand in the link text:
         <ulink url="http://att.com/">AT&amp;T</ulink>.
       </para>
       <para>
-        Here&rsquo;s an
-        <ulink url="/script?foo=1&bar=2">inline link</ulink>.
+        Here's an <ulink url="/script?foo=1&amp;bar=2">inline link</ulink>.
       </para>
       <para>
-        Here&rsquo;s an
-        <ulink url="/script?foo=1&bar=2">inline link in pointy braces</ulink>
-        .
+        Here's an
+        <ulink url="/script?foo=1&amp;bar=2">inline link in pointy braces</ulink>.
       </para>
     </section>
     <section>
       <title>Autolinks</title>
       <para>
         With an ampersand:
-        <ulink url="http://example.com/?foo=1&bar=2">http://example.com/?foo=1&amp;bar=2</ulink>
+        <ulink url="http://example.com/?foo=1&amp;bar=2">http://example.com/?foo=1&amp;bar=2</ulink>
       </para>
       <itemizedlist>
         <listitem>
@@ -1017,8 +889,7 @@ Cat    &amp; 1      \\ \hline
         </listitem>
       </itemizedlist>
       <para>
-        An e-mail address:
-        <ulink url="mailto:nobody@nowhere.net">nobody@nowhere.net</ulink>
+        An e-mail address: <email>nobody@nowhere.net</email>
       </para>
       <blockquote>
         <para>
@@ -1036,74 +907,89 @@ Cat    &amp; 1      \\ \hline
   <section>
     <title>Images</title>
     <para>
-      From &ldquo;Voyage dans la Lune&rdquo; by Georges Melies (1902):
+      From "Voyage dans la Lune" by Georges Melies (1902):
     </para>
     <para>
-      <imagedata fileref="lalune.jpg" />
+      <inlinemediaobject>
+        <imageobject>
+          <objectinfo>
+            <title>
+              Voyage dans la Lune
+            </title>
+          </objectinfo>
+          <imagedata fileref="lalune.jpg" />
+        </imageobject>
+      </inlinemediaobject>
     </para>
     <para>
-      Here is a movie <imagedata fileref="movie.jpg" /> icon.
+      Here is a movie
+      <inlinemediaobject>
+        <imageobject>
+          <objectinfo>
+            <title>
+              
+            </title>
+          </objectinfo>
+          <imagedata fileref="movie.jpg" />
+        </imageobject>
+      </inlinemediaobject>
+      icon.
     </para>
   </section>
   <section>
     <title>Footnotes</title>
     <para>
       Here is a footnote
-      reference,
-      <footnote>
-        <para>
-          Here is the footnote. It can go anywhere after the footnote
-          reference. It need not be placed at the end of the document.
-        </para>
-      </footnote>
+      reference,<footnote>
+                  <para>
+                    Here is the footnote. It can go anywhere after the footnote
+                    reference. It need not be placed at the end of the document.
+                  </para>
+                </footnote>
       and
-      another.
-      <footnote>
-        <para>
-          Here&rsquo;s the long note. This one contains multiple blocks.
-        </para>
-        <para>
-          Subsequent blocks are indented to show that they belong to the
-          footnote (as with list items).
-        </para>
-        <programlisting><![CDATA[  { <code> }]]></programlisting>
-        <para>
-          If you want, you can indent every line, but you can also be lazy
-          and just indent the first line of each block.
-        </para>
-      </footnote>
+      another.<footnote>
+                <para>
+                  Here's the long note. This one contains multiple blocks.
+                </para>
+                <para>
+                  Subsequent blocks are indented to show that they belong to the
+                  footnote (as with list items).
+                </para>
+                <programlisting><![CDATA[  { <code> }]]></programlisting>
+                <para>
+                  If you want, you can indent every line, but you can also be lazy
+                  and just indent the first line of each block.
+                </para>
+              </footnote>
       This should <emphasis>not</emphasis> be a footnote reference,
       because it contains a space.[^my note] Here is an inline
-      note.
-      <footnote>
-        <para>
-          This is <emphasis>easier</emphasis> to type. Inline notes may
-          contain <ulink url="http://google.com">links</ulink> and
-          <literal>]</literal> verbatim characters.
-        </para>
-      </footnote>
+      note.<footnote>
+             <para>
+               This is <emphasis>easier</emphasis> to type. Inline notes may
+               contain <ulink url="http://google.com">links</ulink> and
+               <literal>]</literal> verbatim characters.
+             </para>
+           </footnote>
     </para>
     <blockquote>
       <para>
         Notes can go in
-        quotes.
-        <footnote>
-          <para>
-            In quote.
-          </para>
-        </footnote>
+        quotes.<footnote>
+                 <para>
+                   In quote.
+                 </para>
+               </footnote>
       </para>
     </blockquote>
     <orderedlist>
       <listitem>
         <para>
           And in list
-          items.
-          <footnote>
-            <para>
-              In list.
-            </para>
-          </footnote>
+          items.<footnote>
+                  <para>
+                    In list.
+                  </para>
+                </footnote>
         </para>
       </listitem>
     </orderedlist>

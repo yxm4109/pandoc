@@ -104,8 +104,11 @@ writeDocbook options (Pandoc (Meta title authors date) blocks) =
 --   with specified attributes.
 inTagsWithAttrib :: String -> [(String, String)] -> Doc -> Doc
 inTagsWithAttrib tagType attribs contents = text ("<" ++ tagType ++ 
-  (concatMap (\(a, b) -> " " ++ a ++ "=\"" ++ b ++ "\"") attribs) ++ ">") <> 
-  contents <> text ("</" ++ tagType ++ ">") 
+  (concatMap (\(a, b) -> " " ++ attributeStringToXML a ++ 
+  "=\"" ++ attributeStringToXML b ++ "\"") attribs)) <> 
+  if isEmpty contents
+    then text " />" -- self-closing tag
+    else text ">" <> contents <> text ("</" ++ tagType ++ ">") 
 
 -- | Put the supplied contents between start and end tags of tagType.
 inTags :: String -> Doc -> Doc
@@ -119,10 +122,14 @@ indentedInTags options tagType contents = text ("<" ++ tagType ++ ">") $$
 -- | Convert an Element to Docbook.
 elementToDocbook :: WriterOptions -> Element -> Doc
 elementToDocbook options (Blk block) = blockToDocbook options block 
-elementToDocbook options (Sec title elements) = 
+elementToDocbook options (Sec title elements) =
+  -- Docbook doesn't allow sections with no content, so insert some if needed
+  let elements' = if null elements
+                    then [Blk (Para [])]
+                    else elements in 
   indentedInTags options "section" $
   inTags "title" (wrap options title) $$
-  vcat (map (elementToDocbook options) elements) 
+  vcat (map (elementToDocbook options) elements') 
 
 -- | Convert a list of Pandoc blocks to Docbook.
 blocksToDocbook :: WriterOptions -> [Block] -> Doc
@@ -168,13 +175,17 @@ cdata str = text $ "<![CDATA[" ++ str ++ "]]>"
 
 -- | Take list of inline elements and return wrapped doc.
 wrap :: WriterOptions -> [Inline] -> Doc
-wrap options lst = fsep $ map (fcat . (map (inlineToDocbook options))) (splitBySpace lst)
+wrap options lst = fsep $ map (hcat . (map (inlineToDocbook options))) (splitBySpace lst)
 
 -- | Escape a string for XML (with "smart" option if specified).
 stringToXML :: WriterOptions -> String -> String
 stringToXML options = if writerSmart options
-                        then stringToHtml
-                        else stringToSmartHtml
+                        then stringToSmartHtml
+                        else stringToHtml
+
+-- | Escape string to XML appropriate for attributes
+attributeStringToXML :: String -> String
+attributeStringToXML = gsub "\"" "&quot;" . codeStringToXML
 
 -- | Escape a literal string for XML.
 codeStringToXML :: String -> String
@@ -197,13 +208,20 @@ inlineToDocbook options (Code str) =
 inlineToDocbook options (TeX str) = inlineToDocbook options (Code str)
 inlineToDocbook options (HtmlInline str) = empty
 inlineToDocbook options LineBreak = 
-  text $ "<literallayout>\n</literallayout>" 
+  text $ "<literallayout></literallayout>" 
 inlineToDocbook options Space = char ' '
-inlineToDocbook options (Link txt (Src src tit)) = 
-  inTagsWithAttrib "ulink" [("url", src)] (inlinesToDocbook options txt)
+inlineToDocbook options (Link txt (Src src tit)) =
+  case (matchRegex (mkRegex "mailto:(.*)") src) of
+    Just [addr] -> inTags "email" $ text (codeStringToXML addr)
+    Nothing     -> inTagsWithAttrib "ulink" [("url", src)] $
+                   inlinesToDocbook options txt
 inlineToDocbook options (Link text (Ref ref)) = empty -- shouldn't occur
-inlineToDocbook options (Image alt (Src source tit)) = 
-  text $ "<imagedata fileref=\"" ++ source ++ "\" />"
+inlineToDocbook options (Image alt (Src src tit)) = 
+  indentedInTags options "inlinemediaobject" $ 
+  indentedInTags options "imageobject" $
+  (indentedInTags options "objectinfo" $
+   indentedInTags options "title" (text $ stringToXML options tit)) $$
+  inTagsWithAttrib "imagedata" [("fileref", src)] empty 
 inlineToDocbook options (Image alternate (Ref ref)) = empty --shouldn't occur
 inlineToDocbook options (NoteRef ref) = 
   let notes = writerNotes options
@@ -213,4 +231,3 @@ inlineToDocbook options (NoteRef ref) =
     else let (Note _ contents) = head hits in
          indentedInTags options "footnote" $ blocksToDocbook options contents
 inlineToDocbook options _ = empty
-
