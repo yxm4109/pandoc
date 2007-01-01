@@ -32,10 +32,12 @@ module Text.Pandoc.Writers.Docbook (
                                    ) where
 import Text.Pandoc.Definition
 import Text.Pandoc.Shared
+import Text.Pandoc.Writers.HTML ( stringToSmartHtml, stringToHtml )
 import Text.Html ( stringToHtmlString )
 import Text.Regex ( mkRegex, matchRegex )
 import Data.Char ( toLower )
 import Data.List ( isPrefixOf, partition )
+import Text.PrettyPrint.HughesPJ hiding ( Str )
 
 data Element = Blk Block 
              | Sec [Inline] [Element] deriving (Eq, Read, Show)
@@ -58,26 +60,59 @@ hierarchicalize (block:rest) =
 writeDocbook :: WriterOptions -> Pandoc -> String
 writeDocbook options (Pandoc (Meta title authors date) blocks) = 
   let head = if (writerStandalone options)
-                then docbookHeader options (Meta title authors date)
-                else "" 
-      foot = if (writerStandalone options) then "</article>\n" else "" 
+                then text (writerHeader options)
+                else empty
+      meta = if (writerStandalone options)
+                then indentedInTags options "artheader" 
+                     (inTags "title" (text "title here!") $$ inTags "author" 
+                     (text "<firstname>author here!</firstname>"))
+                else empty
       blocks' = replaceReferenceLinks blocks
       (noteBlocks, blocks'') = partition isNoteBlock blocks' 
-      -- ?? put noteBlocks into options, so it can be used???
-      -- ?? the addHierarchy function will construct a new
-      --    data structure that is hierarchical, for better use
-      --    with docbook.
+      options' = options {writerNotes = noteBlocks}
       elements = hierarchicalize blocks''
-      body = (writerIncludeBefore options) ++ 
-             concatMap (elementToDocbook options) elements ++
-             (writerIncludeAfter options) in
-  head ++ body ++ foot
+      body = text (writerIncludeBefore options') <>
+             vcat (map (elementToDocbook options') elements) $$
+             text (writerIncludeAfter options')
+      body' = if writerStandalone options'
+                then indentedInTags options' "article" (meta $$ body)
+                else body in  
+  render $ head $$ body' <> text "\n"
 
-docbookHeader _ _ = ""
 
-elementToDocbook _ _ = ""
+inTags tagType contents = text ("<" ++ tagType ++ ">") <> 
+  contents <> text ("</" ++ tagType ++ ">") 
 
+indentedInTags options tagType contents = text ("<" ++ tagType ++ ">") $$
+  nest (writerTabStop options) contents $$ text ("</" ++ tagType ++ ">") 
 
+elementToDocbook options (Blk block) = blockToDocbook options block 
+elementToDocbook options (Sec title elements) = 
+  indentedInTags options "section" $
+  inTags "title" (wrap options title) $$
+  vcat (map (elementToDocbook options) elements) 
+
+blockToDocbook options Blank = text ""
+blockToDocbook options Null = empty
+blockToDocbook options (Plain lst) = wrap options lst
+blockToDocbook options (Para lst) = 
+  indentedInTags options "para" (wrap options lst)
+blockToDocbook options _ = indentedInTags options "para" (text "Unknown block type")
+
+-- | Take list of inline elements and return wrapped doc.
+wrap :: WriterOptions -> [Inline] -> Doc
+wrap options lst = fsep $ map (fcat . (map (inlineToDocbook options))) (splitBySpace lst)
+
+-- fill in XML/HTML differences later!
+stringToSmartXML = stringToSmartHtml
+stringToXML = stringToHtml
+
+inlineToDocbook options (Str str) = 
+  if writerSmart options 
+    then text (stringToSmartXML str)
+    else text (stringToXML str)
+inlineToDocbook options Space = char ' '
+inlineToDocbook options _ = char '?'
 
 {-
 -- | Escape string, preserving character entities and quote.
