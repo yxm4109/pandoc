@@ -3,6 +3,7 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
+  * Include docbook writer??
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
@@ -13,7 +14,7 @@ When ready:
   * Upload tarball, dmg, and zip to Google Code downloads section.
   * Create debian packages and start upload to debian
   * Create and upload website.
-  * Announce release on Freshmeat, and on pandoc-announce (create!), markdown list, docutils list, haskell list, etc.
+  * Announce release on Freshmeat, and on pandoc-announce, markdown list, docutils list, haskell list, etc.
  
 Proposed naming scheme:
   * `pandoc-0.3.tar.gz` - source tarball
@@ -74,8 +75,9 @@ in HTML, Markdown, and RTF, we'd have to parse the document for headers
 (or sections - see below) and build a nested list with internal links.
 In RST, we could just use the existing contents directive. 
 
-New [http://www.oasis-open.org/docbook/xml/simple/sdocbook/index.html simplified docbook] writer (underway in experimental docbook-writer branch):
-  * See above on hierachical data structure.  A less elegant solution would be to reorganize the Pandoc data structure into a hierarchy after parsing, but before the Docbook writer is called.
+Docbook writer (nearly complete in docbook branch).
+
+ODF writer.
 
 Acronyms?  Perhaps like this:
 {{{
