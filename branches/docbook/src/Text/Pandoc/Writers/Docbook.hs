@@ -80,7 +80,7 @@ writeDocbook options (Pandoc (Meta title authors date) blocks) =
                 then text (writerHeader options)
                 else empty
       meta = if (writerStandalone options)
-                then indentedInTags options "articleinfo" $
+                then indentedInTags options "artheader" $
                      (inTags "title" (inlinesToDocbook options title)) $$ 
                      (vcat (map (authorToDocbook options) authors)) $$ 
                      (inTags "date" (text date)) 
