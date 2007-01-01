@@ -39,6 +39,7 @@ import Data.Char ( toLower )
 import Data.List ( isPrefixOf, partition )
 import Text.PrettyPrint.HughesPJ hiding ( Str )
 
+-- | Data structure for defining hierarchical Pandoc documents
 data Element = Blk Block 
              | Sec [Inline] [Element] deriving (Eq, Read, Show)
 
@@ -52,10 +53,12 @@ hierarchicalize :: [Block] -> [Element]
 hierarchicalize [] = []
 hierarchicalize (block:rest) = 
   case block of
-    (Header level title)  -> let (thisSection, rest') = break (headerAtLeast level) rest in
-                             (Sec title (hierarchicalize thisSection)):(hierarchicalize rest') 
-    x                     -> (Blk x):(hierarchicalize rest)
+    (Header level title) -> let (thisSection, rest') = break (headerAtLeast level) rest in
+                            (Sec title (hierarchicalize thisSection)):(hierarchicalize rest') 
+    x                    -> (Blk x):(hierarchicalize rest)
 
+-- | Convert list of authors to a docbook <author> section
+authorToDocbook :: WriterOptions -> [Char] -> Doc
 authorToDocbook options name = indentedInTags options "author" $ 
   if ',' `elem` name
     then -- last name first
@@ -97,150 +100,117 @@ writeDocbook options (Pandoc (Meta title authors date) blocks) =
                 else body in  
   render $ head $$ body' <> text "\n"
 
-
-inTags tagType contents = text ("<" ++ tagType ++ ">") <> 
+-- | Put the supplied contents between start and end tags of tagType,
+--   with specified attributes.
+inTagsWithAttrib :: String -> [(String, String)] -> Doc -> Doc
+inTagsWithAttrib tagType attribs contents = text ("<" ++ tagType ++ 
+  (concatMap (\(a, b) -> " " ++ a ++ "=\"" ++ b ++ "\"") attribs) ++ ">") <> 
   contents <> text ("</" ++ tagType ++ ">") 
 
+-- | Put the supplied contents between start and end tags of tagType.
+inTags :: String -> Doc -> Doc
+inTags tagType contents = inTagsWithAttrib tagType [] contents
+
+-- | Put the supplied contents in indented block btw start and end tags.
+indentedInTags :: WriterOptions -> [Char] -> Doc -> Doc
 indentedInTags options tagType contents = text ("<" ++ tagType ++ ">") $$
   nest (writerTabStop options) contents $$ text ("</" ++ tagType ++ ">") 
 
+-- | Convert an Element to Docbook.
+elementToDocbook :: WriterOptions -> Element -> Doc
 elementToDocbook options (Blk block) = blockToDocbook options block 
 elementToDocbook options (Sec title elements) = 
   indentedInTags options "section" $
   inTags "title" (wrap options title) $$
   vcat (map (elementToDocbook options) elements) 
 
+-- | Convert a list of Pandoc blocks to Docbook.
+blocksToDocbook :: WriterOptions -> [Block] -> Doc
+blocksToDocbook options = vcat . map (blockToDocbook options)
+
+-- | Convert a list of lists of blocks to a list of Docbook list items.
+listItemsToDocbook :: WriterOptions -> [[Block]] -> Doc
+listItemsToDocbook options items = 
+  vcat $ map (listItemToDocbook options) items
+
+-- | Convert a list of blocks into a Docbook list item.
+listItemToDocbook :: WriterOptions -> [Block] -> Doc
+listItemToDocbook options item =
+  let plainToPara (Plain x) = Para x
+      plainToPara y = y in
+  let item' = map plainToPara item in
+  indentedInTags options "listitem" (blocksToDocbook options item')
+
+-- | Convert a Pandoc block element to Docbook.
+blockToDocbook :: WriterOptions -> Block -> Doc
 blockToDocbook options Blank = text ""
 blockToDocbook options Null = empty
 blockToDocbook options (Plain lst) = wrap options lst
 blockToDocbook options (Para lst) = 
   indentedInTags options "para" (wrap options lst)
+blockToDocbook options (BlockQuote blocks) =
+  indentedInTags options "blockquote" (blocksToDocbook options blocks)
+blockToDocbook options (CodeBlock str) = 
+  indentedInTags options "programlisting" (cdata str)
+blockToDocbook options (BulletList lst) = 
+  indentedInTags options "itemizedlist" $ listItemsToDocbook options lst 
+blockToDocbook options (OrderedList lst) = 
+  indentedInTags options "orderedlist" $ listItemsToDocbook options lst 
+blockToDocbook options (RawHtml str) = text str -- raw XML block 
+blockToDocbook options HorizontalRule = empty -- not semantic
+blockToDocbook options (Note _ _) = empty -- shouldn't occur
+blockToDocbook options (Key _ _) = empty  -- shouldn't occur
 blockToDocbook options _ = indentedInTags options "para" (text "Unknown block type")
+
+-- | Put string in CDATA section
+cdata :: String -> Doc
+cdata str = text $ "<![CDATA[\n" ++ str ++ "]]>"
 
 -- | Take list of inline elements and return wrapped doc.
 wrap :: WriterOptions -> [Inline] -> Doc
 wrap options lst = fsep $ map (fcat . (map (inlineToDocbook options))) (splitBySpace lst)
 
--- fill in XML/HTML differences later!
+-- | Escape a string for XML (with "smart" option if specified).
+stringToXML :: WriterOptions -> String -> String
 stringToXML options = if writerSmart options
                         then stringToHtml
                         else stringToSmartHtml
 
+-- | Escape a literal string for XML.
+codeStringToXML :: String -> String
+codeStringToXML = gsub "<" "&lt;" . gsub "&" "&amp;" 
+
+-- | Convert a list of inline elements to Docbook.
+inlinesToDocbook :: WriterOptions -> [Inline] -> Doc
 inlinesToDocbook options lst = hcat (map (inlineToDocbook options) lst)
 
+-- | Convert an inline element to Docbook.
+inlineToDocbook :: WriterOptions -> Inline -> Doc
 inlineToDocbook options (Str str) = text $ stringToXML options str 
+inlineToDocbook options (Emph lst) = 
+  inTags "emphasis" (inlinesToDocbook options lst)
+inlineToDocbook options (Strong lst) = 
+  inTagsWithAttrib "emphasis" [("role", "strong")] 
+  (inlinesToDocbook options lst)
+inlineToDocbook options (Code str) = 
+  inTags "literal" $ text (codeStringToXML str)
+inlineToDocbook options (TeX str) = inlineToDocbook options (Code str)
+inlineToDocbook options (HtmlInline str) = empty
+inlineToDocbook options LineBreak = 
+  text $ "<literallayout>\n</literallayout>" 
 inlineToDocbook options Space = char ' '
-inlineToDocbook options _ = char '?'
+inlineToDocbook options (Link txt (Src src tit)) = 
+  inTagsWithAttrib "ulink" [("url", src)] (inlinesToDocbook options txt)
+inlineToDocbook options (Link text (Ref ref)) = empty -- shouldn't occur
+inlineToDocbook options (Image alt (Src source tit)) = 
+  text $ "<imagedata fileref=\"" ++ source ++ "\" />"
+inlineToDocbook options (Image alternate (Ref ref)) = empty --shouldn't occur
+inlineToDocbook options (NoteRef ref) = 
+  let notes = writerNotes options
+      hits = filter (\(Note r _) -> r == ref) notes in
+  if null hits
+    then empty
+    else let (Note _ contents) = head hits in
+         indentedInTags options "footnote" $ blocksToDocbook options contents
+inlineToDocbook options _ = empty
 
-{-
--- | Escape code string as needed for HTML.
-codeStringToHtml :: String -> String
-codeStringToHtml [] = []
-codeStringToHtml (x:xs) = case x of
-  '&' -> "&amp;" ++ codeStringToHtml xs
-  '<' -> "&lt;"  ++ codeStringToHtml xs
-  _   -> x:(codeStringToHtml xs) 
-
--- | Escape string to HTML appropriate for attributes
-attributeStringToHtml :: String -> String
-attributeStringToHtml = gsub "\"" "&quot;"
-
--- | Convert Pandoc block element to HTML.
-blockToHtml :: WriterOptions -> Block -> String
-blockToHtml options Blank = "\n" 
-blockToHtml options Null = ""
-blockToHtml options (Plain lst) = inlineListToHtml options lst 
-blockToHtml options (Para lst) = "<p>" ++ (inlineListToHtml options lst) ++ "</p>\n"
-blockToHtml options (BlockQuote blocks) = 
-  if (writerS5 options)
-     then  -- in S5, treat list in blockquote specially
-           -- if default is incremental, make it nonincremental; 
-           -- otherwise incremental
-           let inc = not (writerIncremental options) in
-           case blocks of 
-              [BulletList lst] -> blockToHtml (options {writerIncremental = 
-                                                        inc}) (BulletList lst)
-              [OrderedList lst] -> blockToHtml (options {writerIncremental =
-                                                       inc}) (OrderedList lst)
-              otherwise         -> "<blockquote>\n" ++ 
-                                   (concatMap (blockToHtml options) blocks) ++
-                                   "</blockquote>\n"
-     else "<blockquote>\n" ++ (concatMap (blockToHtml options) blocks) ++ 
-          "</blockquote>\n"
-blockToHtml options (Note ref lst) = 
-  let contents = (concatMap (blockToHtml options) lst) in
-  "<li id=\"fn" ++ ref ++ "\">" ++ contents ++ " <a href=\"#fnref" ++ ref ++ 
-  "\" class=\"footnoteBacklink\" title=\"Jump back to footnote " ++ ref ++ 
-  "\">&#8617;</a></li>\n" 
-blockToHtml options (Key _ _) = ""
-blockToHtml options (CodeBlock str) = 
-  "<pre><code>" ++ (codeStringToHtml str) ++ "\n</code></pre>\n"
-blockToHtml options (RawHtml str) = str 
-blockToHtml options (BulletList lst) = 
-  let attribs = if (writerIncremental options)
-                   then " class=\"incremental\"" 
-                   else "" in
-  "<ul" ++ attribs ++ ">\n" ++ (concatMap (listItemToHtml options) lst) ++ 
-  "</ul>\n"
-blockToHtml options (OrderedList lst) = 
-  let attribs = if (writerIncremental options)
-                   then " class=\"incremental\""
-                   else "" in
-  "<ol" ++ attribs ++ ">\n" ++ (concatMap (listItemToHtml options) lst) ++ 
-  "</ol>\n"
-blockToHtml options HorizontalRule = "<hr />\n"
-blockToHtml options (Header level lst) = 
-  let contents = inlineListToHtml options lst in
-  if ((level > 0) && (level <= 6))
-      then "<h" ++ (show level) ++ ">" ++ contents ++ 
-           "</h" ++ (show level) ++ ">\n"
-      else "<p>" ++ contents ++ "</p>\n"
-listItemToHtml options list = 
-  "<li>" ++ (concatMap (blockToHtml options) list) ++ "</li>\n"
-
--- | Convert list of Pandoc inline elements to HTML.
-inlineListToHtml :: WriterOptions -> [Inline] -> String
-inlineListToHtml options lst = 
-  -- consolidate adjacent Str and Space elements for more intelligent 
-  -- smart typography filtering
-  let lst' = consolidateList lst in
-  concatMap (inlineToHtml options) lst'
-
--- | Convert Pandoc inline element to HTML.
-inlineToHtml :: WriterOptions -> Inline -> String
-inlineToHtml options (Emph lst) = 
-  "<em>" ++ (inlineListToHtml options lst) ++ "</em>"
-inlineToHtml options (Strong lst) = 
-  "<strong>" ++ (inlineListToHtml options lst) ++ "</strong>"
-inlineToHtml options (Code str) =  
-  "<code>" ++ (codeStringToHtml str) ++ "</code>"
-inlineToHtml options (Str str) = 
-  if (writerSmart options) then stringToSmartHtml str else stringToHtml str
-inlineToHtml options (TeX str) = (codeStringToHtml str)
-inlineToHtml options (HtmlInline str) = str
-inlineToHtml options (LineBreak) = "<br />\n"
-inlineToHtml options Space = " "
-inlineToHtml options (Link text (Src src tit)) = 
-  let title = attributeStringToHtml tit in
-  if (isPrefixOf "mailto:" src)
-     then obfuscateLink options text src 
-     else "<a href=\"" ++ (codeStringToHtml src) ++ "\"" ++ 
-          (if tit /= "" then " title=\"" ++ title  ++ "\">" else ">") ++ 
-          (inlineListToHtml options text) ++ "</a>"
-inlineToHtml options (Link text (Ref ref)) = 
-  "[" ++ (inlineListToHtml options text) ++ "][" ++ 
-  (inlineListToHtml options ref) ++ "]"  
-  -- this is what markdown does, for better or worse
-inlineToHtml options (Image alt (Src source tit)) = 
-  let title = attributeStringToHtml tit
-      alternate = inlineListToHtml options alt in 
-  "<img src=\"" ++ source ++ "\"" ++ 
-  (if tit /= "" then " title=\"" ++ title ++ "\"" else "") ++ 
-  (if alternate /= "" then " alt=\"" ++ alternate ++ "\"" else "") ++ ">"
-inlineToHtml options (Image alternate (Ref ref)) = 
-  "![" ++ (inlineListToHtml options alternate) ++ "][" ++ 
-  (inlineListToHtml options ref) ++ "]"
-inlineToHtml options (NoteRef ref) = 
-  "<sup class=\"footnoteRef\" id=\"fnref" ++ ref ++ "\"><a href=\"#fn" ++ 
-  ref ++ "\">" ++ ref ++ "</a></sup>"
--}
