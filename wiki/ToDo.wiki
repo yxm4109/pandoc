@@ -3,6 +3,16 @@
 == For 0.3 release ==
 
 Prerequisites for 0.3 release:
+  * Hone description:  see http://people.debian.org/~walters/descriptions.html                            ,
+http://www.debian.org/doc/developers-reference/ch-best-pkging-practices.en.html#
+s-bpp-desc-basics,
+http://www.debian.org/doc/developers-reference/ch-best-pkging-practices.en.html#
+s-bpp-pkg-synopsis,
+http://www.debian.org/doc/developers-reference/ch-best-pkging-practices.en.html#
+s-bpp-pkg-desc,                                                             
+http://www.debian.org/doc/developers-reference/ch-best-pkging-practices.en.html#
+s-bpp-upstream-info
+  * Think about adding a wrapper 'hsmarkdown' that calls pandoc with strict options.  This might even be worked into debian's 'alternatives' system.  Could also do it with a behavior in pandoc itself, but this runs up against portability problems because of windows symlinks.
   * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
   * Test Windows binary package on a Windows machine.
   * Test Mac OSX dmg.
