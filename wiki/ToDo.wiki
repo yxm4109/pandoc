@@ -49,6 +49,9 @@ Tricky!  I suppose one would have to use a lookahead:  if
 the next single-quote is at the end of a word, this is an
 apostrophe and not a right-hand single quote.
 
+This method has many advantages.  It simplifies the writers, and it will allow us to use wrapping
+in the HTML writer.
+
 === Attributes ===
 
 Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   Or, at least follow PHP Markdown Extra and allow ID attributes on headers.
