@@ -23,7 +23,37 @@ Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
 == Improvements ==
 
-Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   
+=== Better smart quote handling ===
+
+Think about adding a Quoted inline element,
+and parse quotes in the readers.  Thus, for example,
+{{{
+"hello 'there'"
+}}}
+would get parsed as
+{{{
+Quoted DoubleQuotes [Str "hello", Space, Quoted SingleQuotes [Str "there"]]
+}}}
+and rendered appropriately by all the writers.  (Docbook writer
+could just use `<quote>foo</quote>`!)  What makes it slightly harder
+than parsing Emph and Strong is that you have to recognize possessives,
+which of course can occur at the end of a word!  (Socrates' and
+Socrates's are both valid ways of forming the possessive in English.)
+So the hard cases (hopefully not impossible) would be these:
+{{{
+'Socrates' words were preserved by Plato.'
+
+'Socrates' service in the fight against Xerxes' army    was impressive.'
+}}}
+Tricky!  I suppose one would have to use a lookahead:  if
+the next single-quote is at the end of a word, this is an
+apostrophe and not a right-hand single quote.
+
+=== Attributes ===
+
+Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   Or, at least follow PHP Markdown Extra and allow ID attributes on headers.
+
+=== Metadata ===
 
 More flexible way of specifying metadata at beginning?
 {{{
@@ -42,13 +72,19 @@ Or use RST's way, which is less likely to conflict with anything:
 :Company: X Corp.
 }}}
 
+=== Data structure ===
+
 Consider changing the default Pandoc data structure so that it is more "hierarchical":
   * Instead of section heading blocks, it would have section blocks, each with a title and a list of other elements, which might in turn be sections.
   * It wouldn't be too hard to change the readers to parse this way.  And this would allow more flexibility for the writers, especially for the proposed Docbook writer, which needs a hierarchical structure of sections. 
   * Potential problem:  some existing code assumes e.g. that note blocks are at the outer level (see RTF writer); this would have to be rewritten.
   * It would be good to have a general "tree walker" utility function that makes it easy to, say, walk through the hierarchy filtering out note blocks.
 
+=== Text.XHTML library ===
+
 Use XHTML library for HTML writer?  Not yet - it's not standard with 6.4.2 (but is with 6.6).  When we can drop support for 6.4.2, we can use it.
+
+=== Validation ===
 
 Figure out whether S5 really needs the XHTML header.  If not, change to HTML for consistency.  Or, change pandoc's default header to XHTML.
 
@@ -59,7 +95,11 @@ Note that pandoc's HTML output fails to validate completely (w3c), either as HTM
 
 == New feature ideas ==
 
-Configuration file?
+=== Configuration file ===
+
+Add a configuration file for default options?
+
+=== Table of contents ===
 
 Add format-independent "table of contents" macro.  Something like this:
 {{{
@@ -73,6 +113,8 @@ in HTML, Markdown, and RTF, we'd have to parse the document for headers
 (or sections - see below) and build a nested list with internal links.
 In RST, we could just use the existing contents directive. 
 
+=== Acronyms ===
+
 Acronyms?  Perhaps like this:
 {{{
 the [AAAS]
@@ -83,3 +125,5 @@ yields
 {{{
 <acronym title="American association for the advancement of science">AAAS</acronym>
 }}}
+
+Or see PHP Markdown Extra on abbreviations.  That's a pretty nice system, I think.
