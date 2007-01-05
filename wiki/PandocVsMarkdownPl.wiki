@@ -68,3 +68,5 @@ text
 <p></div></p>
 }}}
 
+**Note:**  This is fixed in Markdown.pl 1.0.2.
+
