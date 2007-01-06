@@ -23,35 +23,6 @@ Note:  debs will be available elsewhere, so we need not put them in Downloads.
 
 == Improvements ==
 
-=== Better smart quote handling ===
-
-Think about adding a Quoted inline element,
-and parse quotes in the readers.  Thus, for example,
-{{{
-"hello 'there'"
-}}}
-would get parsed as
-{{{
-Quoted DoubleQuotes [Str "hello", Space, Quoted SingleQuotes [Str "there"]]
-}}}
-and rendered appropriately by all the writers.  (Docbook writer
-could just use `<quote>foo</quote>`!)  What makes it slightly harder
-than parsing Emph and Strong is that you have to recognize possessives,
-which of course can occur at the end of a word!  (Socrates' and
-Socrates's are both valid ways of forming the possessive in English.)
-So the hard cases (hopefully not impossible) would be these:
-{{{
-'Socrates' words were preserved by Plato.'
-
-'Socrates' service in the fight against Xerxes' army    was impressive.'
-}}}
-Tricky!  I suppose one would have to use a lookahead:  if
-the next single-quote is at the end of a word, this is an
-apostrophe and not a right-hand single quote.
-
-This method has many advantages.  It simplifies the writers, and it will allow us to use wrapping
-in the HTML writer.
-
 === Attributes ===
 
 Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   Or, at least follow PHP Markdown Extra and allow ID attributes on headers.
