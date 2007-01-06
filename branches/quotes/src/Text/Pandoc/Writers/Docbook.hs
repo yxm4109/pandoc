@@ -85,7 +85,7 @@ writeDocbook opts (Pandoc (Meta title authors date) blocks) =
                 else empty
       meta = if (writerStandalone opts)
                 then inTagsIndented "articleinfo" $
-                     (inTagsSimple "title" (inlinesToDocbook opts title)) $$ 
+                     (inTagsSimple "title" (wrap opts title)) $$ 
                      (vcat (map authorToDocbook authors)) $$ 
                      (inTagsSimple "date" (text $ stringToSGML date)) 
                 else empty
@@ -93,13 +93,15 @@ writeDocbook opts (Pandoc (Meta title authors date) blocks) =
       (noteBlocks, blocks'') = partition isNoteBlock blocks' 
       opts' = opts {writerNotes = noteBlocks}
       elements = hierarchicalize blocks''
-      body = text (writerIncludeBefore opts') <>
+      before = writerIncludeBefore opts'
+      after = writerIncludeAfter opts'
+      body = (if null before then empty else text before) $$
              vcat (map (elementToDocbook opts') elements) $$
-             text (writerIncludeAfter opts')
+             (if null after then empty else text after)
       body' = if writerStandalone opts'
                 then inTagsIndented "article" (meta $$ body)
                 else body in  
-  render $ head $$ body' <> text "\n"
+  render $ head $$ body' $$ text ""
 
 -- | Convert an Element to Docbook.
 elementToDocbook :: WriterOptions -> Element -> Doc
