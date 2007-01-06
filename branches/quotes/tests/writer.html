@@ -10,7 +10,7 @@
 </head>
 <body>
 <h1 class="title">Pandoc Test Suite</h1>
-<p>This is a set of tests for pandoc. Most of them are adapted from John Gruber's markdown test suite.</p>
+<p>This is a set of tests for pandoc. Most of them are adapted from John Gruber&rsquo;s markdown test suite.</p>
 <hr />
 <h1>Headers</h1>
 <h2>Level 2 with an <a href="/url">embedded link</a></h2>
@@ -25,9 +25,9 @@
 <p>with no blank line</p>
 <hr />
 <h1>Paragraphs</h1>
-<p>Here's a regular paragraph.</p>
+<p>Here&rsquo;s a regular paragraph.</p>
 <p>In Markdown 1.0.0 and earlier. Version 8. This line turns into a list item. Because a hard-wrapped line in the middle of a paragraph looked like a list item.</p>
-<p>Here's one with a bullet. * criminey.</p>
+<p>Here&rsquo;s one with a bullet. * criminey.</p>
 <p>There should be a hard line break<br />
 here.</p>
 <hr />
@@ -70,11 +70,11 @@ here.</p>
 <li>take out the trash</li>
 </ol>
 </blockquote>
-<p>Here's a nested one:</p>
+<p>Here&rsquo;s a nested one:</p>
 <blockquote>
 <p>Joe said:</p>
 <blockquote>
-<p>Don't quote me.</p>
+<p>Don&rsquo;t quote me.</p>
 </blockquote>
 </blockquote>
 <p>And a following paragraph.</p>
@@ -176,7 +176,7 @@ These should not be escaped:  \$ \\ \&gt; \[ \{
 <p>Multiple paragraphs:</p>
 <ol>
 <li><p>Item 1, graf one.</p>
-<p>Item 1. graf two. The quick brown fox jumped over the lazy dog's back.</p>
+<p>Item 1. graf two. The quick brown fox jumped over the lazy dog&rsquo;s back.</p>
 </li>
 <li><p>Item 2.</p>
 </li>
@@ -193,7 +193,7 @@ These should not be escaped:  \$ \\ \&gt; \[ \{
 </ul>
 </li>
 </ul>
-<p>Here's another:</p>
+<p>Here&rsquo;s another:</p>
 <ol>
 <li>First</li>
 <li>Second:<ul>
@@ -251,7 +251,7 @@ These should not be escaped:  \$ \\ \&gt; \[ \{
 </table>
 
 <script type="text/javascript">document.write('This *should not* be interpreted as markdown');</script>
-<p>Here's a simple block:</p>
+<p>Here&rsquo;s a simple block:</p>
 <div>
     foo</div>
 <p>This should be a code block, though:</p>
@@ -288,7 +288,7 @@ Blah
 <p>Code:</p>
 <pre><code>&lt;hr /&gt;
 </code></pre>
-<p>Hr's:</p>
+<p>Hr&rsquo;s:</p>
 <hr>
 
 <hr />
@@ -318,14 +318,14 @@ Blah
 <p>This is code: <code>&gt;</code>, <code>$</code>, <code>\</code>, <code>\$</code>, <code>&lt;html&gt;</code>.</p>
 <hr />
 <h1>Smart quotes, ellipses, dashes</h1>
-<p>&quot;Hello,&quot; said the spider. &quot;'Shelob' is my name.&quot;</p>
-<p>'A', 'B', and 'C' are letters.</p>
-<p>'Oak,' 'elm,' and 'beech' are names of trees. So is 'pine.'</p>
-<p>'He said, &quot;I want to go.&quot;' Were you alive in the 70's?</p>
-<p>Here is some quoted '<code>code</code>' and a &quot;<a href="http://example.com/?foo=1&amp;bar=2">quoted link</a>&quot;.</p>
-<p>Some dashes: one---two --- three--four -- five.</p>
-<p>Dashes between numbers: 5-7, 255-66, 1987-1999.</p>
-<p>Ellipses...and. . .and . . . .</p>
+<p>&ldquo;Hello,&rdquo; said the spider. &ldquo;&lsquo;Shelob&rsquo; is my name.&rdquo;</p>
+<p>&lsquo;A&rsquo;, &lsquo;B&rsquo;, and &lsquo;C&rsquo; are letters.</p>
+<p>&lsquo;Oak,&rsquo; &lsquo;elm,&rsquo; and &lsquo;beech&rsquo; are names of trees. So is &lsquo;pine.&rsquo;</p>
+<p>&lsquo;He said, &ldquo;I want to go.&rdquo;&rsquo; Were you alive in the 70&rsquo;s?</p>
+<p>Here is some quoted &lsquo;<code>code</code>&rsquo; and a &ldquo;<a href="http://example.com/?foo=1&amp;bar=2">quoted link</a>&rdquo;.</p>
+<p>Some dashes: one&mdash;two&mdash;three&mdash;four&mdash;five.</p>
+<p>Dashes between numbers: 5&ndash;7, 255&ndash;66, 1987&ndash;1999.</p>
+<p>Ellipses&hellip;and&hellip;and&hellip;.</p>
 <hr />
 <h1>LaTeX</h1>
 <ul>
@@ -337,15 +337,15 @@ Blah
 <li>$223$</li>
 <li>$p$-Tree</li>
 <li>$\frac{d}{dx}f(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}$</li>
-<li>Here's one that has a line break in it: $\alpha + \omega \times x^2$.</li>
+<li>Here&rsquo;s one that has a line break in it: $\alpha + \omega \times x^2$.</li>
 </ul>
-<p>These shouldn't be math:</p>
+<p>These shouldn&rsquo;t be math:</p>
 <ul>
 <li>To get the famous equation, write <code>$e = mc^2$</code>.</li>
-<li>$22,000 is a <em>lot</em> of money. So is $34,000. (It worked if &quot;lot&quot; is emphasized.)</li>
+<li>$22,000 is a <em>lot</em> of money. So is $34,000. (It worked if &ldquo;lot&rdquo; is emphasized.)</li>
 <li>Escaped <code>$</code>: $73 <em>this should be emphasized</em> 23$.</li>
 </ul>
-<p>Here's a LaTeX table:</p>
+<p>Here&rsquo;s a LaTeX table:</p>
 <p>\begin{tabular}{|l|l|}\hline
 Animal &amp; Number \\ \hline
 Dog    &amp; 2      \\
@@ -413,10 +413,10 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+'Email link'+'<\/'+'a'+'>')
 <p>Foo <a href="/url/" title="Title with &quot;quotes&quot; inside">bar</a>.</p>
 <p>Foo <a href="/url/" title="Title with &quot;quote&quot; inside">biz</a>.</p>
 <h2>With ampersands</h2>
-<p>Here's a <a href="http://example.com/?foo=1&amp;bar=2">link with an ampersand in the URL</a>.</p>
-<p>Here's a link with an amersand in the link text: <a href="http://att.com/" title="AT&amp;T">AT&amp;T</a>.</p>
-<p>Here's an <a href="/script?foo=1&amp;bar=2">inline link</a>.</p>
-<p>Here's an <a href="/script?foo=1&amp;bar=2">inline link in pointy braces</a>.</p>
+<p>Here&rsquo;s a <a href="http://example.com/?foo=1&amp;bar=2">link with an ampersand in the URL</a>.</p>
+<p>Here&rsquo;s a link with an amersand in the link text: <a href="http://att.com/" title="AT&amp;T">AT&amp;T</a>.</p>
+<p>Here&rsquo;s an <a href="/script?foo=1&amp;bar=2">inline link</a>.</p>
+<p>Here&rsquo;s an <a href="/script?foo=1&amp;bar=2">inline link in pointy braces</a>.</p>
 <h2>Autolinks</h2>
 <p>With an ampersand: <a href="http://example.com/?foo=1&amp;bar=2">http://example.com/?foo=1&amp;bar=2</a></p>
 <ul>
@@ -438,7 +438,7 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+e+'<\/'+'a'+'>');
 </code></pre>
 <hr />
 <h1>Images</h1>
-<p>From &quot;Voyage dans la Lune&quot; by Georges Melies (1902):</p>
+<p>From &ldquo;Voyage dans la Lune&rdquo; by Georges Melies (1902):</p>
 <p><img src="lalune.jpg" title="Voyage dans la Lune" alt="lalune"></p>
 <p>Here is a movie <img src="movie.jpg" alt="movie"> icon.</p>
 <hr />
@@ -456,7 +456,7 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'">'+e+'<\/'+'a'+'>');
 <ol>
 <li id="fn1"><p>Here is the footnote. It can go anywhere after the footnote reference. It need not be placed at the end of the document.</p>
  <a href="#fnref1" class="footnoteBacklink" title="Jump back to footnote 1">&#8617;</a></li>
-<li id="fn2"><p>Here's the long note. This one contains multiple blocks.</p>
+<li id="fn2"><p>Here&rsquo;s the long note. This one contains multiple blocks.</p>
 <p>Subsequent blocks are indented to show that they belong to the footnote (as with list items).</p>
 <pre><code>  { &lt;code&gt; }
 </code></pre>

@@ -121,12 +121,12 @@ htmlHeader options (Meta title authors date) =
       authortext = if (null authors) 
                       then "" 
                       else "<meta name=\"author\" content=\"" ++ 
-                           (joinWithSep ", " (map (stringToSGML options) authors)) ++ 
+                           (joinWithSep ", " (map stringToSGML authors)) ++ 
                            "\" />\n" 
       datetext = if (date == "")
                     then "" 
                     else "<meta name=\"date\" content=\"" ++ 
-                         (stringToSGML options date) ++ "\" />\n" in
+                         (stringToSGML date) ++ "\" />\n" in
   (writerHeader options) ++ authortext ++ datetext ++ titletext ++ 
   "</head>\n<body>\n"
 
@@ -186,10 +186,7 @@ listItemToHtml options list =
 -- | Convert list of Pandoc inline elements to HTML.
 inlineListToHtml :: WriterOptions -> [Inline] -> String
 inlineListToHtml options lst = 
-  -- consolidate adjacent Str and Space elements for more intelligent 
-  -- smart typography filtering
-  let lst' = consolidateList lst in
-  concatMap (inlineToHtml options) lst'
+  concatMap (inlineToHtml options) lst
 
 -- | Convert Pandoc inline element to HTML.
 inlineToHtml :: WriterOptions -> Inline -> String
@@ -199,13 +196,21 @@ inlineToHtml options (Strong lst) =
   "<strong>" ++ (inlineListToHtml options lst) ++ "</strong>"
 inlineToHtml options (Code str) =  
   "<code>" ++ (escapeSGML str) ++ "</code>"
-inlineToHtml options (Str str) = stringToSGML options str
+inlineToHtml options (Quoted SingleQuote lst) =
+  "&lsquo;" ++ (inlineListToHtml options lst) ++ "&rsquo;"
+inlineToHtml options (Quoted DoubleQuote lst) =
+  "&ldquo;" ++ (inlineListToHtml options lst) ++ "&rdquo;"
+inlineToHtml options EmDash = "&mdash;"
+inlineToHtml options EnDash = "&ndash;"
+inlineToHtml options Ellipses = "&hellip;"
+inlineToHtml options Apostrophe = "&rsquo;"
+inlineToHtml options (Str str) = stringToSGML str
 inlineToHtml options (TeX str) = (escapeSGML str)
 inlineToHtml options (HtmlInline str) = str
 inlineToHtml options (LineBreak) = "<br />\n"
 inlineToHtml options Space = " "
 inlineToHtml options (Link text (Src src tit)) = 
-  let title = stringToSGML options tit in
+  let title = stringToSGML tit in
   if (isPrefixOf "mailto:" src)
      then obfuscateLink options text src 
      else "<a href=\"" ++ (escapeSGML src) ++ "\"" ++ 
@@ -216,7 +221,7 @@ inlineToHtml options (Link text (Ref ref)) =
   (inlineListToHtml options ref) ++ "]"  
   -- this is what markdown does, for better or worse
 inlineToHtml options (Image alt (Src source tit)) = 
-  let title = stringToSGML options tit
+  let title = stringToSGML tit
       alternate = inlineListToHtml options alt in 
   "<img src=\"" ++ source ++ "\"" ++ 
   (if tit /= "" then " title=\"" ++ title ++ "\"" else "") ++ 
