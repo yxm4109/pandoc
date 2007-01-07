@@ -1,0 +1,38 @@
+#summary Benchmarks comparing Pandoc to Markdown.pl.
+
+= Pandoc r446 =
+
+This benchmark uses the sources for Allan Odgaard's [http://macromates.com/textmate/manual/ TextMate manual], available at
+http://macromates.com/textmate/manual/source.tbz.  The test machine is a
+Pentium M 1.4GHz, 1G RAM, running debian linux.  Pandoc was compiled with
+the '-O0' optimization flag.
+
+{{{
+    roktas@cobalt:~$ du textmate_manual.txt
+    176K    textmate_manual.txt
+
+    roktas@cobalt:~$ time pandoc textmate_manual.txt >/dev/null
+
+    real    0m6.006s
+    user    0m5.376s
+    sys     0m0.020s
+
+    roktas@cobalt:~$ time pandoc --strict textmate_manual.txt >/dev/null
+
+    real    0m6.938s
+    user    0m5.724s
+    sys     0m0.024s
+
+    roktas@cobalt:~$ time markdown-1.0.1 textmate_manual.txt >/dev/null
+
+    real    0m11.769s
+    user    0m10.937s
+    sys     0m0.028s
+
+
+    roktas@cobalt:~$ time markdown-1.0.2b7 textmate_manual.txt >/dev/null
+
+    real    0m23.575s
+    user    0m19.581s
+    sys     0m2.060s
+}}}
