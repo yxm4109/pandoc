@@ -99,3 +99,23 @@ This should be an unordered list followed by an ordered one:
 
 *See also:* http://bugs.debian.org/368413
 
+== Unordered lists and horizontal rules ==
+
+Input:
+{{{
++   item 1
+
+    +   item 2
+
+  *   *   *   *   *
+}}}
+
+Markdown.pl's output:
+{{{
+<ul>
+<li><p>item 1</p>
+
+<ul><li><p>item 2</p></li>
+<li><ul><li><ul><li><ul><li>*</li></ul></li></ul></li></ul></li></ul></li>
+</ul>
+}}}
