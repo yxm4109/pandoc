@@ -1,26 +1,5 @@
 ﻿#summary To-do list.
 
-== For 0.3 release ==
-
-  * Test all Makefile targets on various machines (including linux with GHC 6.4.2, linux with GHC 6.6, openBSD, Mac OS X, Windows/Cygwin). 
-  * Test Windows binary package on a Windows machine.
-  * Test Mac OSX dmg.
-
-When ready:
-  * Tag 0.3 branch
-  * Check out fresh copy, create tarball, OSX dmg, Windows zip
-  * Upload tarball, dmg, and zip to Google Code downloads section.
-  * Create debian packages and start upload to debian
-  * Create and upload website.
-  * Announce release on Freshmeat, and on pandoc-announce, markdown list, docutils list, haskell list, etc.
- 
-Proposed naming scheme:
-  * `pandoc-0.3.tar.gz` - source tarball
-  * `pandoc-0.3.dmg` - OSX disk image (compiled on PPC)
-  * `pandoc-0.3.zip` - zip file containing Windows binary and documentation
-
-Note:  debs will be available elsewhere, so we need not put them in Downloads.
-
 == Improvements ==
 
 === Attributes ===
