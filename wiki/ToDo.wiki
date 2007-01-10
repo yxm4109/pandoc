@@ -2,6 +2,11 @@
 
 == Improvements ==
 
+=== Tables ===
+
+See this suggestion (and the whole thread):
+http://six.pairlist.net/pipermail/markdown-discuss/2005-March/001097.html
+
 === Attributes ===
 
 Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   Or, at least follow PHP Markdown Extra and allow ID attributes on headers.
@@ -56,9 +61,11 @@ Add a configuration file for default options?
 
 Add format-independent "table of contents" macro.  Something like this:
 {{{
-
 %contents
-
+}}}
+or (maruku)
+{{{
+{toc}
 }}}
 in a block by itself.  To implement this, we might add a 'TableOfContents'
 block type.  In latex output, this would come out as `\tableofcontents`,
