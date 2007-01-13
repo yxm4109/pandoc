@@ -7,6 +7,73 @@
 See this suggestion (and the whole thread):
 http://six.pairlist.net/pipermail/markdown-discuss/2005-March/001097.html
 
+Here's a proposal that draws on Fortin's ideas.  Support three kinds of
+tables:
+
+**Simple tables, one row per line:**
+{{{
+  left aligned   default aligned  right aligned  centered
+  -------------  --------------- -------------- ----------
+  one item       3                         44.0    Yes
+  per line       4                          3.6     No
+
+}}}
+Note:  must end with a blank line.
+
+**Multiline tables (rows may be more than one line):**
+{{{
+  -------------------------------------------------------------
+   Table    Column                  Single-                       
+   syntax   separator  Font choice  column   Comment              
+  --------  ---------  -----------  -------  ------------------
+     A      Pipe       Any font     Yes      Somewhat cluttered   
+            (`|`)                            but always work.     
+  
+     B      Character  Monospace    Yes      Currently my         
+            count                            favorite.            
+ 
+     C      Character  Monospace    Yes      Lazier than B and    
+            count                            less pretty.         
+
+     D      Character  Monospace    No       No single-column     
+            count                            table and may be a   
+                                             little confusing     
+                                             with header syntax.  
+  --------------------------------------------------------------
+}}}
+Notes:  Headers are treated as in simple tables, but the header
+must be preceded by a line of ---'s.  This can be broken up, as 
+in
+{{{
+  --------  ---------  -----------  -------  ------------------
+   Table    Column                  Single-                       
+   syntax   separator  Font choice  column   Comment              
+  --------  ---------  -----------  -------  ------------------
+}}}
+A similar line of dashes must end the table.  Table rows may use
+any number of lines; they are separated by one or more blank lines.
+
+**Ascii tables:**
+{{{
++------------------------+------------+----------+----------+
+| Header row, column 1   | Header 2   | Header 3 | Header 4 |
++------------------------+------------+----------+----------+
+| body row 1, column 1   | column 2   | column 3 | column 4 |
+| and more col 1         |            |          | and more |
+| and more               | and more   | and more |   col4   |
++------------------------+------------+----------+----------+
+| body row 2             | Cells may s| pan colum|          |
++------------------------+------------+----------+----------+
+}}}
+These should also be supported as the most general table construct
+(though they're a pain to write).  Unlike the other two types,
+these can contain multiple blocks in a cell.
+
+I don't like the use of pipe characters in simple tables; they
+make tables harder to write and clutter up the appearance.  I
+suspect they're used partly to make it easier for those who use
+a proportional font.
+
 === Attributes ===
 
 Add a way of specifying attributes?  See [http://six.pairlist.net/pipermail/markdown-discuss/2005-January/000960.html this thread].   Or, at least follow PHP Markdown Extra and allow ID attributes on headers.
