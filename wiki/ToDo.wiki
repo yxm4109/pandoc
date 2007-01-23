@@ -74,7 +74,7 @@ any number of lines; they are separated by one or more blank lines.
 | and more col 1         |            |          | and more |
 | and more               | and more   | and more |   col4   |
 +------------------------+------------+----------+----------+
-| body row 2             | Cells may s| pan colum|          |
+| body row 2             | Cells may span column |          |
 +------------------------+------------+----------+----------+
 }}}
 Look at reStructuredText's table syntax as a paradigm.
