@@ -7,10 +7,10 @@
 See this suggestion (and the whole thread):
 http://six.pairlist.net/pipermail/markdown-discuss/2005-March/001097.html
 
-Here's a proposal that draws on Fortin's ideas.  Support three kinds of
+Here's a proposal that draws on Fortin's ideas.  Support four kinds of
 tables:
 
-**Simple tables, one row per line:**
+**1. Simple tables, one row per line:**
 {{{
   left aligned   default aligned  right aligned  centered
   -------------  --------------- -------------- ----------
@@ -20,7 +20,19 @@ tables:
 }}}
 Note:  must end with a blank line.
 
-**Multiline tables (rows may be more than one line):**
+**2. Simple tables, pipe separators:**
+{{{
+| Item      | Value |
+| --------- | -----:|
+| Computer  | $1600 |
+| Phone     |   $12 |
+| Pipe      |    $1 |
+}}}
+Note:  must end with a blank line.  The pipes on the ends are optional; those between columns
+are mandatory.  The colons indicate alignment.  The point of this sort of table is to allow tables
+to be written in proportionally spaced fonts, e.g. in Wikis.
+
+**3. Multiline tables (rows may be more than one line):**
 {{{
   -------------------------------------------------------------
    Table    Column                  Single-                       
@@ -53,7 +65,7 @@ in
 A similar line of dashes must end the table.  Table rows may use
 any number of lines; they are separated by one or more blank lines.
 
-**Ascii tables:**
+**4. General Ascii tables:**
 {{{
 +------------------------+------------+----------+----------+
 | Header row, column 1   | Header 2   | Header 3 | Header 4 |
@@ -65,14 +77,14 @@ any number of lines; they are separated by one or more blank lines.
 | body row 2             | Cells may s| pan colum|          |
 +------------------------+------------+----------+----------+
 }}}
+Look at reStructuredText's table syntax as a paradigm.
 These should also be supported as the most general table construct
 (though they're a pain to write).  Unlike the other two types,
 these can contain multiple blocks in a cell.
 
-I don't like the use of pipe characters in simple tables; they
-make tables harder to write and clutter up the appearance.  I
-suspect they're used partly to make it easier for those who use
-a proportional font.
+Currently 1 and 3 are supported in the repository version of pandoc.  It would
+not be hard to add 2.  Supported writers so far are latex, docbook, HTML.
+Think about adding Markdown, RTF, and RST writer support.
 
 === Attributes ===
 
