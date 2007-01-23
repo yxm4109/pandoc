@@ -2,6 +2,23 @@
 
 == Improvements ==
 
+=== Footnotes ===
+
+Jonathan Deber notes on the Markdown list:
+"If you're posting to a CMS system where multiple
+articles may appear on the same HTML page, you need to assign each
+article a GUID so that the footnote links make sense (i.e., you can't
+have two articles that both use "fnref" as the anchor name for the
+footnotes, since you would end up with two anchors with the same name
+if two articles are published on the same page).  It's of course
+possible to do this with a search and replace of "fnref" to something
+like "2007-01-23-1" prior to publishing.  But, it would be nice if
+you could specify a document GUID and have the Markdown processor do
+that substitution for you."
+
+Perhaps a command-line option should be provided to specify
+a string to be added to the anchor names?
+
 === Tables ===
 
 See this suggestion (and the whole thread):
