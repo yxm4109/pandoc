@@ -5,9 +5,7 @@
 === ByeString ===
 
 Consider rewriting Main.hs to use ByteString instead of regular string IO,
-for a performance boost.  Drawback:  ByteString is not standard in GHC 6.4,
-so we'd have to require 6.6 or provide a means for downloading an external
-library in the build.  Anyway, worth a test to see how big the performance
+for a performance boost.  Worth a test to see how big the performance
 boost would be.
 
 === Footnotes ===
