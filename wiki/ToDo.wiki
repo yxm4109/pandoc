@@ -2,11 +2,6 @@
 
 == Improvements ==
 
-=== Data.Map ===
-
-Use Data.Map instead of an association list in Entities?  Will that
-increase performance?
-
 === ByeString ===
 
 Consider rewriting Main.hs to use ByteString instead of regular string IO,
