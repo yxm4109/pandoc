@@ -2,6 +2,18 @@
 
 == Improvements ==
 
+=== Text.Html ===
+
+Use Text.Html library for output of readHtml.  Main.hs can then call
+renderHtml to convert this to text.  This will make Pandoc more useful
+in projects where Text.Html is used (e.g. HAppS applications).
+
+Note that primHtml can be used for unprocessed text (e.g. scripts).
+
+It would be better to use Text.XHtml, but this is not a standard part
+of GHC 6.4.  The S5 slide shows still work with the HTML document header, so
+for now let's use Text.Html.
+
 === ByeString ===
 
 Consider rewriting Main.hs to use ByteString instead of regular string IO,
@@ -139,10 +151,6 @@ Consider changing the default Pandoc data structure so that it is more "hierarch
   * It wouldn't be too hard to change the readers to parse this way.  And this would allow more flexibility for the writers, especially for the proposed Docbook writer, which needs a hierarchical structure of sections. 
   * Potential problem:  some existing code assumes e.g. that note blocks are at the outer level (see RTF writer); this would have to be rewritten.
   * It would be good to have a general "tree walker" utility function that makes it easy to, say, walk through the hierarchy filtering out note blocks.
-
-=== Text.XHTML library ===
-
-Use XHTML library for HTML writer?  Not yet - it's not standard with 6.4.2 (but is with 6.6).  When we can drop support for 6.4.2, we can use it.
 
 === Validation ===
 
