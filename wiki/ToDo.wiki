@@ -2,24 +2,6 @@
 
 == Improvements ==
 
-=== Text.Html ===
-
-Use Text.Html library for output of readHtml.  Main.hs can then call
-renderHtml to convert this to text.  This will make Pandoc more useful
-in projects where Text.Html is used (e.g. HAppS applications).
-
-Note that primHtml can be used for unprocessed text (e.g. scripts).
-
-It would be better to use Text.XHtml, but this is not a standard part
-of GHC 6.4.  The S5 slide shows still work with the HTML document header, so
-for now let's use Text.Html.
-
-=== ByeString ===
-
-Consider rewriting Main.hs to use ByteString instead of regular string IO,
-for a performance boost.  Worth a test to see how big the performance
-boost would be.
-
 === Footnotes ===
 
 Jonathan Deber notes on the Markdown list:
@@ -153,8 +135,6 @@ Consider changing the default Pandoc data structure so that it is more "hierarch
   * It would be good to have a general "tree walker" utility function that makes it easy to, say, walk through the hierarchy filtering out note blocks.
 
 === Validation ===
-
-Figure out whether S5 really needs the XHTML header.  If not, change to HTML for consistency.  Or, change pandoc's default header to XHTML.
 
 Note that pandoc's HTML output fails to validate completely (w3c), either as HTML or as XHTML.
   * HTML doesn't like the `\>` at the end of `<meta>` tags.
