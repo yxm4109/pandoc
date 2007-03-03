@@ -2,6 +2,12 @@
 
 == Improvements ==
 
+=== Inline links ===
+
+Add option so that HTML reader will parse links as
+inline links rather than reference links?  See issue #4.
+This could be a command-line option.
+
 === Footnotes ===
 
 Jonathan Deber notes on the Markdown list:
