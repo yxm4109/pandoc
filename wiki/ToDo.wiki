@@ -163,7 +163,7 @@ in HTML, Markdown, and RTF, we'd have to parse the document for headers
 (or sections - see below) and build a nested list with internal links.
 In RST, we could just use the existing contents directive. 
 
-=== Acronyms ===
+=== Acronyms/abbreviations ===
 
 Acronyms?  Perhaps like this:
 {{{
@@ -176,4 +176,7 @@ yields
 <acronym title="American association for the advancement of science">AAAS</acronym>
 }}}
 
-Or see PHP Markdown Extra on abbreviations.  That's a pretty nice system, I think.
+Or see PHP Markdown Extra on abbreviations.  That's a pretty nice system, I think.  Michael Fortin says (on Markdown discusion list) that <acronym>
+has been removed from HTML5 on grounds that it's usually pointless to
+distinguish acronyms from other kinds of abbreviations.
+
