@@ -2,6 +2,27 @@
 
 == Improvements ==
 
+=== Definition Lists ===
+
+Use the PHP Markdown Extra syntax:
+http://www.michelf.com/projects/php-markdown/extra/#def-list
+
+In docbook, these come out as variablelists.
+In latex, description environments.
+Note that latex description environments allow only one term
+and one definition.  Docbook variablelists allow multiple
+terms but only one defintion.
+
+Done:  basic parser.
+
+Todo:  definition, writers, html and latex readers, utility routines
+in shared...
+
+=== Man page output ===
+
+One we have definition lists, we can add a man page writer.
+(Definition lists will be used for options.)
+
 === Footnotes ===
 
 Jonathan Deber notes on the Markdown list:
@@ -179,4 +200,3 @@ yields
 Or see PHP Markdown Extra on abbreviations.  That's a pretty nice system, I think.  Michael Fortin says (on Markdown discusion list) that <acronym>
 has been removed from HTML5 on grounds that it's usually pointless to
 distinguish acronyms from other kinds of abbreviations.
-
