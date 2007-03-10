@@ -4,8 +4,19 @@
 
 === Definition Lists ===
 
-Use the PHP Markdown Extra syntax:
+PHP Markdown Extra syntax:
 http://www.michelf.com/projects/php-markdown/extra/#def-list
+
+I prefer the restructured text way:
+{{{
+term 1
+	Definition 1.
+
+term 2
+	Definition 2, par. 1.
+
+	Definition 2, par. 2
+}}}
 
 In docbook, these come out as variablelists.
 In latex, description environments.
