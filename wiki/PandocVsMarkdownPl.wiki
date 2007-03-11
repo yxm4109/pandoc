@@ -1,5 +1,9 @@
 ﻿#summary List of cases where `Markdown.pl` fails and Pandoc does the right thing.
 
+== Indentation in multiple blocks in list items ==
+
+http://thread.gmane.org/gmane.text.markdown.general/2341/focus=2342
+
 == Indented code in list item ==
 
 {{{
