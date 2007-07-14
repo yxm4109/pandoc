@@ -72,11 +72,11 @@ latexHeader options (Meta title authors date) =
       titleblock = "\\doctitle{" ++ titletext ++ "}\n\
                    \ \\author{" ++ authorstext ++ "}\n\
                    \ \\date{" ++ datetext ++ "}\n\n"
-      secnumline = if (writerNumberSections options)
-                      then "\\setupheads[sectionnumber=yes]\n" 
-                      else "\\setupheads[sectionnumber=no]\n"
+      setupheads = if (writerNumberSections options)
+                      then "\\setupheads[sectionnumber=yes, style=\\bf]\n" 
+                      else "\\setupheads[sectionnumber=no, style=\\bf]\n"
       header     = writerHeader options in
-  header ++ secnumline ++ titleblock ++ "\\starttext\n\\maketitle\n\n"
+  header ++ setupheads ++ titleblock ++ "\\starttext\n\\maketitle\n\n"
 
 -- escape things as needed for ConTeXt
 
@@ -107,8 +107,8 @@ blockToConTeXt :: Block -> String
 blockToConTeXt Null = ""
 blockToConTeXt (Plain lst) = inlineListToConTeXt lst ++ "\n"
 blockToConTeXt (Para lst) = (inlineListToConTeXt lst) ++ "\n\n"
-blockToConTeXt (BlockQuote lst) = "\\startquotation\n" ++ 
-    (concatMap blockToConTeXt lst) ++ "\\stopquotation\n\n"
+blockToConTeXt (BlockQuote lst) = "\\startnarrower\n" ++ 
+    (concatMap blockToConTeXt lst) ++ "\\stopnarrower\n\n"
 blockToConTeXt (CodeBlock str) = "\\starttyping\n" ++ str ++ 
     "\n\\stoptyping\n"
 blockToConTeXt (RawHtml str) = ""
@@ -174,7 +174,7 @@ inlineToConTeXt :: Inline    -- ^ Inline to convert
               -> String
 inlineToConTeXt (Emph lst) = "{\\em " ++ 
     (inlineListToConTeXt lst) ++ "}"
-inlineToConTeXt (Strong lst) = "{\\bf{ " ++ 
+inlineToConTeXt (Strong lst) = "{\\bf " ++ 
     (inlineListToConTeXt lst) ++ "}"
 inlineToConTeXt (Code str) = "\\type{" ++ str ++ "}"
 inlineToConTeXt (Quoted SingleQuote lst) = 

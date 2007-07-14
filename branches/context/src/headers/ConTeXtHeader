@@ -4,11 +4,14 @@
 \setupinteraction[state=start, color=middlered] % needed for hyperlinks
 
 \setuppapersize[letter][letter]  % use letter paper
-\setuplayout[topspace=0.5in, backspace=1in, header=24pt, footer=36pt,
-  height=middle, width=middle]  % page layout
+\setuplayout[width=6in, height=9.5in] % page layout
 \setuppagenumbering[location={footer,center}, style=bold]  % number pages
-\setupbodyfont[11pt]  % 11pt font (12pt is default)
+\setupbodyfont[11pt]  % 11pt font
 \setupwhitespace[medium]  % inter-paragraph spacing
+
+\setuphead[section][style=\tfc]
+\setuphead[subsection][style=\tfb]
+\setuphead[subsubsection][style=\bf]
 
 % define title block commands
 \unprotect
@@ -34,20 +37,18 @@
   width=broad,margin=1cm]
 
 % define ltxitem (for bulleted lists)  
-\defineitemgroup[ltxitem][levels=5]
+\defineitemgroup[ltxitem][levels=4]
 \setupitemgroup[ltxitem][1][1]
 \setupitemgroup[ltxitem][2][2]
 \setupitemgroup[ltxitem][3][3]
-\setupitemgroup[ltxitem][4][4]
-\setupitemgroup[ltxitem][5][5]
+\setupitemgroup[ltxitem][4][4,packed]
 
 % define ltxenum (for enumerated lists)
-\defineitemgroup[ltxenum][levels=5]
+\defineitemgroup[ltxenum][levels=4]
 \setupitemgroup[ltxenum][1][n]
 \setupitemgroup[ltxenum][2][a]
 \setupitemgroup[ltxenum][3][r]
-\setupitemgroup[ltxenum][4][m]
-\setupitemgroup[ltxenum][5][AK]
+\setupitemgroup[ltxenum][4][A,packed]
 
 \setupthinrules[width=15em]  % width of horizontal rules
 
