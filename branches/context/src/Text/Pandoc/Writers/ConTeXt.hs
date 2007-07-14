@@ -73,101 +73,94 @@ latexHeader options (Meta title authors date) =
                    \ \\author{" ++ authorstext ++ "}\n\
                    \ \\date{" ++ datetext ++ "}\n\n"
       secnumline = if (writerNumberSections options)
-                      then "" 
-                      else "\\setcounter{secnumdepth}{0}\n" 
+                      then "\\setupheads[sectionnumber=yes]\n" 
+                      else "\\setupheads[sectionnumber=no]\n"
       header     = writerHeader options in
   header ++ secnumline ++ titleblock ++ "\\starttext\n\\maketitle\n\n"
 
--- escape things as needed for ConTeXt (also ldots, dashes, quotes, etc.) 
+-- escape things as needed for ConTeXt
 
-escapeBrackets  = backslashEscape "{}"
-escapeSpecial   = backslashEscape "$%&~_#"
-
-escapeBackslash = substitute "\\" "\\textbackslash{}" 
-fixBackslash    = substitute "\\textbackslash\\{\\}" "\\textbackslash{}"
-escapeHat       = substitute "^" "\\^{}"
-escapeBar       = substitute "|" "\\textbar{}"
-escapeLt        = substitute "<" "\\textless{}"
-escapeGt        = substitute ">" "\\textgreater{}"
+escapeCharForConTeXt :: Char -> String
+escapeCharForConTeXt ch =
+ case ch of
+    '{'  -> "\\letteropenbrace{}"
+    '}'  -> "\\letterclosebrace{}"
+    '\\' -> "\\letterbackslash{}"
+    '$'  -> "\\$"
+    '|'  -> "\\letterbar{}"
+    '^'  -> "\\letterhat{}"
+    '%'  -> "\\%"
+    '~'  -> "\\lettertilde{}"
+    '&'  -> "\\&"
+    '#'  -> "\\#"
+    '<'  -> "\\letterless{}"
+    '>'  -> "\\lettermore{}"
+    '_'  -> "\\letterunderscore{}"
+    x    -> [x]
 
 -- | Escape string for ConTeXt
 stringToConTeXt :: String -> String
-stringToConTeXt = escapeGt . escapeLt . escapeBar . escapeHat . 
-                escapeSpecial . fixBackslash . escapeBrackets . 
-                escapeBackslash 
-
--- | Remove all code elements from list of inline elements
--- (because it's illegal to have a \\verb inside a command argument)
-deVerb :: [Inline] -> [Inline]
-deVerb [] = []
-deVerb ((Code str):rest) = (Str str):(deVerb rest)
-deVerb (other:rest) = other:(deVerb rest)
+stringToConTeXt = concatMap escapeCharForConTeXt
 
 -- | Convert Pandoc block element to ConTeXt.
-blockToConTeXt :: Block     -- ^ Block to convert
-             -> String 
+blockToConTeXt :: Block -> String 
 blockToConTeXt Null = ""
 blockToConTeXt (Plain lst) = inlineListToConTeXt lst ++ "\n"
 blockToConTeXt (Para lst) = (inlineListToConTeXt lst) ++ "\n\n"
-blockToConTeXt (BlockQuote lst) = "\\begin{quote}\n" ++ 
-    (concatMap blockToConTeXt lst) ++ "\\end{quote}\n"
-blockToConTeXt (CodeBlock str) = "\\begin{verbatim}\n" ++ str ++ 
-    "\n\\end{verbatim}\n"
+blockToConTeXt (BlockQuote lst) = "\\startquotation\n" ++ 
+    (concatMap blockToConTeXt lst) ++ "\\stopquotation\n\n"
+blockToConTeXt (CodeBlock str) = "\\starttyping\n" ++ str ++ 
+    "\n\\stoptyping\n"
 blockToConTeXt (RawHtml str) = ""
-blockToConTeXt (BulletList lst) = "\\begin{itemize}\n" ++ 
-    (concatMap listItemToConTeXt lst) ++ "\\end{itemize}\n"
-blockToConTeXt (OrderedList lst) = "\\begin{enumerate}\n" ++ 
-    (concatMap listItemToConTeXt lst) ++ "\\end{enumerate}\n"
+blockToConTeXt (BulletList lst) = "\\startltxitem\n" ++ 
+    concatMap listItemToConTeXt lst ++ "\\stopltxitem\n"
+blockToConTeXt (OrderedList lst) = "\\startltxenum\n" ++
+    concatMap listItemToConTeXt lst ++ "\\stopltxenum\n"
 blockToConTeXt (DefinitionList lst) = 
-    let defListItemToConTeXt (term, def) = "\\item[" ++ 
-           substitute "]" "\\]" (inlineListToConTeXt term) ++ "] " ++
-           concatMap blockToConTeXt def
-    in  "\\begin{description}\n" ++ concatMap defListItemToConTeXt lst ++ 
-        "\\end{description}\n"
+    let defListItemToConTeXt (term, def) = "\\startdescr{" ++
+           inlineListToConTeXt term ++ "}\n" ++
+           concatMap blockToConTeXt def ++ "\n\\stopdescr\n"
+    in  concatMap defListItemToConTeXt lst ++ "\n"
 blockToConTeXt HorizontalRule = 
-    "\\begin{center}\\rule{3in}{0.4pt}\\end{center}\n\n"
+    "\\thinrule\n\n"
 blockToConTeXt (Header level lst) = 
     if (level > 0) && (level <= 3)
        then "\\" ++ (concat (replicate (level - 1) "sub")) ++ "section{" ++ 
-            (inlineListToConTeXt (deVerb lst)) ++ "}\n\n"
+            (inlineListToConTeXt lst) ++ "}\n\n"
        else (inlineListToConTeXt lst) ++ "\n\n"
 blockToConTeXt (Table caption aligns widths heads rows) =
     let colWidths = map printDecimal widths
-        colDescriptors = concat $ zipWith
-                                  (\width align -> ">{\\PBS" ++ 
-                                  (case align of 
-                                         AlignLeft -> "\\raggedright"
-                                         AlignRight -> "\\raggedleft"
-                                         AlignCenter -> "\\centering"
-                                         AlignDefault -> "\\raggedright") ++
-                                  "\\hspace{0pt}}p{" ++ width ++ 
-                                  "\\textwidth}")
-                                  colWidths aligns
+        colDescriptor colWidth alignment = (case alignment of
+                                               AlignLeft    -> "l"
+                                               AlignRight   -> "r"
+                                               AlignCenter  -> ""
+                                               AlignDefault -> "l") ++
+                                           "p(" ++ colWidth ++ "\\textwidth)|"
+        colDescriptors = "|" ++ (concat $ 
+                                 zipWith colDescriptor colWidths aligns)
         headers        = tableRowToConTeXt heads 
         captionText    = inlineListToConTeXt caption 
-        tableBody      = "\\begin{tabular}{" ++ colDescriptors ++ "}\n" ++
-                         headers ++ "\\hline\n" ++ 
-                         (concatMap tableRowToConTeXt rows) ++ 
-                         "\\end{tabular}\n" 
-        centered str   = "\\begin{center}\n" ++ str ++ "\\end{center}\n" in
-    if null captionText
-      then centered tableBody ++ "\n"
-      else "\\begin{table}[h]\n" ++ centered tableBody ++ "\\caption{" ++
-           captionText ++ "}\n" ++ "\\end{table}\n\n" 
+        captionCode    = if null captionText
+                            then ""
+                            else "\\placetable[here]{" ++ captionText ++ "}\n"
+        tableBody      = "\\starttable[" ++ colDescriptors ++ "]\n" ++
+                         "\\HL\n" ++ headers ++ "\\HL\n" ++ 
+                         (concatMap tableRowToConTeXt rows) ++ "\\HL\n" ++
+                         "\\stoptable\n" 
+    in  captionCode ++ tableBody ++ "\n"
 
 printDecimal :: Float -> String
 printDecimal = printf "%.2f" 
 
 tableColumnWidths cols = map (length . (concatMap blockToConTeXt)) cols
 
-tableRowToConTeXt cols = joinWithSep " & " (map (concatMap blockToConTeXt) cols) ++ "\\hfil\\break\n"
+tableRowToConTeXt cols = joinWithSep " \\NC " (map (concatMap blockToConTeXt) cols) ++ "\\AR\n"
 
-listItemToConTeXt list = "\\item " ++ 
-    (concatMap blockToConTeXt list) 
+listItemToConTeXt list = "\\item " ++ concatMap blockToConTeXt list
 
 -- | Convert list of inline elements to ConTeXt.
 inlineListToConTeXt :: [Inline]  -- ^ Inlines to convert
-                  -> String
+                    -> String
 inlineListToConTeXt lst = 
   concatMap inlineToConTeXt lst
 
@@ -179,21 +172,15 @@ isQuoted _ = False
 -- | Convert inline element to ConTeXt
 inlineToConTeXt :: Inline    -- ^ Inline to convert
               -> String
-inlineToConTeXt (Emph lst) = "\\emph{" ++ 
-    (inlineListToConTeXt (deVerb lst)) ++ "}"
-inlineToConTeXt (Strong lst) = "\\textbf{" ++ 
-    (inlineListToConTeXt (deVerb lst)) ++ "}"
-inlineToConTeXt (Code str) = "\\verb" ++ [chr] ++ stuffing ++ [chr]
-                     where stuffing = str 
-                           chr      = ((enumFromTo '!' '~') \\ stuffing) !! 0
-inlineToConTeXt (Quoted SingleQuote lst) =
-  let s1 = if (not (null lst)) && (isQuoted (head lst)) then "\\," else ""
-      s2 = if (not (null lst)) && (isQuoted (last lst)) then "\\," else "" in
-  "`" ++ s1 ++ inlineListToConTeXt lst ++ s2 ++ "'"
+inlineToConTeXt (Emph lst) = "{\\em " ++ 
+    (inlineListToConTeXt lst) ++ "}"
+inlineToConTeXt (Strong lst) = "{\\bf{ " ++ 
+    (inlineListToConTeXt lst) ++ "}"
+inlineToConTeXt (Code str) = "\\type{" ++ str ++ "}"
+inlineToConTeXt (Quoted SingleQuote lst) = 
+  "\\quote{" ++ inlineListToConTeXt lst ++ "}"
 inlineToConTeXt (Quoted DoubleQuote lst) =
-  let s1 = if (not (null lst)) && (isQuoted (head lst)) then "\\," else ""
-      s2 = if (not (null lst)) && (isQuoted (last lst)) then "\\," else "" in
-  "``" ++ s1 ++ inlineListToConTeXt lst ++ s2 ++ "''"
+  "\\quotation{" ++ inlineListToConTeXt lst ++ "}"
 inlineToConTeXt Apostrophe = "'"
 inlineToConTeXt EmDash = "---"
 inlineToConTeXt EnDash = "--"
@@ -203,9 +190,10 @@ inlineToConTeXt (TeX str) = str
 inlineToConTeXt (HtmlInline str) = ""
 inlineToConTeXt (LineBreak) = "\\hfil\\break\n"
 inlineToConTeXt Space = " "
-inlineToConTeXt (Link text (src, tit)) = 
-    "\\href{" ++ src ++ "}{" ++ (inlineListToConTeXt (deVerb text)) ++ "}"
-inlineToConTeXt (Image alternate (source, tit)) = 
-    "\\includegraphics{" ++ source ++ "}" 
+inlineToConTeXt (Link text (src, _)) = 
+  "\\useurl[x][" ++ src ++ "][][" ++ inlineListToConTeXt text ++ "]\\from[x]" 
+inlineToConTeXt (Image alternate (src, tit)) = 
+  "\\placefigure\n[]\n[fig:" ++ inlineListToConTeXt alternate ++ "]\n{" ++
+  tit ++ "\n{\\externalfigure[" ++ src ++ "]}" 
 inlineToConTeXt (Note contents) = 
-    "\\footnote{" ++ (stripTrailingNewlines $ concatMap blockToConTeXt contents)  ++ "}"
+    "\\footnote{" ++ concatMap blockToConTeXt contents ++ "}"
