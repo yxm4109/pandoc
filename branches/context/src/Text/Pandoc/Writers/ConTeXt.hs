@@ -194,6 +194,6 @@ inlineToConTeXt (Link text (src, _)) =
   "\\useurl[x][" ++ src ++ "][][" ++ inlineListToConTeXt text ++ "]\\from[x]" 
 inlineToConTeXt (Image alternate (src, tit)) = 
   "\\placefigure\n[]\n[fig:" ++ inlineListToConTeXt alternate ++ "]\n{" ++
-  tit ++ "\n{\\externalfigure[" ++ src ++ "]}" 
+  tit ++ "}\n{\\externalfigure[" ++ src ++ "]}" 
 inlineToConTeXt (Note contents) = 
     "\\footnote{" ++ concatMap blockToConTeXt contents ++ "}"
