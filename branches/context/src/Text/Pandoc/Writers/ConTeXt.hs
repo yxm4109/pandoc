@@ -45,10 +45,10 @@ writeConTeXt options (Pandoc meta blocks) =
                 then latexHeader options meta
                 else ""
       toc  = if writerTableOfContents options
-                then "\\tableofcontents\n\n"
+                then "\\placecontent\n\n"
                 else "" 
       foot = if writerStandalone options
-                then "\n\\end{document}\n"
+                then "\n\\stoptext\n"
                 else ""
   in  head ++ toc ++ body ++ foot
 
@@ -59,21 +59,24 @@ latexHeader :: WriterOptions -- ^ Options, including ConTeXt header
 latexHeader options (Meta title authors date) =
   let titletext = if null title
                      then "" 
-                     else "\\title{" ++ inlineListToConTeXt title ++ "}\n"
+                     else inlineListToConTeXt title
       authorstext = if null authors
+                       then ""
+                       else if length authors == 1
+                            then stringToConTeXt $ head authors
+                            else stringToConTeXt $ (joinWithSep ", " $
+                                 init authors) ++ " & " ++ last authors
+      datetext   = if date == ""
                        then "" 
-                       else "\\author{" ++ (joinWithSep "\\\\" 
-                            (map stringToConTeXt authors)) ++ "}\n"
-      datetext = if date == ""
-                    then "" 
-                    else "\\date{" ++ stringToConTeXt date ++ "}\n"
-      maketitle = if null title then "" else "\\maketitle\n\n" 
+                       else stringToConTeXt date
+      titleblock = "\\doctitle{" ++ titletext ++ "}\n\
+                   \ \\author{" ++ authorstext ++ "}\n\
+                   \ \\date{" ++ datetext ++ "}\n\n"
       secnumline = if (writerNumberSections options)
                       then "" 
                       else "\\setcounter{secnumdepth}{0}\n" 
       header     = writerHeader options in
-  header ++ secnumline ++ titletext ++ authorstext ++ datetext ++ 
-  "\\begin{document}\n" ++ maketitle
+  header ++ secnumline ++ titleblock ++ "\\starttext\n\\maketitle\n\n"
 
 -- escape things as needed for ConTeXt (also ldots, dashes, quotes, etc.) 
 
@@ -157,7 +160,7 @@ printDecimal = printf "%.2f"
 
 tableColumnWidths cols = map (length . (concatMap blockToConTeXt)) cols
 
-tableRowToConTeXt cols = joinWithSep " & " (map (concatMap blockToConTeXt) cols) ++ "\\\\\n"
+tableRowToConTeXt cols = joinWithSep " & " (map (concatMap blockToConTeXt) cols) ++ "\\hfil\\break\n"
 
 listItemToConTeXt list = "\\item " ++ 
     (concatMap blockToConTeXt list) 
@@ -198,7 +201,7 @@ inlineToConTeXt Ellipses = "\\ldots{}"
 inlineToConTeXt (Str str) = stringToConTeXt str
 inlineToConTeXt (TeX str) = str
 inlineToConTeXt (HtmlInline str) = ""
-inlineToConTeXt (LineBreak) = "\\\\\n"
+inlineToConTeXt (LineBreak) = "\\hfil\\break\n"
 inlineToConTeXt Space = " "
 inlineToConTeXt (Link text (src, tit)) = 
     "\\href{" ++ src ++ "}{" ++ (inlineListToConTeXt (deVerb text)) ++ "}"
