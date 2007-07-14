@@ -1,0 +1,8 @@
+\enableregime[utf]
+\setuppapersize[letter][letter]
+\setuplayout[topspace=0.5in, backspace=1in, header=24pt, footer=36pt,
+  height=middle, width=middle]
+\setuppagenumbering[location={footer,center}, style=bold]
+\setupbodyfont[11pt]
+\setupwhitespace[medium]  % inter-paragraph spacing
+
