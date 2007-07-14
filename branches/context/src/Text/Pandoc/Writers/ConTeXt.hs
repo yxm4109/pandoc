@@ -154,7 +154,7 @@ printDecimal = printf "%.2f"
 
 tableColumnWidths cols = map (length . (concatMap blockToConTeXt)) cols
 
-tableRowToConTeXt cols = joinWithSep " \\NC " (map (concatMap blockToConTeXt) cols) ++ "\\AR\n"
+tableRowToConTeXt cols = concatMap (("\\NC " ++) . (concatMap blockToConTeXt)) cols ++ "\\NC\\AR\n"
 
 listItemToConTeXt list = "\\item " ++ concatMap blockToConTeXt list
 
