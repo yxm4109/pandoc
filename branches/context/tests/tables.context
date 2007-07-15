@@ -1,25 +1,25 @@
 Simple table with caption:
 
 \placetable[here]{Demonstration of simple table syntax.}
-\starttable[|rp(0.15\textwidth)|lp(0.09\textwidth)|p(0.16\textwidth)|lp(0.13\textwidth)|]
+\starttable[|rp(0.15\textwidth)|lp(0.09\textwidth)|cp(0.16\textwidth)|lp(0.13\textwidth)|]
 \HL
-Right
+\NC Right
 \NC Left
 \NC Center
 \NC Default
 \NC\AR
 \HL
-12
+\NC 12
 \NC 12
 \NC 12
 \NC 12
 \NC\AR
-123
+\NC 123
 \NC 123
 \NC 123
 \NC 123
 \NC\AR
-1
+\NC 1
 \NC 1
 \NC 1
 \NC 1
@@ -29,25 +29,26 @@ Right
 
 Simple table without caption:
 
-\starttable[|rp(0.15\textwidth)|lp(0.09\textwidth)|p(0.16\textwidth)|lp(0.13\textwidth)|]
+\placetable[here]{none}
+\starttable[|rp(0.15\textwidth)|lp(0.09\textwidth)|cp(0.16\textwidth)|lp(0.13\textwidth)|]
 \HL
-Right
+\NC Right
 \NC Left
 \NC Center
 \NC Default
 \NC\AR
 \HL
-12
+\NC 12
 \NC 12
 \NC 12
 \NC 12
 \NC\AR
-123
+\NC 123
 \NC 123
 \NC 123
 \NC 123
 \NC\AR
-1
+\NC 1
 \NC 1
 \NC 1
 \NC 1
@@ -58,25 +59,25 @@ Right
 Simple table indented two spaces:
 
 \placetable[here]{Demonstration of simple table syntax.}
-\starttable[|rp(0.15\textwidth)|lp(0.09\textwidth)|p(0.16\textwidth)|lp(0.13\textwidth)|]
+\starttable[|rp(0.15\textwidth)|lp(0.09\textwidth)|cp(0.16\textwidth)|lp(0.13\textwidth)|]
 \HL
-Right
+\NC Right
 \NC Left
 \NC Center
 \NC Default
 \NC\AR
 \HL
-12
+\NC 12
 \NC 12
 \NC 12
 \NC 12
 \NC\AR
-123
+\NC 123
 \NC 123
 \NC 123
 \NC 123
 \NC\AR
-1
+\NC 1
 \NC 1
 \NC 1
 \NC 1
@@ -87,20 +88,20 @@ Right
 Multiline table with caption:
 
 \placetable[here]{Here's the caption. It may span multiple lines.}
-\starttable[|p(0.15\textwidth)|lp(0.14\textwidth)|rp(0.16\textwidth)|lp(0.34\textwidth)|]
+\starttable[|cp(0.15\textwidth)|lp(0.14\textwidth)|rp(0.16\textwidth)|lp(0.34\textwidth)|]
 \HL
-Centered Header
+\NC Centered Header
 \NC Left Aligned
 \NC Right Aligned
 \NC Default aligned
 \NC\AR
 \HL
-First
+\NC First
 \NC row
 \NC 12.0
 \NC Example of a row that spans multiple lines.
 \NC\AR
-Second
+\NC Second
 \NC row
 \NC 5.0
 \NC Here's another one. Note the blank line between rows.
@@ -110,20 +111,21 @@ Second
 
 Multiline table without caption:
 
-\starttable[|p(0.15\textwidth)|lp(0.14\textwidth)|rp(0.16\textwidth)|lp(0.34\textwidth)|]
+\placetable[here]{none}
+\starttable[|cp(0.15\textwidth)|lp(0.14\textwidth)|rp(0.16\textwidth)|lp(0.34\textwidth)|]
 \HL
-Centered Header
+\NC Centered Header
 \NC Left Aligned
 \NC Right Aligned
 \NC Default aligned
 \NC\AR
 \HL
-First
+\NC First
 \NC row
 \NC 12.0
 \NC Example of a row that spans multiple lines.
 \NC\AR
-Second
+\NC Second
 \NC row
 \NC 5.0
 \NC Here's another one. Note the blank line between rows.
