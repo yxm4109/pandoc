@@ -75,23 +75,29 @@ latexHeader options (Meta title authors date) =
   header ++ secnumline ++ titletext ++ authorstext ++ datetext ++ 
   "\\begin{document}\n" ++ maketitle
 
--- escape things as needed for LaTeX (also ldots, dashes, quotes, etc.) 
+-- escape things as needed for LaTeX
 
-escapeBrackets  = backslashEscape "{}"
-escapeSpecial   = backslashEscape "$%&~_#"
-
-escapeBackslash = substitute "\\" "\\textbackslash{}" 
-fixBackslash    = substitute "\\textbackslash\\{\\}" "\\textbackslash{}"
-escapeHat       = substitute "^" "\\^{}"
-escapeBar       = substitute "|" "\\textbar{}"
-escapeLt        = substitute "<" "\\textless{}"
-escapeGt        = substitute ">" "\\textgreater{}"
+escapeCharForLaTeX :: Char -> String
+escapeCharForLaTeX ch =
+  case ch of
+       '\\' -> "\\textbackslash{}"
+       '{'  -> "\\{"
+       '}'  -> "\\}"
+       '$'  -> "\\$"
+       '%'  -> "\\%"
+       '&'  -> "\\&"
+       '~'  -> "\\~"
+       '_'  -> "\\_"
+       '#'  -> "\\#"
+       '^'  -> "\\^{}"
+       '|'  -> "\\textbar{}"
+       '<'  -> "\\textless{}"
+       '>'  -> "\\textgreater{}"
+       x    -> [x]
 
 -- | Escape string for LaTeX
 stringToLaTeX :: String -> String
-stringToLaTeX = escapeGt . escapeLt . escapeBar . escapeHat . 
-                escapeSpecial . fixBackslash . escapeBrackets . 
-                escapeBackslash 
+stringToLaTeX = concatMap escapeCharForLaTeX
 
 -- | Remove all code elements from list of inline elements
 -- (because it's illegal to have a \\verb inside a command argument)
@@ -154,8 +160,6 @@ blockToLaTeX (Table caption aligns widths heads rows) =
 
 printDecimal :: Float -> String
 printDecimal = printf "%.2f" 
-
-tableColumnWidths cols = map (length . (concatMap blockToLaTeX)) cols
 
 tableRowToLaTeX cols = joinWithSep " & " (map (concatMap blockToLaTeX) cols) ++ "\\\\\n"
 
