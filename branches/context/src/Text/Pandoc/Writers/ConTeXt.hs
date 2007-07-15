@@ -33,50 +33,56 @@ module Text.Pandoc.Writers.ConTeXt (
 import Text.Pandoc.Definition
 import Text.Pandoc.Shared
 import Text.Printf ( printf )
-import Data.List ( (\\) )
+import Data.List ( (\\), intersperse )
+import Control.Monad.State
+
+type WriterState = Int -- number of next URL reference 
 
 -- | Convert Pandoc to ConTeXt.
 writeConTeXt :: WriterOptions -> Pandoc -> String
-writeConTeXt options (Pandoc meta blocks) = 
-  let body = (writerIncludeBefore options) ++ 
-             (concatMap blockToConTeXt blocks) ++
-             (writerIncludeAfter options)
-      head = if writerStandalone options
-                then latexHeader options meta
-                else ""
-      toc  = if writerTableOfContents options
+writeConTeXt options document = 
+  evalState (pandocToConTeXt options document) 1 
+
+pandocToConTeXt :: WriterOptions -> Pandoc -> State WriterState String
+pandocToConTeXt options (Pandoc meta blocks) = do
+  main    <- blockListToConTeXt blocks 
+  let body = writerIncludeBefore options ++ main ++ writerIncludeAfter options
+  head    <- if writerStandalone options
+                then contextHeader options meta
+                else return ""
+  let toc  = if writerTableOfContents options
                 then "\\placecontent\n\n"
                 else "" 
-      foot = if writerStandalone options
+  let foot = if writerStandalone options
                 then "\n\\stoptext\n"
                 else ""
-  in  head ++ toc ++ body ++ foot
+  return $ head ++ toc ++ body ++ foot
 
 -- | Insert bibliographic information into ConTeXt header.
-latexHeader :: WriterOptions -- ^ Options, including ConTeXt header
-            -> Meta          -- ^ Meta with bibliographic information
-            -> String
-latexHeader options (Meta title authors date) =
-  let titletext = if null title
-                     then "" 
+contextHeader :: WriterOptions -- ^ Options, including ConTeXt header
+              -> Meta          -- ^ Meta with bibliographic information
+              -> State WriterState String
+contextHeader options (Meta title authors date) = do
+  titletext    <- if null title
+                     then return "" 
                      else inlineListToConTeXt title
-      authorstext = if null authors
+  let authorstext = if null authors
                        then ""
                        else if length authors == 1
                             then stringToConTeXt $ head authors
                             else stringToConTeXt $ (joinWithSep ", " $
                                  init authors) ++ " & " ++ last authors
-      datetext   = if date == ""
+  let datetext   = if date == ""
                        then "" 
                        else stringToConTeXt date
-      titleblock = "\\doctitle{" ++ titletext ++ "}\n\
+  let titleblock = "\\doctitle{" ++ titletext ++ "}\n\
                    \ \\author{" ++ authorstext ++ "}\n\
                    \ \\date{" ++ datetext ++ "}\n\n"
-      setupheads = if (writerNumberSections options)
+  let setupheads = if (writerNumberSections options)
                       then "\\setupheads[sectionnumber=yes, style=\\bf]\n" 
                       else "\\setupheads[sectionnumber=no, style=\\bf]\n"
-      header     = writerHeader options in
-  header ++ setupheads ++ titleblock ++ "\\starttext\n\\maketitle\n\n"
+  let header     = writerHeader options
+  return $ header ++ setupheads ++ titleblock ++ "\\starttext\n\\maketitle\n\n"
 
 -- escape things as needed for ConTeXt
 
@@ -103,66 +109,74 @@ stringToConTeXt :: String -> String
 stringToConTeXt = concatMap escapeCharForConTeXt
 
 -- | Convert Pandoc block element to ConTeXt.
-blockToConTeXt :: Block -> String 
-blockToConTeXt Null = ""
-blockToConTeXt (Plain lst) = inlineListToConTeXt lst ++ "\n"
-blockToConTeXt (Para lst) = (inlineListToConTeXt lst) ++ "\n\n"
-blockToConTeXt (BlockQuote lst) = "\\startnarrower\n" ++ 
-    (concatMap blockToConTeXt lst) ++ "\\stopnarrower\n\n"
-blockToConTeXt (CodeBlock str) = "\\starttyping\n" ++ str ++ 
-    "\n\\stoptyping\n"
-blockToConTeXt (RawHtml str) = ""
-blockToConTeXt (BulletList lst) = "\\startltxitem\n" ++ 
-    concatMap listItemToConTeXt lst ++ "\\stopltxitem\n"
-blockToConTeXt (OrderedList lst) = "\\startltxenum\n" ++
-    concatMap listItemToConTeXt lst ++ "\\stopltxenum\n"
-blockToConTeXt (DefinitionList lst) = 
-    let defListItemToConTeXt (term, def) = "\\startdescr{" ++
-           inlineListToConTeXt term ++ "}\n" ++
-           concatMap blockToConTeXt def ++ "\n\\stopdescr\n"
-    in  concatMap defListItemToConTeXt lst ++ "\n"
-blockToConTeXt HorizontalRule = 
-    "\\thinrule\n\n"
-blockToConTeXt (Header level lst) = 
-    if (level > 0) && (level <= 3)
-       then "\\" ++ (concat (replicate (level - 1) "sub")) ++ "section{" ++ 
-            (inlineListToConTeXt lst) ++ "}\n\n"
-       else (inlineListToConTeXt lst) ++ "\n\n"
-blockToConTeXt (Table caption aligns widths heads rows) =
+blockToConTeXt :: Block -> State WriterState String 
+blockToConTeXt Null = return ""
+blockToConTeXt (Plain lst) = inlineListToConTeXt lst >>= (return . (++ "\n"))
+blockToConTeXt (Para lst) = inlineListToConTeXt lst >>= (return . (++ "\n\n"))
+blockToConTeXt (BlockQuote lst) = do
+  contents <- blockListToConTeXt lst
+  return $ "\\startnarrower\n" ++ contents ++ "\\stopnarrower\n\n"
+blockToConTeXt (CodeBlock str) = 
+  return $ "\\starttyping\n" ++ str ++ "\n\\stoptyping\n"
+blockToConTeXt (RawHtml str) = return ""
+blockToConTeXt (BulletList lst) = do 
+  contents <- mapM listItemToConTeXt lst
+  return $ "\\startltxitem\n" ++ concat contents ++ "\\stopltxitem\n"
+blockToConTeXt (OrderedList lst) = do
+  contents <- mapM listItemToConTeXt lst
+  return $  "\\startltxenum\n" ++ concat contents ++ "\\stopltxenum\n"
+blockToConTeXt (DefinitionList lst) =
+  mapM defListItemToConTeXt lst >>= (return . (++ "\n") . concat)
+blockToConTeXt HorizontalRule = return "\\thinrule\n\n"
+blockToConTeXt (Header level lst) = do
+  contents <- inlineListToConTeXt lst
+  return $ if (level > 0) && (level <= 3)
+              then "\\" ++ (concat (replicate (level - 1) "sub")) ++ 
+                   "section{" ++ contents ++ "}\n\n"
+              else contents ++ "\n\n"
+blockToConTeXt (Table caption aligns widths heads rows) = do
     let colWidths = map printDecimal widths
-        colDescriptor colWidth alignment = (case alignment of
-                                               AlignLeft    -> "l"
-                                               AlignRight   -> "r"
-                                               AlignCenter  -> ""
-                                               AlignDefault -> "l") ++
+    let colDescriptor colWidth alignment = (case alignment of
+                                               AlignLeft    -> 'l' 
+                                               AlignRight   -> 'r'
+                                               AlignCenter  -> 'c'
+                                               AlignDefault -> 'l'):
                                            "p(" ++ colWidth ++ "\\textwidth)|"
-        colDescriptors = "|" ++ (concat $ 
+    let colDescriptors = "|" ++ (concat $ 
                                  zipWith colDescriptor colWidths aligns)
-        headers        = tableRowToConTeXt heads 
-        captionText    = inlineListToConTeXt caption 
-        captionCode    = if null captionText
-                            then ""
-                            else "\\placetable[here]{" ++ captionText ++ "}\n"
-        tableBody      = "\\starttable[" ++ colDescriptors ++ "]\n" ++
-                         "\\HL\n" ++ headers ++ "\\HL\n" ++ 
-                         (concatMap tableRowToConTeXt rows) ++ "\\HL\n" ++
-                         "\\stoptable\n" 
-    in  captionCode ++ tableBody ++ "\n"
+    headers <- tableRowToConTeXt heads 
+    captionText <- inlineListToConTeXt caption 
+    let captionText' = if null caption then "none" else captionText
+    rows' <- mapM tableRowToConTeXt rows 
+    return $ "\\placetable[here]{" ++ captionText' ++ "}\n\\starttable[" ++ 
+             colDescriptors ++ "]\n" ++ "\\HL\n" ++ headers ++ "\\HL\n" ++ 
+             concat rows' ++ "\\HL\n\\stoptable\n\n" 
 
 printDecimal :: Float -> String
 printDecimal = printf "%.2f" 
 
-tableColumnWidths cols = map (length . (concatMap blockToConTeXt)) cols
+tableRowToConTeXt cols = do
+  cols' <- mapM blockListToConTeXt cols
+  return $ "\\NC " ++ (concat $ intersperse "\\NC " cols') ++ "\\NC\\AR\n"
 
-tableRowToConTeXt cols = concatMap (("\\NC " ++) . (concatMap blockToConTeXt)) cols ++ "\\NC\\AR\n"
+listItemToConTeXt list = do
+  contents <- blockListToConTeXt list
+  return $ "\\item " ++ contents
 
-listItemToConTeXt list = "\\item " ++ concatMap blockToConTeXt list
+defListItemToConTeXt (term, def) = do
+  term' <- inlineListToConTeXt term
+  def'  <- blockListToConTeXt def
+  return $ "\\startdescr{" ++ term' ++ "}\n" ++
+           def' ++ "\n\\stopdescr\n"
+
+-- | Convert list of block elements to ConTeXt.
+blockListToConTeXt :: [Block] -> State WriterState String
+blockListToConTeXt lst = mapM blockToConTeXt lst >>= (return . concat)
 
 -- | Convert list of inline elements to ConTeXt.
 inlineListToConTeXt :: [Inline]  -- ^ Inlines to convert
-                    -> String
-inlineListToConTeXt lst = 
-  concatMap inlineToConTeXt lst
+                    -> State WriterState String
+inlineListToConTeXt lst = mapM inlineToConTeXt lst >>= (return . concat)
 
 isQuoted :: Inline -> Bool
 isQuoted (Quoted _ _) = True
@@ -171,29 +185,41 @@ isQuoted _ = False
 
 -- | Convert inline element to ConTeXt
 inlineToConTeXt :: Inline    -- ^ Inline to convert
-              -> String
-inlineToConTeXt (Emph lst) = "{\\em " ++ 
-    (inlineListToConTeXt lst) ++ "}"
-inlineToConTeXt (Strong lst) = "{\\bf " ++ 
-    (inlineListToConTeXt lst) ++ "}"
-inlineToConTeXt (Code str) = "\\type{" ++ str ++ "}"
-inlineToConTeXt (Quoted SingleQuote lst) = 
-  "\\quote{" ++ inlineListToConTeXt lst ++ "}"
-inlineToConTeXt (Quoted DoubleQuote lst) =
-  "\\quotation{" ++ inlineListToConTeXt lst ++ "}"
-inlineToConTeXt Apostrophe = "'"
-inlineToConTeXt EmDash = "---"
-inlineToConTeXt EnDash = "--"
-inlineToConTeXt Ellipses = "\\ldots{}"
-inlineToConTeXt (Str str) = stringToConTeXt str
-inlineToConTeXt (TeX str) = str
-inlineToConTeXt (HtmlInline str) = ""
-inlineToConTeXt (LineBreak) = "\\hfil\\break\n"
-inlineToConTeXt Space = " "
-inlineToConTeXt (Link text (src, _)) = 
-  "\\useurl[x][" ++ src ++ "][][" ++ inlineListToConTeXt text ++ "]\\from[x]" 
-inlineToConTeXt (Image alternate (src, tit)) = 
-  "\\placefigure\n[]\n[fig:" ++ inlineListToConTeXt alternate ++ "]\n{" ++
-  tit ++ "}\n{\\externalfigure[" ++ src ++ "]}" 
-inlineToConTeXt (Note contents) = 
-    "\\footnote{" ++ concatMap blockToConTeXt contents ++ "}"
+                -> State WriterState String
+inlineToConTeXt (Emph lst) = do
+  contents <- inlineListToConTeXt lst
+  return $ "{\\em " ++ contents ++ "}" 
+inlineToConTeXt (Strong lst) = do
+  contents <- inlineListToConTeXt lst
+  return $ "{\\bf " ++ contents ++ "}" 
+inlineToConTeXt (Code str) = return $ "\\type{" ++ str ++ "}"
+inlineToConTeXt (Quoted SingleQuote lst) = do
+  contents <- inlineListToConTeXt lst
+  return $ "\\quote{" ++ contents ++ "}"
+inlineToConTeXt (Quoted DoubleQuote lst) = do
+  contents <- inlineListToConTeXt lst
+  return $ "\\quotation{" ++ contents ++ "}"
+inlineToConTeXt Apostrophe = return "'"
+inlineToConTeXt EmDash = return "---"
+inlineToConTeXt EnDash = return "--"
+inlineToConTeXt Ellipses = return "\\ldots{}"
+inlineToConTeXt (Str str) = return $ stringToConTeXt str
+inlineToConTeXt (TeX str) = return str
+inlineToConTeXt (HtmlInline str) = return ""
+inlineToConTeXt (LineBreak) = return "\\hfil\\break\n"
+inlineToConTeXt Space = return " "
+inlineToConTeXt (Link text (src, _)) = do
+  next <- get
+  put (next + 1)
+  let ref = show next
+  label <- inlineListToConTeXt text
+  return $ "\\useurl[" ++ ref ++ "][" ++ src ++ "][][" ++ label ++ 
+           "]\\from[" ++ ref ++ "]" 
+inlineToConTeXt (Image alternate (src, tit)) = do
+  alt <- inlineListToConTeXt alternate
+  return $ "\\placefigure\n[]\n[fig:" ++ alt ++ "]\n{" ++
+           tit ++ "}\n{\\externalfigure[" ++ src ++ "]}" 
+inlineToConTeXt (Note contents) = do
+  contents' <- blockListToConTeXt contents
+  return $ "\\footnote{" ++ contents' ++ "}"
+
