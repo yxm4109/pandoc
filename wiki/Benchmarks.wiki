@@ -1,38 +1,46 @@
-#summary Benchmarks comparing Pandoc to Markdown.pl.
+﻿#summary Benchmarks comparing Pandoc to Markdown.pl.
 
-= Pandoc r446 =
-
-This benchmark uses the sources for Allan Odgaard's [http://macromates.com/textmate/manual/ TextMate manual], available at
-http://macromates.com/textmate/manual/source.tbz.  The test machine is a
-Pentium M 1.4GHz, 1G RAM, running debian linux.  Pandoc was compiled with
-the '-O0' optimization flag.
+= Pandoc r836 =
+This benchmark uses the sources for Allan Odgaard's
+[http://macromates.com/textmate/manual/ TextMate manual], available at
+http://macromates.com/textmate/manual/source.tbz. These sources were
+concatenated into a single file, `textmate_manual.txt`, 178K in size. The
+test machine is an Intel Core Duo 1.66GHz, 1G RAM, running Ubuntu linux.
+Pandoc was compiled with the '-O0' optimization flag.
 
 {{{
-    roktas@cobalt:~$ du textmate_manual.txt
-    176K    textmate_manual.txt
+$ Markdown.pl --version
 
-    roktas@cobalt:~$ time pandoc textmate_manual.txt >/dev/null
+This is Markdown, version 1.0.2b8.
+Copyright 2004 John Gruber
+http://daringfireball.net/projects/markdown/
 
-    real    0m6.006s
-    user    0m5.376s
-    sys     0m0.020s
+$ time Markdown.pl textmate_manual.txt >/dev/null
 
-    roktas@cobalt:~$ time pandoc --strict textmate_manual.txt >/dev/null
+real    0m15.470s
+user    0m15.457s
+sys     0m0.012s
+$ 
+$ markdown --version
 
-    real    0m6.938s
-    user    0m5.724s
-    sys     0m0.024s
+This is Markdown, version 1.0.1.
+Copyright 2004 John Gruber
+http://daringfireball.net/projects/markdown/
 
-    roktas@cobalt:~$ time markdown-1.0.1 textmate_manual.txt >/dev/null
+$ time markdown textmate_manual.txt >/dev/null
 
-    real    0m11.769s
-    user    0m10.937s
-    sys     0m0.028s
+real    0m10.300s
+user    0m10.249s
+sys     0m0.020s
+$ time ./pandoc textmate_manual.txt >/dev/null
 
+real    0m7.061s
+user    0m7.004s
+sys     0m0.052s
+$ time ./pandoc --strict textmate_manual.txt >/dev/null
 
-    roktas@cobalt:~$ time markdown-1.0.2b7 textmate_manual.txt >/dev/null
-
-    real    0m23.575s
-    user    0m19.581s
-    sys     0m2.060s
+real    0m4.005s
+user    0m3.984s
+sys     0m0.016s
+$ 
 }}}
