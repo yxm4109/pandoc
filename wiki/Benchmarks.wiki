@@ -20,7 +20,7 @@ $ time Markdown.pl textmate_manual.txt >/dev/null
 real    0m15.470s
 user    0m15.457s
 sys     0m0.012s
-$ 
+
 $ markdown --version
 
 This is Markdown, version 1.0.1.
@@ -32,11 +32,13 @@ $ time markdown textmate_manual.txt >/dev/null
 real    0m10.300s
 user    0m10.249s
 sys     0m0.020s
+
 $ time ./pandoc textmate_manual.txt >/dev/null
 
 real    0m7.061s
 user    0m7.004s
 sys     0m0.052s
+
 $ time ./pandoc --strict textmate_manual.txt >/dev/null
 
 real    0m4.005s
@@ -44,3 +46,21 @@ user    0m3.984s
 sys     0m0.016s
 $ 
 }}}
+
+Compiling pandoc with -O1 does not seem to yield a big
+advantage (but takes much longer and yields a binary twice as large):
+
+{{{
+$ time ./pandoc textmate_manual.txt >/dev/null
+
+real    0m6.065s
+user    0m5.988s
+sys     0m0.060s
+
+$ time ./pandoc --strict textmate_manual.txt >/dev/null
+
+real    0m3.394s
+user    0m3.348s
+sys     0m0.012s
+}}}
+
