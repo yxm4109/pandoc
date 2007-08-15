@@ -2,38 +2,6 @@
 
 == Improvements ==
 
-=== Definition Lists ===
-
-PHP Markdown Extra syntax:
-http://www.michelf.com/projects/php-markdown/extra/#def-list
-
-I prefer the restructured text way:
-{{{
-term 1
-	Definition 1.
-
-term 2
-	Definition 2, par. 1.
-
-	Definition 2, par. 2
-}}}
-
-In docbook, these come out as variablelists.
-In latex, description environments.
-Note that latex description environments allow only one term
-and one definition.  Docbook variablelists allow multiple
-terms but only one defintion.
-
-Done:  basic parser.
-
-Todo:  definition, writers, html and latex readers, utility routines
-in shared...
-
-=== Man page output ===
-
-One we have definition lists, we can add a man page writer.
-(Definition lists will be used for options.)
-
 === Footnotes ===
 
 Jonathan Deber notes on the Markdown list:
@@ -131,9 +99,8 @@ These should also be supported as the most general table construct
 (though they're a pain to write).  Unlike the other two types,
 these can contain multiple blocks in a cell.
 
-Currently 1 and 3 are supported in the repository version of pandoc.  It would
-not be hard to add 2.  Supported writers so far are latex, docbook, HTML.
-Think about adding Markdown, RTF, and RST writer support.
+Currently 1 and 3 are supported (in pandoc 4.0).  It would
+not be hard to add 2. 
 
 === Attributes ===
 
@@ -158,14 +125,6 @@ Or use RST's way, which is less likely to conflict with anything:
 :Company: X Corp.
 }}}
 
-=== Data structure ===
-
-Consider changing the default Pandoc data structure so that it is more "hierarchical":
-  * Instead of section heading blocks, it would have section blocks, each with a title and a list of other elements, which might in turn be sections.
-  * It wouldn't be too hard to change the readers to parse this way.  And this would allow more flexibility for the writers, especially for the proposed Docbook writer, which needs a hierarchical structure of sections. 
-  * Potential problem:  some existing code assumes e.g. that note blocks are at the outer level (see RTF writer); this would have to be rewritten.
-  * It would be good to have a general "tree walker" utility function that makes it easy to, say, walk through the hierarchy filtering out note blocks.
-
 === Validation ===
 
 Note that pandoc's HTML output fails to validate completely (w3c), either as HTML or as XHTML.
@@ -178,22 +137,6 @@ Note that pandoc's HTML output fails to validate completely (w3c), either as HTM
 === Configuration file ===
 
 Add a configuration file for default options?
-
-=== Table of contents ===
-
-Add format-independent "table of contents" macro.  Something like this:
-{{{
-%contents
-}}}
-or (maruku)
-{{{
-{toc}
-}}}
-in a block by itself.  To implement this, we might add a 'TableOfContents'
-block type.  In latex output, this would come out as `\tableofcontents`,
-in HTML, Markdown, and RTF, we'd have to parse the document for headers
-(or sections - see below) and build a nested list with internal links.
-In RST, we could just use the existing contents directive. 
 
 === Acronyms/abbreviations ===
 
