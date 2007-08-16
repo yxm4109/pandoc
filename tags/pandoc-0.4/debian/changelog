@@ -1,0 +1,644 @@
+pandoc (0.4) unstable; urgency=low
+
+  [ John MacFarlane ]
+
+  * Added two new output formats: groff man pages and ConTeXt. By
+    default, output files with extensions ".ctx" and ".context" are
+    assumed to be ConTeXt, and output files with single-digit extensions
+    are assumed to be man pages.
+
+  * Enhanced ordered lists (documented in README, under Lists):
+    + The OrderedList block element now stores information about
+      list number style, list number delimiter, and starting number.
+    + The readers parse this information when possible.
+    + The writers use this information to style ordered lists.
+    + The enhancement can be disabled using the --strict option. 
+
+  * Added support for tables (with a new Table block element). Two kinds
+    of tables are supported: a simple table with one-line rows, and a
+    more complex variety with multiline rows. All output formats are
+    supported, but only markdown tables are parsed at the moment. The
+    syntax is documented in README.
+
+  * Added support for definition lists (with a new DefinitionList block
+    element). All output and input formats are supported. The syntax is
+    documented in README.
+
+  * Added support for superscripts and subscripts (with new Superscript
+    and Subscript inline elements).  All input and output
+    formats.  The syntax is documented in README.
+
+  * Added support for strikeout (with a new Strikeout inline element).
+    All input and output formats are supported. Thanks to Bradley Kuhn,
+    who contributed a patch. The syntax is documented in README. Resolves
+    Issue #18.
+
+  * Added a --toc|--table-of-contents option.  This causes an automatically
+    generated table of contents (or an instruction that creates one) to
+    be inserted at the beginning of the document. Not supported in S5,
+    DocBook, or man page writers.
+
+  * Modified the -m|--asciimathml option:
+
+    + If an optional URL argument is provided, a link is inserted
+      instead of the contents of the ASCIIMathML.js script.
+    + Nothing is inserted unless the document actually contains
+      LaTeX math.
+
+  * Removed Blank block element as unnecessary.
+
+  * Removed Key and Note blocks from the Pandoc data structure. All
+    links are now stored as explicit links, and note contents are
+    stored with the (inline) notes.
+
+    + All link Targets are now explicit (URL, title) pairs; there
+      is no longer a 'Ref' target.
+    + Markdown and RST parsers now need to extract data from key and
+      note blocks and insert them into the relevant inline elements.
+      Other parsers have been simplified, since there is no longer any need
+      to construct separate key and note blocks.
+    + Markdown, RST, and HTML writers need to construct lists of
+      notes; Markdown and RST writers need to construct lists of link
+      references (when the --reference-links option is specified); and
+      the RST writer needs to construct a list of image substitution
+      references. All writers have been rewritten to use the State monad
+      when state is required.
+    + Several functions (generateReference, keyTable,
+      replaceReferenceLinks, replaceRefLinksBlockList, and some auxiliaries
+      used by them) have been removed from Text.Pandoc.Shared, since
+      they are no longer needed. New functions and data structures
+      (Reference, isNoteBlock, isKeyBlock, isLineClump) have been
+      added. The functions inTags, selfClosingTag, inTagsSimple, and
+      inTagsIndented have been moved to the DocBook writer, since that
+      is now the only module that uses them. NoteTable is now exported
+      in Text.Pandoc.Shared.
+    + Added stateKeys and stateNotes to ParserState; removed stateKeyBlocks,
+      stateKeysUsed, stateNoteBlocks, stateNoteIdentifiers, stateInlineLinks. 
+    + Added writerNotes and writerReferenceLinks to WriterOptions.
+
+  * Added Text.Pandoc module that exports basic readers, writers,
+    definitions, and utility functions. This should export everything
+    needed for most uses of Pandoc libraries. The haddock documentation
+    includes a short example program.
+
+  * Text.Pandoc.ASCIIMathML is no longer an exported module.
+
+  * Added Text.Pandoc.Blocks module to help in printing markdown
+    and RST tables.  This module provides functions for working with
+    fixed-width blocks of text--e.g., placing them side by side, as
+    in a table row.
+
+  * Refactored to avoid reliance on Haskell's Text.Regex library, which
+    (a) is slow, and (b) does not properly handle unicode.  This fixed
+    some strange bugs, e.g. in parsing S-cedilla, and improved performance.
+
+    + Replaced 'gsub' with a general list function  'substitute'
+      that does not rely on Text.Regex.
+    + Rewrote extractTagType in HTML reader so that it doesn't use
+      regexs.
+    + In Markdown reader, replaced email regex test with a custom email
+      autolink parser (autoLinkEmail). Also replaced selfClosingTag regex
+      with a custom function isSelfClosingTag.
+    + Modified Docbook writer so that it doesn't rely on Text.Regex for
+      detecting 'mailto' links.
+    + Removed escapePreservingRegex and reamped entity-handling
+      functions in Text.Pandoc.Shared and Text.Pandoc.CharacterReferences to
+      avoid reliance on Text.Regex (see below on character reference
+      handling changes).
+
+  * Renamed Text.Pandoc.Entities as Text.Pandoc.CharacterReferences.
+
+  * Changed handling of XML entities.  Entities are now parsed (and unicode
+    characters returned) in the Markdown and HTML readers, rather than being
+    handled in the writers.  In HTML and Docbook writers, UTF-8 is now used
+    instead of entities for characters above 128.  This makes the HTML and 
+    DocBook output much more readable and more easily editable.
+
+    + Removed sgmlHexEntity, sgmlDecimalEntity, sgmlNamedEntity, and
+      sgmlCharacterEntity regexes from Text.Pandoc.Shared.
+    + Renamed escapeSGMLChar to escapeCharForXML.  Added escapeStringForXML.
+      Moved both functions to Text.Pandoc.Writers.Docbook.
+    + Added characterReference parser to Text.Pandoc.CharacterReferences.
+      This parses a string and return a unicode character.
+    + Rewrote decodeCharacterReferences to use the new parser instead of 
+      Text.Regex.
+    + Added new charRef parser for Markdown and HTML, which replaces the
+      old 'entity' parser. Added '&' as a special character in Markdown reader.
+    + Modified HTML and Markdown readers to call decodeEntities on all raw
+      strings (e.g. authors, dates, link titles), to ensure that no 
+      unprocessed entities are included in the native representation of
+      the document.  (In the HTML reader, most of this work is done by a 
+      change in extractAttributeName.)
+    + In XML and Markdown output, escape unicode nonbreaking space as '&nbsp;', 
+      since a unicode non-breaking space is impossible to distinguish visually
+      from a regular space.  (Resolves Issue #3.)
+    + Removed encodeEntitiesNumerical.
+    + Use Data.Map for entityTable and (new) reverseEntityTable, for a
+      slight performance boost over the old association list.
+    + Removed unneeded decodeEntities from 'str' parser in HTML and
+      Markdown readers.
+
+  * Text.Pandoc.UTF8:  Renamed encodeUTF8 to toUTF8, decodeUTF8 to
+    fromUTF8, for clarity.
+
+  * Replaced old haskell98 module names replaced by hierarchical module
+    names, e.g. List by Data.List.  Removed haskell98 from dependencies
+    in pandoc.cabal, and added mtl (needed for state monad). Substituted
+    xhtml for html.
+
+  * Refactored and cleaned up character escaping in writers, using
+    backslashEscapes and escapeStringUsing functions.
+
+  * Instead of adding "\n\n" to the end of an input string in Main.hs,
+    this is now done in the readers. This makes the libraries behave
+    the way you'd expect from the pandoc program. Resolves Issue #10.
+
+  * URLs and email addresses in autolinks are now typeset as Code.
+
+  * In Main.hs, changed putStr to putStrLn -- mainly because MacOS X
+    doesn't display the whole output unless there's a line ending.
+
+  * Major code cleanup in all modules, for greater consistency, concision,
+    and readability.
+
+  * HTML reader:
+
+    + Fixed several bugs (extractTagType, attribute parsing).
+    + Remove Null blocks in lists of blocks when possible.
+    + Allow HTML comments as raw HTML inline.
+
+  * Markdown reader:
+
+    + Ordered list items may no longer begin with uppercase letters, or
+      letters greater than 'n'.  (This prevents first initials and page
+      reference, e.g. 'p. 400', from being parsed as beginning lists.)
+      Also, numbers beginning list items may no longer end with ')',
+      which is now allowed only after letters.  Note: These changes
+      may cause documents to be parsed differently. Users should take
+      care in upgrading.
+    + Changed autoLink parsing to conform better to Markdown.pl's
+      behavior. <google.com> is not treated as a link, but 
+      <http://google.com>, <ftp://google.com>, and <mailto:google@google.com>
+      are.
+    + Cleaned up handling of embedded quotes in link titles.  Now these are 
+      stored as a '"' character, not as '&quot;'.
+    + Use lookAhead parser for the 'first pass' (looking for reference keys),
+      instead of parsing normally, then using setInput to reset input.  This
+      yields a slight performance boost.
+    + Fixed several bugs in smart quote recognition.
+    + Fixed bug in indentSpaces (which didn't properly handle
+      cases with mixed spaces and tabs).
+    + Consolidated 'text', 'special', and 'inline' into 'inline'.
+    + Fixed bug which allowed URL and title to be separated by multiple blank
+      lines in links and reference keys.  They can be on separate lines but
+      can't have blank lines between them.
+    + Correctly handle bracketed text inside inline footnotes and links,using
+      new function inlinesInBalanced.  Resolves Issue #14. 
+    + Fixed bug in footnotes: links in footnotes were not being
+      processed. Solution: three-stage parse. First, get all the
+      reference keys and add information to state. Next, get all the
+      notes and add information to state. (Reference keys may be needed
+      at this stage.) Finally, parse everything else.
+    + Replaced named constants like 'emphStart' with literals.
+    + Removed an extra occurance of escapedChar in definition of inline.
+
+  * RST reader:
+
+    + Allow the URI in a RST hyperlink target to start on the line
+      after the reference key.
+    + Added 'try' in front of 'string', where needed, or used a different
+      parser.  This fixes a bug where ````` would not be correctly parsed as
+      a verbatim `.
+    + Fixed slow performance in parsing inline literals in RST reader.  The 
+      problem was that ``#`` was seen by 'inline' as a potential link or image.
+      Fix:  inserted 'notFollowedBy (char '`')' in link parsers.
+      Resolves Issue #8.
+    + Use lookAhead instead of getInput/setInput in RST reader.  Removed
+      unneeded getState call, since lookAhead automatically saves and
+      restores the parser state.
+    + Allow hyperlink target URIs to be split over multiple lines, and
+      to start on the line after the reference. Resolves Issue #7.
+    + Fixed handling of autolinks.
+
+  * LaTeX reader:
+
+    + Replaced 'choice [(try (string ...), ...]' idiom with 'oneOfStrings',
+      for clarity.
+    + Added clauses for tilde and caret. Tilde is \ensuremath{\sim}, and
+      caret is \^{}, not \^ as before.
+    + Added parsing for \url.
+    + Parse \texttt{} as code, provided there's nothing fancy inside.
+
+  * HTML writer:
+
+    + Modified HTML writer to use the Text.XHtml library. This results
+      in cleaner, faster code, and it makes it easier to use Pandoc in
+      other projects, like wikis, which use Text.XHtml. Two functions are
+      now provided, writeHtml and writeHtmlString: the former outputs an
+      Html structure, the latter a rendered string. The S5 writer is also
+      changed, in parallel ways (writeS5, writeS5String). 
+    + The Html header is now written programmatically, so it has been
+      removed from the 'headers' directory. The S5 header is still
+      needed, but the doctype and some of the meta declarations have
+      been removed, since they are written programatically. This change
+      introduces a new dependency on the xhtml package.
+    + Fixed two bugs in email obfuscation involving improper escaping
+      of '&' in the <noscript> section and in --strict mode. Resolves
+      Issue #9.
+    + Fixed another bug in email obfuscation: If the text to be obfuscated
+      contains an entity, this needs to be decoded before obfuscation.
+      Thanks to thsutton for the patch. Resolves Issue #15.
+    + Changed the way the backlink is displayed in HTML footnotes.
+      Instead of appearing on a line by itself, it now generally
+      appears on the last line of the note.  (Exception:  when the
+      note does not end with a Plain or Para block.) This saves space
+      and looks better.
+    + Added automatic unique identifiers to headers:
+      - The identifier is derived from the header via a scheme
+        documented in README.
+      - WriterState now includes a list of header identifiers and a table
+        of contents in addition to notes.
+      - The function uniqueIdentifiers creates a list of unique identifiers
+        from a list of inline lists (e.g. headers).
+      - This list is part of WriterState and gets consumed by blockToHtml
+        each time a header is encountered.
+    + Include CSS for .strikethrough class in header only if strikethrough
+      text appears in the document.
+    + If the 'strict' option is specified, elements that do not appear in
+      standard markdown (like definition lists) are passed through as
+      raw HTML.
+    + Simplified treatment of autolinks, using pattern matching instead of
+      conditionals.
+
+  * Markdown writer:
+
+    + Links in markdown output are now printed as inline links by default,
+      rather than reference links.  A --reference-links option has been added
+      that forces links to be printed as reference links.  Resolves Issue #4.
+    + Use autolinks when possible.  Instead of [site.com](site.com), 
+      use <site.com>.
+
+  * LaTeX writer:
+
+    + Rewrote to use the State monad. The preamble now includes only those
+      packages that are actually required, given the document's content.
+      Thus, for example, if strikeout is not used, ulem is not required.
+      Modified LaTeXHeader accordingly.
+    + Modified LaTeX writer to insert '\,' between consecutive quotes.
+    + Removed unused function tableRowColumnWidths.
+    + Simplified code for escaping special characters.
+    + Leave extra blank line after \maketitle.
+    + Include empty '\author{}' when no author specified to avoid LaTeX
+      errors.
+    + Include fancyvrb code in header only if needed -- that is, only
+      if there is actually code in a footnote.
+    + Use \url{} for autolinks.
+    + Include [mathletters] option in ucs package, so that basic unicode
+      Greek letters will work correctly.
+
+  * RST writer:  Force blank line before lists, so that sublists will
+    be handled correctly.
+
+  * Docbook writer:  Fixed a bug:  email links with text, like
+    [foo](me@bar.baz), were being incorrectly treated as autolinks.
+
+  * Removed Text.ParserCombinators.Pandoc and moved all its functions to
+    Text.Pandoc.Shared.
+
+  * Text.Pandoc.Shared:
+
+    + Added defaultWriterOptions.
+    + Added writerTableOfContents to WriterOptions.
+    + Added writerIgnoreNotes option to WriterOptions.  This is needed
+      for processing header blocks for a table of contents, since notes on
+      headers should not appear in the TOC.
+    + Added prettyprinting for native Table format.
+    + Removed some unneeded imports.   
+    + Moved escape and nullBlock parsers from
+      Text.ParserCombinators.Pandoc, since the latter is for
+      general-purpose parsers that don't depend on Text.Pandoc.Definition.
+    + Moved isHeaderBlock from Text.Pandoc.Writers.HTML.
+    + Moved Element, headerAtLeast, and hierarchicalize from Docbook
+      writer, because HTML writer now uses these in constructing a table
+      of contents.
+    + Added clauses for new inline elements (Strikeout, Superscript,
+      Subscript) to refsMatch.
+    + Removed backslashEscape; added new functions escapeStringUsing and
+      backslashEscapes.
+    + Moved failIfStrict from markdown reader, since it is now used also
+      by the HTML reader.
+    + Added a 'try' to the definition of indentSpaces.
+    + In definition of 'reference', added check to make sure it's not a note
+      reference.
+    + Added functions: camelCaseToHyphenated, toRomanNumeral,
+      anyOrderedListMarker, orderedListmarker, orderedListMarkers,
+      charsInBalanced', withHorizDisplacement, romanNumeral
+    + Fixed a bug in the anyLine parser. Previously it would parse an empty
+      string "", but it should fail on an empty string, or we get an error
+      when it is used inside "many" combinators.
+    + Removed followedBy' parser, replacing it with the lookAhead parser from
+      Parsec. 
+    + Added some needed 'try's before multicharacter parsers, especially in 
+      'option' contexts.
+    + Removed the 'try' from the 'end' parser in 'enclosed', so that
+      'enclosed' behaves like 'option', 'manyTill', etc.
+    + Added lineClump parser, which parses a raw line block up to and
+      including any following blank lines.
+    + Renamed parseFromStr to parseFromString.
+    + Added a 'try' to the 'end' parser in 'enclosed'.  This makes errors in
+      the use of 'enclosed' less likely. Removed some now-unnecessary 'try's
+      in calling code.
+    + Removed unneeded 'try' in blanklines.
+    + Removed endsWith function and rewrote calling functions to use
+      isSuffixOf instead.
+    + Added >>~ combinator.
+    + Fixed bug in normalizeSpaces:  Space:Str "":Space should compress to
+      Space.
+
+  * Refactored runtests.pl; added separate tests for tables. 
+
+  * Shell scripts:
+
+    + Added -asxhtml flag to tidy in html2markdown. This will
+      perhaps help the parser, which expects closing tags.
+    + Modified markdown2pdf to run pdflatex a second time if --toc or
+      --table-of-contents was specified; otherwise the table of 
+      contents won't appear.
+    + Modified markdown2pdf to print a helpful message if the 'ulem'
+      LaTeX package is required and not found.
+ 
+  * Changes to build process:
+
+    + Dropped support for compilation with GHC 6.4.  GHC 6.6 or higher
+      is now required.
+    + Removed cabalize and Pandoc.cabal.in. The repository now contains
+      pandoc.cabal itself.
+    + Pandoc.cabal has been changed to pandoc.cabal, because HackageDB
+      likes the cabal file to have the same name as the tarball. 
+    + Expanded and revised the package description in pandoc.cabal.
+      Revised the package synopsis.
+    + The tarball built by 'make tarball' now contains files built from
+      templates (including man pages and shell scripts), so pandoc can
+      be built directly using Cabal tools, without preprocessing.
+    + Executable binaries are now stripped before installing.
+    + Man pages are now generated from markdown sources, using pandoc's
+      man page writer.
+    + Use HTML version of README (instead of RTF) in Mac OS X installer.
+    + Instead of testing for the existence of a pandoc symlink in build-exec,
+      use ln -f.
+
+  * Documentation:
+
+    + Updated README and man pages with information on new features.
+    + Updated INSTALL instructions with some useful clarifications and
+      links. 
+    + Updated web content.
+
+  * Added FreeBSD port.
+
+  [ Recai Oktaş ]
+
+  * debian/control:
+
+    + Changed pandoc's Build-Depends to include libghc6-mtl-dev and
+      libghc6-xhtml-dev.  Removed libghc6-html-dev.
+    + Suggest texlive-latex-recommended | tetex-extra instead of
+      tetex-bin.  This brings in fancyvrb and unicode support.
+
+
+ -- Recai Oktaş <roktas@debian.org>  Tue, 16 Jan 2007 00:37:21 +0200
+
+pandoc (0.3) unstable; urgency=low
+
+  [ John MacFarlane ]
+
+  * Changes in pandoc options:
+
+    + Allow options to follow or precede arguments.
+    + Changed '--smartypants' to '--smart' and adjusted symbols accordingly.
+    + Added '--strict' option.
+    + Added '-o/--output' option.
+    + Added '--dump-args' and '--ignore-args' options (for use in wrappers).
+    + Modified '-v' and '-h' output to go to STDERR, not STDOUT, and return
+      error conditions.  This is helpful for writing wrappers.
+    + Added copyright message to '-v' output, modeled after FSF messages.
+    + Reformatted usage message so that it doesn't wrap illegibly.
+    + Removed extra blanks after '-h' and '-D' output.
+
+  * Added docbook writer.
+
+  * Added implicit setting of default input and output format based
+    on input and output filename extensions.  These defaults are
+    overridden if explicit input and output formats are specified using
+    '-t', '-f', '-r', or '-w' options.  Documented in pandoc(1) man page
+    and README.
+
+  * Allow ordered list items to begin with (single) letters, as well
+    as numbers.  The list item marker may now be terminated either by
+    '.' or by ')'.  This extension to standard markdown is documented
+    in README.
+
+  * Revised footnote syntax.  (See README for full details.)  The
+    '[^1]' format now standard in markdown extensions is supported,
+    as are inline footnotes with this syntax: '^[My note.]'.
+    The earlier footnote syntax '^(1)' is no longer supported.
+
+  * Improved HTML representation of footnotes.  All footnotes
+    are now auto-numbered and appear in an ordered list at the
+    end of the HTML document.  Since the default appearance is now
+    acceptable, the old footnote styles have been removed from the
+    HTML header.
+
+  * Bug fixes:
+
+    + Fixed a serious bug in the markdown, LaTeX, and RST readers.
+      These readers ran 'runParser' on processed chunks of text to handle
+      embedded block lists in lists and quotation blocks.  But then
+      any changes made to the parser state in these chunks was lost,
+      as the state is local to the parser.  So, for example, footnotes
+      didn't work in quotes or list items.  The fix:  instead of calling
+      runParser on some raw text, use setInput to make it the input, then
+      parse it, then use setInput to restore the input to what it was
+      before.  This is shorter and more elegant, and it fixes the problem.
+    + Fixed bug in notFollowedBy' combinator (adding 'try' before
+      'parser').  Adjusted code that uses this combinator accordingly.
+    + Fixed bug in RTF writer that caused improper indentation on
+      footnotes occurring in indented blocks like lists.
+    + Fixed parsing of metadata in LaTeX reader.  Now the title, author,
+      and date are parsed correctly.  Everything else in the preamble
+      is skipped.
+    + Modified escapedChar in LaTeX reader to allow a '\' at the end of a
+      line to count as escaped whitespace.
+    + Modified LaTeX reader to produce inline links rather than reference
+      links.  Otherwise, links in footnotes aren't handled properly.
+    + Fixed handling of titles in links in Markdown reader, so that
+      embedded quotation marks are now handled properly.
+    + Fixed Markdown reader's handling of embedded brackets in links.
+    + Fixed Markdown reader so that it only parses bracketed material
+      as a reference link if there is actually a corresponding key.
+    + Revised inline code parsing in Markdown reader to conform to
+      markdown standard.  Now any number of `s can begin inline code,
+      which will end with the same number of `s.  For example, to
+      have two backticks as code, write ``` `` ```.  Modified Markdown
+      writer accordingly.
+    + Fixed bug in text-wrapping routine in Markdown and RST writers.
+      Now LineBreaks no longer cause wrapping problems.
+    + Supported hexadecimal numerical entity references as well as
+      decimal ones.
+    + Fixed bug in Markdown reader's handling of underscores and other
+      inline formatting markers inside reference labels:  for example,
+      in '[A_B]: /url/a_b', the material between underscores was being
+      parsed as emphasized inlines.
+    + Changed Markdown reader's handling of backslash escapes so that
+      only non-alphanumeric characters can be escaped.  Strict mode
+      follows Markdown.pl in only allowing a select group of punctuation
+      characters to be escaped.
+    + Modified HTML reader to skip a newline following a <br> tag.
+      Otherwise the newline will be treated as a space at the beginning
+      of the next line.
+
+  * Made handling of code blocks more consistent.  Previously, some
+    readers allowed trailing newlines, while others stripped them.
+    Now, all readers strip trailing newlines in code blocks. Writers
+    insert a newline at the end of code blocks as needed.
+
+  * Modified readers to make spacing at the end of output more consistent.
+
+  * Minor improvements to LaTeX reader:
+
+    + '\thanks' now treated like a footnote.    
+    + Simplified parsing of LaTeX command arguments and options.
+      commandArgs now returns a list of arguments OR options (in
+      whatever order they appear).  The brackets are included, and
+      a new stripFirstAndLast function is provided to strip them off
+      when needed.  This fixes a problem in dealing with \newcommand
+      and \newenvironment.
+
+  * Revised RTF writer:
+
+    + Default font is now Helvetica.
+    + An '\f0' is added to each '\pard', so that font resizing works
+      correctly.
+
+  * Moved handling of "smart typography" from the writers to the Markdown
+    and LaTeX readers.  This allows great simplification of the writers
+    and more accurate smart quotes, dashes, and ellipses.  DocBook can
+    now use '<quote>'.  The '--smart' option now toggles an option in
+    the parser state rather than a writer option.  Several new kinds
+    of inline elements have been added: Quoted, Ellipses, Apostrophe,
+    EmDash, EnDash.
+
+  * Changes in HTML writer:
+
+    + Include title block in header even when title is null.
+    + Made javascript obfuscation of emails even more obfuscatory,
+      by combining it with entity obfuscation.
+
+  * Changed default ASCIIMathML text color to black.
+
+  * Test suite:
+
+    + Added --strip-trailing-cr option to diff in runtests.pl, for
+      compatibility with Windows.
+    + Added regression tests with footnotes in quote blocks and lists.
+
+  * Makefile changes:
+
+    + osx-pkg target creates a Mac OS X package (directory). New osx
+      directory contains files needed for construction of the package.
+    + osx-dmg target creates a compressed disk image containing the package.
+    + win-pkg target creates Windows binary package.
+    + tarball target creates distribution source tarball.
+    + website target generates pandoc's website automatically, including
+      demos.  New 'web' directory containts files needed for construction
+      of the website (which will be created as the 'pandoc' subdirectory
+      of 'web').
+    + Makefile checks to see if we're running Windows/Cygwin; if so,
+      a '.exe' extension is added to each executable in EXECS.
+
+  * Removed all wrappers except markdown2pdf and html2markdown.
+
+  * Added new wrapper hsmarkdown, to be used as a drop-in replacement
+    for Markdown.pl.  hsmarkdown calls pandoc with the '--strict'
+    option and disables other options.
+
+  * Added code to html2markdown that tries to determine the character 
+    encoding of an HTML file, by parsing the "Content-type" meta tag.
+
+    + If the encoding can't be determined, then if the content is local,
+      the local encoding is used; if it comes from a URL, UTF-8 is used 
+      by default.
+    + If input is from STDIN, don't try to determine character encoding.
+    + Encoding can be specified explicitly using '-e' option.
+
+  * Improved warning messages in wrappers:
+
+    + Print warning if iconv not available
+    + More user-friendly error messages in markdown2pdf, when
+      pdflatex fails.
+
+  * Code cleanup:
+
+    + Renamed 'Text/Pandoc/HtmlEntities' module to 
+      'Text/Pandoc/Entities'. Also changed function names so as
+      not to be HTML-specific.
+    + Refactored SGML string escaping functions from HTML and Docbook
+      writers into Text/Pandoc/Shared.  (escapeSGML, stringToSGML)
+    + Removed 'BlockQuoteContext' from ParserContext, as it isn't
+      used anywhere.
+    + Removed splitBySpace and replaced it with a general, polymorphic
+      splitBy function.
+    + Refactored LaTeX reader for clarity (added isArg function).
+    + Converted some CR's to LF's in src/ui/default/print.css.
+    + Added license text to top of source files.
+    + Added module data for haddock to source files.
+    + Reformatted code for consistency.
+
+  * Rewrote documentation and man pages.  Split README into INSTALL
+    and README.
+
+  * Split LICENSE into COPYING and COPYRIGHT.
+
+  * Removed TODO, since we now maintain ToDo on the wiki.
+
+  * Made COPYRIGHT in top level a symlink to debian/copyright, to avoid
+    duplication.
+
+  [ Recai Oktaş ]
+
+  * Revamped build process to conform to debian standards and created
+    a proper debian package.  Closes: #391666.
+
+  * Modified build process to support GHC 6.6.
+
+    + The package can still be compiled using GHC 6.4.2, though because
+      of dependencies the "make deb" target works only with GHC 6.6+.
+    + The script 'cabalize' is used to create an appropriate
+      'Pandoc.cabal' from 'Pandoc.cabal.in', depending on the GHC and
+      Cabal versions.
+
+  * Refactored template processing (fillTemplates.pl).
+
+  * Modified wrapper scripts to make them more robust and portable.
+    To avoid code duplication and ensure consistency, wrappers are 
+    generated via a templating system from templates in src/wrappers.
+
+    + Wrappers now accept multiple filenames, when appropriate.
+    + Spaces and tabs allowed in filenames.
+    + getopts shell builtin is used for portable option parsing.
+    + Improved html2markdown's web grabber code, making it more robust,
+      configurable and verbose.  Added '-e', '-g' options.
+
+ -- Recai Oktaş <roktas@debian.org>  Fri, 05 Jan 2007 09:41:19 +0200
+
+pandoc (0.2) unstable; urgency=low
+
+  * Fixed unicode/utf-8 translation
+
+ -- John MacFarlane <jgm@berkeley.edu>  Mon,  14 Aug 2006 00:00:00 -0400
+
+pandoc (0.1) unstable; urgency=low
+
+  * Initial creation of debian package 
+
+ -- John MacFarlane <jgm@berkeley.edu>  Mon,  14 Aug 2006 00:00:00 -0400
