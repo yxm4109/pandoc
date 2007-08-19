@@ -1,0 +1,81 @@
+#!/bin/sh -e
+
+REQUIRED="pdflatex"
+SYNOPSIS="converts markdown-formatted text to PDF, using pdflatex."
+
+### common.sh
+
+### tempdir.sh
+
+texname=output
+logfile=$THIS_TEMPDIR/log
+
+pandoc -s -r markdown -w latex "$@" -o $THIS_TEMPDIR/$texname.tex
+
+if [ "$OUTPUT" = "-" ]; then
+    firstinfile="$(echo $ARGS | sed -ne '1p')"
+    firstinfilebase="${firstinfile%.*}"
+    destname="${firstinfilebase:-stdin}.pdf"
+else
+    destname="$OUTPUT"
+fi
+
+(
+    origdir=$(pwd)
+    cd $THIS_TEMPDIR
+    TEXINPUTS=$origdir:$TEXINPUTS:
+    export TEXINPUTS
+    finished=no
+    runs=0
+    while [ $finished = "no" ]; do
+      pdflatex -interaction=batchmode $texname.tex >/dev/null || {
+        errcode=$?
+        err "${THIS}: pdfLaTeX failed with error code $errcode"
+        [ -f $texname.log ] && {
+          err "${THIS}: error context:"
+          sed -ne '/^!/,/^[[:space:]]*$/p' \
+            -ne '/^[Ll]a[Tt]e[Xx] [Ww]arning/,/^[[:space:]]*$/p' \
+            -ne '/^[Ee]rror/,/^[[:space:]]*$/p' $texname.log >&2
+          if grep -q "File \`ucs.sty' not found" $texname.log; then
+            err "${THIS}: Please install the 'unicode' package from CTAN:"
+            err "  http://www.ctan.org/tex-archive/macros/latex/contrib/unicode/"
+          fi
+          if grep -q "File \`ulem.sty' not found" $texname.log; then
+            err "${THIS}: Please install the 'ulem' package from CTAN:"
+            err "  http://www.ctan.org/tex-archive/macros/latex/contrib/misc/ulem.sty"
+          fi
+        }
+        exit $errcode
+      }
+      if [ $runs -lt 3 ] && 
+      ((grep -q "LaTeX Warning: There were undefined references." $texname.log) ||
+       (echo "$@" | grep -q -- "--toc\|--table-of-contents")); then
+        runs=$(($runs + 1))
+        if grep -q "LaTeX Warning:.*[Cc]itation" $texname.log; then
+          bibtex $texname 2>&1 >bibtex.err
+          if [ $runs -gt 2 ]; then
+            if grep -q "error message" bibtex.err ||
+            grep -q "Warning" bibtex.err; then
+              cat bibtex.err >&2
+            fi
+          fi
+        fi
+      else
+        finished=yes
+      fi
+    done
+) || exit $?
+
+is_target_exists=
+if [ -f "$destname" ]; then
+    is_target_exists=1
+    mv "$destname" "$destname~" 
+fi
+
+mv -f $THIS_TEMPDIR/$texname.pdf "$destname"
+
+errn "Created $destname"
+[ -z "$is_target_exists" ] || {
+    errn " (previous file has been backed up as $destname~)"
+}
+err .
