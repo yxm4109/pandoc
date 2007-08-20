@@ -148,3 +148,14 @@ And
 
 In both cases, `Markdown.pl` produces sublists (in the
 way indicated by the item numbering) and pandoc does not.
+
+== Nested emphasis and strong emphasis ==
+
+{{{
+***bold** in italics*
+}}}
+
+Markdown.pl's output:
+{{{
+<p><strong><em>bold</strong> in italics</em></p>
+}}}
