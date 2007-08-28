@@ -1,12 +1,13 @@
 ﻿#summary Benchmarks comparing Pandoc to Markdown.pl.
 
-= Pandoc r836 =
 This benchmark uses the sources for Allan Odgaard's
 [http://macromates.com/textmate/manual/ TextMate manual], available at
 http://macromates.com/textmate/manual/source.tbz. These sources were
 concatenated into a single file, `textmate_manual.txt`, 178K in size. The
 test machine is an Intel Core Duo 1.66GHz, 1G RAM, running Ubuntu linux.
 Pandoc was compiled with the '-O0' optimization flag.
+
+== Markdown.pl ==
 
 {{{
 $ Markdown.pl --version
@@ -32,7 +33,27 @@ $ time markdown textmate_manual.txt >/dev/null
 real    0m10.300s
 user    0m10.249s
 sys     0m0.020s
+}}}
 
+== pandoc r940 ==
+
+{{{
+$ time ./pandoc textmate_manual.txt >/dev/null
+
+real    0m2.921s
+user    0m2.876s
+sys     0m0.036s
+
+$ time ./pandoc --strict textmate_manual.txt >/dev/null
+
+real    0m2.010s
+user    0m1.988s
+sys     0m0.016s
+}}}
+
+== pandoc r836 ==
+
+{{{
 $ time ./pandoc textmate_manual.txt >/dev/null
 
 real    0m7.061s
@@ -49,18 +70,3 @@ $
 
 Compiling pandoc with -O1 does not seem to yield a big
 advantage (but takes much longer and yields a binary twice as large):
-
-{{{
-$ time ./pandoc textmate_manual.txt >/dev/null
-
-real    0m6.065s
-user    0m5.988s
-sys     0m0.060s
-
-$ time ./pandoc --strict textmate_manual.txt >/dev/null
-
-real    0m3.394s
-user    0m3.348s
-sys     0m0.012s
-}}}
-
