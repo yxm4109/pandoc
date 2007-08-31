@@ -38,12 +38,6 @@ sys     0m0.020s
 == pandoc r969 ==
 
 {{{
-$ time ./pandoc textmate_manual.txt >/dev/null
-
-real    0m2.224s
-user    0m2.208s
-sys     0m0.012s
-
 $ time ./pandoc --strict textmate_manual.txt >/dev/null
 
 real    0m1.462s
@@ -54,12 +48,6 @@ sys     0m0.020s
 == pandoc r940 ==
 
 {{{
-$ time ./pandoc textmate_manual.txt >/dev/null
-
-real    0m2.921s
-user    0m2.876s
-sys     0m0.036s
-
 $ time ./pandoc --strict textmate_manual.txt >/dev/null
 
 real    0m2.010s
@@ -70,12 +58,6 @@ sys     0m0.016s
 == pandoc r836 ==
 
 {{{
-$ time ./pandoc textmate_manual.txt >/dev/null
-
-real    0m7.061s
-user    0m7.004s
-sys     0m0.052s
-
 $ time ./pandoc --strict textmate_manual.txt >/dev/null
 
 real    0m4.005s
