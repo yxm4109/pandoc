@@ -35,6 +35,22 @@ user    0m10.249s
 sys     0m0.020s
 }}}
 
+== pandoc r969 ==
+
+{{{
+$ time ./pandoc textmate_manual.txt >/dev/null
+
+real    0m2.224s
+user    0m2.208s
+sys     0m0.012s
+
+$ time ./pandoc --strict textmate_manual.txt >/dev/null
+
+real    0m1.462s
+user    0m1.440s
+sys     0m0.020s
+}}}
+
 == pandoc r940 ==
 
 {{{
