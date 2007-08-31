@@ -37,11 +37,21 @@ sys     0m0.020s
 
 == pandoc r969 ==
 
+Compiled with -O0:
 {{{
-$ time ./pandoc --strict textmate_manual.txt >/dev/null
+x$ time ./pandoc --strict textmate_manual.txt >/dev/null
 
 real    0m1.462s
 user    0m1.440s
+sys     0m0.020s
+}}}
+
+Compiled with -O2 (much slower compile, much bigger executable):
+{{{
+$ time ./pandoc --strict textmate_manual.txt >/dev/null
+
+real    0m1.293s
+user    0m1.248s
 sys     0m0.020s
 }}}
 
@@ -65,6 +75,3 @@ user    0m3.984s
 sys     0m0.016s
 $ 
 }}}
-
-Compiling pandoc with -O1 does not seem to yield a big
-advantage (but takes much longer and yields a binary twice as large):
