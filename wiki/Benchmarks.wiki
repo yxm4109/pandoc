@@ -35,11 +35,22 @@ user    0m10.249s
 sys     0m0.020s
 }}}
 
+== pandoc r979 ==
+
+{{{
+$ time ./pandoc --strict textmate_manual.txt >/dev/null
+
+real    0m1.089s
+user    0m1.064s
+sys     0m0.012s
+}}}
+
+
 == pandoc r969 ==
 
 Compiled with -O0:
 {{{
-x$ time ./pandoc --strict textmate_manual.txt >/dev/null
+$ time ./pandoc --strict textmate_manual.txt >/dev/null
 
 real    0m1.462s
 user    0m1.440s
