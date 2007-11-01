@@ -2,7 +2,7 @@
 
 Courtesy of Idris Samawi Hamid
 
-= I. Headings
+==I. Headings==
 
 There are two issues in the way pandoc translates headings into ConTeXt:
 
@@ -51,7 +51,7 @@ A Subtopic
 }}}
 In ConTeXt we use \title, \subject, etc. for unordered headings.
 
-= II. Quotes
+==II. Quotes==
 
 A. Inline quotes
 
@@ -87,7 +87,7 @@ iii. There is a spurious blank line before \stopblockquote. Indeed, there
 are spurious spaces before the end of many of your \start-stop  
 constructions, as well as missing blank spaces after those constructions.
 
-= III. Lists
+==III. Lists==
 
 The ConTeXt philosophy of lists calls for a different approach: No need  
 for new, nonstandard constructions (like \startltxitem), no need for \sym;  
@@ -191,7 +191,7 @@ consistently. So there is no need to exacly mimic the settings of lists,
 etc; it's much more important to capture the structure as abstractly as  
 possible.
 
-= IV. Emphasize and Bold
+==IV. Emphasize and Bold==
 
 If we want to be really precise and do things the ConTeXt way, then we  
 should define a new control sequence like
@@ -224,7 +224,7 @@ bold. From a TeX/typographic point of view this is a huge distinction. But
 markdown has its own purpose so maybe the distinction is not so important  
 there...
 
-= V. Footnotes
+==V. Footnotes==
 
 Pandoc output:
 
@@ -245,4 +245,3 @@ This sentence contains no footnote.
 }}}
 
 There is no spurious space after the first line; \footnote gobbles it.
-
