@@ -53,14 +53,6 @@ In ConTeXt we use \title, \subject, etc. for unordered headings.
 
 ==II. Quotes==
 
-A. Inline quotes
-
-For eg. quotation using U201C and U201D maybe you could translate that  
-to \quotation{...} as well, though I guess these quotes
-are not part of markdown  syntax so...
-
-B. Block Quotes
-
 There are three issues:
 
 i) When run in fragment mode (no -s switch), all of your defined control  
@@ -169,11 +161,6 @@ And yet another.
 }}}
 
 Here is a post paragraph sentence (with a blank space after \stopitemize).
-
-D. An ordered list with nesting and paragraphs:
-
-The output seems buggy; I don't get level-2 paragraphs. Maybe my markdown  
-syntax is wrong?
 
 There's more in test-context-r.tex. Note that nested ordered list are  
 defined for the document in the preamble, for example:
