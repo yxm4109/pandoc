@@ -137,3 +137,13 @@ yields
 Or see PHP Markdown Extra on abbreviations.  That's a pretty nice system, I think.  Michael Fortin says (on Markdown discusion list) that <acronym>
 has been removed from HTML5 on grounds that it's usually pointless to
 distinguish acronyms from other kinds of abbreviations.
+
+Aristotle Pagaltzis points out on markdown-discuss that many extensions
+can be achieved by using regular markdown link syntax:  e.g.,
+{{{
+    [RDF](abbr: "Reality Distortion Field")
+}}}
+which could be transformed into
+{{{
+    <abbr title="Reality Distortion Field">RDF</abbr>
+}}}
