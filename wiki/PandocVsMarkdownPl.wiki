@@ -1,5 +1,14 @@
 ﻿#summary List of cases where `Markdown.pl` fails and Pandoc does the right thing.
 
+[http://babelmark.bobtfish.net Babelmark] is a web page that allows you to compare
+various markdown implementations (thanks to Michel Fortin and Tom Doran).
+Here are some of my favorites:
+
+  * http://babelmark.bobtfish.net/?markdown=-+foo%0D%0A-+bar%0D%0A%0D%0A1.+first%0D%0A2.+second%0D%0A&normalize=on
+  * http://babelmark.bobtfish.net/?markdown=%2B+++item+1%0D%0A%0D%0A++++%2B+++item+2%0D%0A%0D%0A+*+++*+++*+++*+++*&normalize=on
+  * http://babelmark.bobtfish.net/?markdown=+8.+item+1%0D%0A+9.+item+2%0D%0A10.+item+2a&normalize=on
+  * http://babelmark.bobtfish.net/?markdown=x%3Cmax(a%2Cb)%0D%0A&normalize=on
+
 == Indentation in multiple blocks in list items ==
 
 http://thread.gmane.org/gmane.text.markdown.general/2341/focus=2342
