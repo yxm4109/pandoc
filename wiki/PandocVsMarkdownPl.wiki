@@ -1,5 +1,7 @@
 ﻿#summary List of cases where `Markdown.pl` fails and Pandoc does the right thing.
 
+== Babelmark test cases ==
+
 [http://babelmark.bobtfish.net Babelmark] is a web page that allows you to compare
 various markdown implementations (thanks to Michel Fortin and Tom Doran).
 Here are some of my favorites:
