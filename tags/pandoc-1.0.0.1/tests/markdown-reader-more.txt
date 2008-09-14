@@ -1,0 +1,24 @@
+# Additional markdown reader tests
+
+## Blank line before URL in link reference
+
+[foo] and [bar]
+
+[foo]: 
+  /url
+
+[bar]:
+/url
+"title"
+
+## Raw ConTeXt environments
+
+\placeformula \startformula
+   L_{1} = L_{2}
+   \stopformula
+
+\start[a2]
+\start[a2]
+\stop[a2]
+\stop[a2]
+

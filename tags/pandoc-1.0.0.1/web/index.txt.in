@@ -1,0 +1,183 @@
+% Pandoc
+
+# Overview
+
+Pandoc is a [Haskell] library for converting from one markup format
+to another, and a command-line tool that uses this library. It can read
+[markdown] and (subsets of) [reStructuredText], [HTML], and [LaTeX],
+and it can write [markdown], [reStructuredText], [HTML], [LaTeX], [ConTeXt],
+[PDF], [RTF], [DocBook XML], [OpenDocument XML], [ODT], [GNU Texinfo],
+[MediaWiki markup], [groff man] pages, and [S5] HTML slide shows.
+
+Pandoc features
+
+- Modular design, using separate writers and readers for each
+  supported format.
+- A real markdown parser, not based on regex substitutions.
+  [More accurate] and [much faster] than `Markdown.pl`.
+- Also parses (subsets of) reStructuredText, LaTeX, and HTML.
+- Multiple output formats: HTML, Docbook XML, LaTeX, ConTeXt,
+  reStructuredText, Markdown, RTF, groff man pages, OpenDocument
+  XML, ODT (Open Office document), MediaWiki, GNU Texinfo,
+  S5 slide shows.
+- Unicode support.
+- Optional "smart" quotes, dashes, and ellipses.
+- Automatically generated tables of contents.
+- Support for displaying math in HTML.
+- Extensions to markdown syntax:
+    + Document metadata (title, author, date).
+    + Footnotes, tables, and definition lists.
+    + Superscripts, subscripts, and strikeout.
+    + Inline LaTeX math and LaTeX commands.
+    + Markdown inside HTML blocks.
+    + Enhanced ordered lists:  start number and numbering style
+      are significant.
+    + Delimited (unindented) code blocks with syntax highlighting.
+    + Compatibility mode to turn off syntax entensions and emulate
+      `Markdown.pl`.
+- Convenient wrapper scripts:
+    + `markdown2pdf` converts directly from markdown to PDF, using
+      `pdflatex`.
+    + `html2markdown` makes it easy to produce a markdown version
+      of any web page.
+    + `hsmarkdown` is a drop-in replacement for `Markdown.pl`.
+- Multi-platform:  runs on Windows, MacOS X, Linux, Unix.
+- Free software, released under the [GPL].
+
+To see what pandoc can do, see the [demonstration page](examples.html),
+or [try pandoc on the web](/pandoc/try).
+
+# Documentation
+
+- [User's Guide](README.html)
+- [Demonstrations](examples.html)
+- Man pages
+    - [`pandoc(1)`](pandoc.1.html)
+    - [`markdown2pdf(1)`](markdown2pdf.1.html)
+    - [`html2markdown(1)`](html2markdown.1.html)
+    - [`hsmarkdown(1)`](hsmarkdown.1.html)
+- [Library documentation](doc/pandoc/index.html) (for Haskell programmers)
+- [Installation instructions](INSTALL.html)
+- [Changelog](changelog.txt)
+
+# Downloads
+
+For installation instructions for all architectures, see
+[INSTALL](INSTALL.html). Pandoc is in the [MacPorts], [Debian unstable],
+[Ubuntu], and [FreeBSD ports] repositories. Abhishek Dasgupta has also
+contributed an [Arch linux PKGBUILD script]. Note that the version of
+pandoc in these repositories may not be the most recent.
+
+- [Source tarball]
+- [Windows installer]
+
+# Code repository
+
+Pandoc has a publicly accesible subversion repository at Google
+Code (<http://code.google.com/p/pandoc>). To check out the latest,
+bleeding-edge source code:
+
+    svn checkout http://pandoc.googlecode.com/svn/trunk/ pandoc
+
+# Reporting bugs
+
+You may view existing bug reports and submit new ones at 
+<http://code.google.com/p/pandoc/issues/list>.
+
+# Mailing lists
+
+- [pandoc-announce]:  Announcements of new releases only.
+- [pandoc-discuss]:  General discussion of pandoc.
+
+# News
+
+-   Version 1.0 release (September 13, 2008).
+
+    + New writers for MediaWiki, GNU Texinfo (thanks to Peter Wang),
+      OpenDocument XML (thanks to Andrea Rossato), and ODT (OpenOffice
+      document).
+    + New [delimited code blocks](README.html#delimited-code-blocks),
+      with optional syntax highlighting.
+    + Reorganized build system:  pandoc can now be built using standard
+      Cabal tools.  It can be compiled on Windows without Cygwin.
+      The tests can also be run without perl or unix tools.
+    + LaTeXMathML replaces ASCIIMathML for rendering math in HTML.
+    + Support for "displayed" math.
+    + Common abbreviations are now handled more intelligently, with
+      a non-breaking space (and not a sentence-ending space) after
+      the period.
+    + Code is -Wall clean.
+    + Many bug fixes and small improvements.  See [changelog] for
+      full details.
+
+-   Version 0.46 released (January 8, 2008).
+
+    + Added a `--sanitize-html` option (and a corresponding parameter
+      in `ParserState` for those using the pandoc libraries in programs).
+      This option causes pandoc to sanitize HTML (in HTML or Markdown
+      input) using a whitelist method. Possibly harmful HTML elements
+      are replaced with HTML comments. This should be useful in the
+      context of web applications, where pandoc may be used to convert
+      user input into HTML.
+    + Made -H, -A, and -B options cumulative: if they are specified
+      multiple times, multiple files will be included.
+    + Many bug fixes and small improvements.  See [changelog] for full
+      details.
+
+-   Version 0.45 released (December 9, 2007).
+
+    + Many bug fixes and structural improvements.  See [changelog] for
+      full details.
+    + Improved treatment of math. Math is now rendered using unicode
+      by default in HTML, RTF, and DocBook output. For more accurate
+      display of math in HTML, `--gladtex`, `--mimetex`, and `--asciimathml`
+      options are provided. See the [User's Guide](README.html#math) for
+      details.
+    + Removed support for box-style block quotes in markdown.
+    + More idiomatic ConTeXt output.
+    + Text wrapping in ConTeXt and LaTeX output.
+    + Pandoc now correctly handles all standard line endings
+      (CR, LF, CRLF).
+    + New `--no-wrap` option that disables line wrapping and minimizes
+      whitespace in HTML output.
+    + Build process is now compatible with both GHC 6.8 and GHC 6.6.
+      GHC and GHC_PKG environment variables may be used to specify
+      which version of the compiler to use, when multiple versions are
+      installed.
+
+# Disclaimer
+
+Pandoc carries no warranties of any kind.
+
+[More accurate]: http://code.google.com/p/pandoc/wiki/PandocVsMarkdownPl
+[much faster]: http://code.google.com/p/pandoc/wiki/Benchmarks
+ 
+[John MacFarlane]: http://johnmacfarlane.net/
+[markdown]: http://daringfireball.net/projects/markdown/
+[reStructuredText]: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
+[S5]: http://meyerweb.com/eric/tools/s5/
+[HTML]:  http://www.w3.org/TR/html40/
+[LaTeX]:  http://www.latex-project.org/
+[ConTeXt]: http://www.pragma-ade.nl/ 
+[RTF]:  http://en.wikipedia.org/wiki/Rich_Text_Format
+[PDF]: http://en.wikipedia.org/wiki/Portable_Document_Format
+[ODT]: http://en.wikipedia.org/wiki/OpenDocument
+[DocBook XML]: http://www.docbook.org/
+[OpenDocument XML]: http://opendocument.xml.org/
+[MediaWiki markup]: http://www.mediawiki.org/wiki/Help:Formatting
+[groff man]: http://developer.apple.com/DOCUMENTATION/Darwin/Reference/ManPages/man7/groff_man.7.html
+[GNU Texinfo]: http://www.gnu.org/software/texinfo/
+[Haskell]:  http://www.haskell.org/
+[GHC]:  http://www.haskell.org/ghc/
+[GPL]:  http://www.gnu.org/copyleft/gpl.html
+[Source tarball]: http://code.google.com/p/pandoc/downloads/detail?name=pandoc-@VERSION@.tar.gz "Download source tarball from Pandoc's Google Code site"
+[Windows installer]: http://code.google.com/p/pandoc/downloads/detail?name=pandoc-@VERSION@-setup.exe "Download Windows installer from Pandoc's Google Code site"
+[Debian unstable]: http://packages.debian.org/unstable/text/pandoc
+[FreeBSD ports]: http://www.freshports.org/textproc/pandoc/
+[Arch linux PKGBUILD script]: http://aur.archlinux.org/packages.php?do_Details=1&ID=12751&O=0&L=0&C=0&K=pandoc&SB=n&SO=a&PP=25&do_MyPackages=0&do_Orphans=0&SeB=nd
+[Ubuntu]: http://www.ubuntu.com
+[MacPorts]: http://db.macports.org/port/show/4218
+[pandoc-announce]: http://groups.google.com/group/pandoc-announce
+[pandoc-discuss]: http://groups.google.com/group/pandoc-discuss
+[changelog]: changelog.txt
+
